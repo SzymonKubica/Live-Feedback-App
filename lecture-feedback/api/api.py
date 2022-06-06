@@ -12,7 +12,8 @@ def index():
 @app.route("/test")
 @cross_origin()
 def test():
-    return {"test":"hello there sir"}
+    import random
+    return {"test":random.randint(0,100)}
 
 if __name__ == "__main__":
     app.run()

@@ -13,7 +13,7 @@ function App() {
   
   return (
     <div className="App">
-      <p>{state}</p>
+      <p>your random number is {state}</p>
     </div>
   );
 }
