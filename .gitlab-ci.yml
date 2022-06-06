@@ -1,12 +1,26 @@
 stages:
-  # - build
+  - build
   # - test
   - deploy
 
 
+build_job:
+  image: node:16.15.1
+  stage: build
+  script:
+    - npm --prefix lecture-feedback install
+    - CI=false npm --prefix lecture-feedback run build
+  artifacts:
+    paths:
+      - lecture-feedback/build
+    expire_in: 1 hour
+
 deploy_job:
-  image: ruby:latest
+  image: ruby:2.7.5
   stage: deploy
   script:
-    - gem install dpl --verbose
-    - dpl --provider=heroku --app=lecture-feedback-frontend --api-key=$HEROKU_API
+    - cp lecture-feedback/api/requirements.txt .
+    - gem install dpl --pre
+    - dpl --provider=heroku --app=lecture-feedback-drp --api-key=$HEROKU_API
+  only:
+    - master

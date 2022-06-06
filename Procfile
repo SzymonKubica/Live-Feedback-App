@@ -1,0 +1,1 @@
+web: gunicorn lecture-feedback.api.api:app
