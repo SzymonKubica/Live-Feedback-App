@@ -19,6 +19,6 @@ deploy_job:
   image: ruby:latest
   stage: deploy
   script:
-    - ls
+    - cp lecture-feedback/api/Procfile .
     - gem install dpl --verbose
     - dpl --provider=heroku --app=lecture-feedback-frontend --api-key=$HEROKU_API
