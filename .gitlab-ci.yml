@@ -8,7 +8,7 @@ build_job:
   image: node:16.15.1
   stage: build
   script:
-    - npm --prefix lecture-feedback build
+    - npm --prefix lecture-feedback run build
 
 deploy_job:
   image: ruby:latest
