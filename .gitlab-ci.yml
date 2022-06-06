@@ -18,7 +18,7 @@ stages:
 deploy_job:
   image: ruby:latest
   stage: deploy
-  skip_cleanup: true
+  #skip_cleanup: true
   script:
     # - cp lecture-feedback/api/Procfile .
     # - cp lecture-feedback/api/requirements.txt .
