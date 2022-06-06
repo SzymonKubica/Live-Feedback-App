@@ -22,6 +22,6 @@ deploy_job:
   #skip_cleanup: true
   script:
     # - cp lecture-feedback/api/Procfile .
-    # - cp lecture-feedback/api/requirements.txt .
+    - cp lecture-feedback/api/requirements.txt .
     - gem install dpl --pre
     - dpl --provider=heroku --app=lecture-feedback-frontend --api-key=$HEROKU_API
