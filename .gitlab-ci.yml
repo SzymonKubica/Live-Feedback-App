@@ -21,4 +21,4 @@ deploy_job:
   script:
     - cp lecture-feedback/api/requirements.txt .
     - gem install dpl --pre
-    - dpl --provider=heroku --app=lecture-feedback-frontend --api-key=$HEROKU_API
+    - dpl --provider=heroku --app=lecture-feedback-drp --api-key=$HEROKU_API
