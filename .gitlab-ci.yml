@@ -16,7 +16,7 @@ build_job:
     expire_in: 1 hour
 
 deploy_job:
-  image: ruby:latest
+  image: ruby:2.7.5
   stage: deploy
   # deploy.skip_cleanup: true
   #skip_cleanup: true
