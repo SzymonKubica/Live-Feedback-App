@@ -1,11 +1,20 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  const [state, setState] = useState("")
+
+  useEffect(() => {
+    fetch("/test").then(res => res.json()).then(data=> {
+      setState(data.test)
+    })
+  },[])
+  
   return (
     <div className="App">
-      <header className="App-header">
+      <p>{state}</p>
+      {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
@@ -18,7 +27,7 @@ function App() {
         >
           Learn React
         </a>
-      </header>
+      </header> */}
     </div>
   );
 }
