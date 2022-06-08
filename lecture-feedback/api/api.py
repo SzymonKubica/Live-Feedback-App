@@ -13,6 +13,11 @@ CORS(app)
 
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+# When there is a 404, we send it to react so it can deal with it
+@app.errorhandler(404)
+def not_found(e):
+    return app.send_static_file("index.html")
+
 @app.route("/")
 @cross_origin()
 def index():
