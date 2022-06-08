@@ -1,13 +1,9 @@
 import React, {useState, useEffect} from "react";
-import { Button, ButtonGroup } from '@chakra-ui/react'
 import socketIOClient from "socket.io-client";
-import { socket } from "../../context/socket";
-
-const ENDPOINT = "http://127.0.0.1:5000";
+import { socket } from "../context/socket";
 
 
-export const ButtonSocketComponent = () => {
-
+export const SocketCounter = () => {
     const [confused, setConfused] = useState(0);
 
     useEffect(() => {
@@ -21,15 +17,8 @@ export const ButtonSocketComponent = () => {
 
     }, [])
 
-    function handleButton() {
-        socket.emit("confused")
-    }
-
-
-
     return (
     <div>
-        <Button colorScheme='blue' onClick={handleButton}>Button</Button>
         <p>{confused}</p>
     </div>
     );
