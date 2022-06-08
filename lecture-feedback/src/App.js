@@ -1,4 +1,6 @@
 import React, {useState, useEffect}from 'react';
+import {SocketContext, socket} from './context/socket';
+import { ButtonSocketComponent } from './components/test/buttonSocket';
 
 import {
   ChakraProvider,
@@ -28,6 +30,11 @@ function App() {
         <Grid minH="100vh" p={3}>
           <ColorModeSwitcher justifySelf="flex-end" />
           <p>your random number is {state}</p>
+        
+        <SocketContext.Provider value={socket}>
+          <ButtonSocketComponent/>
+        </SocketContext.Provider>
+        
         </Grid>
       </Box>
     </ChakraProvider>
