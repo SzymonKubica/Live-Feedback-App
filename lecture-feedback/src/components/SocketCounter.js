@@ -3,12 +3,13 @@ import socketIOClient from "socket.io-client";
 import { socket } from "../context/socket";
 
 
-export const SocketCounter = () => {
-    const [confused, setConfused] = useState(0);
+export const SocketCounter = (props) => {
+    const [counter, setCounter] = useState(0);
 
     useEffect(() => {
-        socket.on("fromApi", data => {
-            setConfused(data.count);
+        socket.on("update " + props.reaction, data => {
+            setCounter(data.count)
+
         });
 
         // Disconnect when unmounts
@@ -19,7 +20,7 @@ export const SocketCounter = () => {
 
     return (
     <div>
-        <p>{confused}</p>
+        <p>{props.reaction}: {counter}</p>
     </div>
     );
 }
