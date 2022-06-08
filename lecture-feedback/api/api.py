@@ -2,8 +2,10 @@ from flask import Flask
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit
 
-count = 0
-
+goodCount = 0
+confusedCount = 0
+tooFastCount = 0
+chillingCount = 0
 
 app = Flask(__name__, static_folder='../build', static_url_path='/')
 
@@ -24,11 +26,9 @@ def test():
     import random
     return {"test":random.randint(0,100)}
 
-
 @socketio.on('connect')
 def test_connect():
     print("connected")
-    emit("fromApi",{"count":count})
 
 @socketio.on('disconnect')
 def test_disconnect():
@@ -37,17 +37,58 @@ def test_disconnect():
 
 @socketio.on("confused")
 def handleMessage():
-    global count
-    count += 1
-    emit("fromApi",{"count":count}, broadcast=True)
+    global confusedCount
+    confusedCount += 1
+    emit("update confused", {"count":confusedCount}, broadcast=True)
     # return None
 
 @socketio.on("no longer confused")
 def handleMessage():
-    global count
-    count -= 1
-    emit("fromApi",{"count":count}, broadcast=True)
+    global confusedCount
+    confusedCount -= 1
+    emit("update confused", {"count":confusedCount}, broadcast=True)
     # return None
 
+@socketio.on("good")
+def handleMessage():
+    global goodCount 
+    goodCount += 1
+    emit("update good", {"count":goodCount}, broadcast=True)
+    # return None
+
+@socketio.on("no longer good")
+def handleMessage():
+    global goodCount
+    goodCount -= 1
+    emit("update good", {"count":goodCount}, broadcast=True)
+    # return None
+
+@socketio.on("too fast")
+def handleMessage():
+    global tooFastCount
+    tooFastCount += 1
+    emit("update too fast", {"count":tooFastCount}, broadcast=True)
+    # return None
+
+@socketio.on("no longer too fast")
+def handleMessage():
+    global tooFastCount
+    tooFastCount -= 1
+    emit("update too fast", {"count":tooFastCount}, broadcast=True)
+    # return None
+
+@socketio.on("chilling")
+def handleMessage():
+    global chillingCount
+    chillingCount += 1
+    emit("update chilling", {"count":chillingCount}, broadcast=True)
+    # return None
+
+@socketio.on("no longer chilling")
+def handleMessage():
+    global chillingCount
+    chillingCount -= 1
+    emit("update chilling", {"count":chillingCount}, broadcast=True)
+    # return None
 if __name__ == "__main__":
     socketio.run()
