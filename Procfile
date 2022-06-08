@@ -1,1 +1,1 @@
-web: gunicorn lecture-feedback.api.api:app
+web: gunicorn -w 1 lecture-feedback.api.api:app --worker-class eventlet --reload

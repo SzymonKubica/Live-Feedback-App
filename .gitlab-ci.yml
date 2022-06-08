@@ -1,7 +1,8 @@
 stages:
   - build
   # - test
-  - deploy
+  - deploy_dev
+  - deploy_prod
 
 
 build_job:
@@ -15,12 +16,22 @@ build_job:
       - lecture-feedback/build
     expire_in: 1 hour
 
-deploy_job:
+deploy_dev_job:
   image: ruby:2.7.5
-  stage: deploy
+  stage: deploy_dev
+  script:
+    - cp lecture-feedback/api/requirements.txt .
+    - gem install dpl --pre
+    - dpl --provider=heroku --app=lecture-feedback-drp-dev --api-key=$HEROKU_API
+  only:
+     - dev
+
+deploy_prod_job:
+  image: ruby:2.7.5
+  stage: deploy_prod
   script:
     - cp lecture-feedback/api/requirements.txt .
     - gem install dpl --pre
     - dpl --provider=heroku --app=lecture-feedback-drp --api-key=$HEROKU_API
   only:
-    - master
+     - master
