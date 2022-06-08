@@ -5,21 +5,8 @@ import {
   Route,
 } from "react-router-dom"  
 
-import {
-  ChakraProvider,
-  Box,
-  Text,
-  Link,
-  VStack,
-  Code,
-  Grid,
-  theme,
-} from '@chakra-ui/react';
-import { ColorModeSwitcher } from './ColorModeSwitcher';
-import { Logo } from './Logo';
 import { StudentView } from './components/StudentView';
 import { LecturerView } from './components/LecturerView';
-import { RandomNumber } from './components/RandomNumber';
 
 function App() {
   const [state, setState] = useState("")
@@ -31,6 +18,7 @@ function App() {
   },[])
 
   return (
+    <div>
     <Router>
       <Fragment> 
       <Routes>
@@ -39,6 +27,7 @@ function App() {
       </Routes>
       </Fragment>
     </Router>
+    </div>
   );
 }
 

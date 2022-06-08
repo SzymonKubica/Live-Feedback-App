@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { socket, SocketContext } from "../context/socket";
 import { SocketButton } from "./SocketButton";
+import { ToggleButton } from "./ToggleButton";
 
 import {
   ChakraProvider,

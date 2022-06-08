@@ -42,5 +42,12 @@ def handleMessage():
     emit("fromApi",{"count":count}, broadcast=True)
     # return None
 
+@socketio.on("no longer confused")
+def handleMessage():
+    global count
+    count -= 1
+    emit("fromApi",{"count":count}, broadcast=True)
+    # return None
+
 if __name__ == "__main__":
     socketio.run()
