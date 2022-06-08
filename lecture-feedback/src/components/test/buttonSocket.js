@@ -3,9 +3,6 @@ import { Button, ButtonGroup } from '@chakra-ui/react'
 import socketIOClient from "socket.io-client";
 import { socket } from "../../context/socket";
 
-const ENDPOINT = "http://127.0.0.1:5000";
-
-
 export const ButtonSocketComponent = () => {
 
     const [confused, setConfused] = useState(0);
