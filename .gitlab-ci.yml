@@ -10,7 +10,7 @@ build_job:
   stage: build
   script:
     - npm --prefix lecture-feedback install
-    - if ["$CI_COMMIT_BRANCH" == "master"]; then BUILD="build-development"; elif ["$CI_COMMIT_BRANCH" == "dev"]; then BUILD="build-staging"; else BUILD="build" fi
+    - if ["$CI_COMMIT_BRANCH" == "master"]; then BUILD="build-development"; elif ["$CI_COMMIT_BRANCH" == "dev"]; then BUILD="build-staging"; else BUILD="build"; fi
     - CI=false npm --prefix lecture-feedback run ${BUILD}
   artifacts:
     paths:
