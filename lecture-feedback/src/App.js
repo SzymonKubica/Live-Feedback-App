@@ -6,6 +6,7 @@ import {
 } from "react-router-dom"  
 
 import { StudentView } from './components/StudentView';
+import { SimpleStudentView } from './components/SimpleStudentView';
 import { LecturerView } from './components/LecturerView';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
       <Routes>
         <Route path="student" element={<StudentView />}/>
         <Route path="lecturer" element={<LecturerView />}/>
+        <Route path="simpleStudent" element={<SimpleStudentView />}/>
       </Routes>
       </Fragment>
     </Router>
