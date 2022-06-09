@@ -1,35 +1,41 @@
-import React, { useEffect } from "react";
-import { socket, SocketContext } from "../context/socket";
-import { ToggleButton } from "./ToggleButton";
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+
+import { Link } from 'react-router-dom';
 
 import {
-  ChakraProvider,
-  Box,
-  Grid,
-  theme,
-  Button,
+    ChakraProvider,
+    Stack,
+    theme,
+    Button,
+    Center,
+    SimpleGrid,
+    Box,
+    Flex,
+    HStack,
+    Spacer,
 } from '@chakra-ui/react';
 import { ColorModeSwitcher } from '../ColorModeSwitcher';
+import HomeButton from './HomeBtn';
+import Header from './Header';
+import StudentFeedbackBtn from './StudentFeedbackBtn';
+import StudentFeedbackGrid from './StudentFeedbackGrid';
 
-export const StudentView = () => {
-    return(
+const NilButton = 'nil'
+
+const Student = () => {
+    const [selected, setSelected] = useState(NilButton)
+
+    return (
         <ChakraProvider theme={theme}>
-            <Box textAlign="center" fontSize="xl">
-            <Grid minH="100vh" p={3}>
-                <ColorModeSwitcher justifySelf="flex-end" />
-                Hello Mr Student
-            <SocketContext.Provider value={socket}>
-                <ToggleButton reaction="good"/>            
-                <ToggleButton reaction="confused"/>            
-                <ToggleButton reaction="too fast"/>            
-                <ToggleButton reaction="chilling"/>            
-                  <Link to="/">
-                    <Button onClick={() => socket.emit("disconnect student")}>Home</Button>
-                  </Link>
-            </SocketContext.Provider>
-            </Grid>
-            </Box>
+            <Stack width='100%'>
+                <Header />
+
+                <StudentFeedbackGrid
+                    selected={selected}
+                    setSelected={setSelected} />
+            </Stack>
         </ChakraProvider>
-    )
+    );
 }
+
+export default Student
