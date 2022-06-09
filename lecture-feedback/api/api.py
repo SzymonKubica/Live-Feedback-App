@@ -103,10 +103,10 @@ def create_new_snapshot():
     currentSnapshot = nextSnapshot
 
     # need to update counts now
-    socketio.emit("update confused", {"count":count_active(db, "confused")}, broadcast=True)
-    socketio.emit("update good", {"count":count_active(db, "good")}, broadcast=True)
-    socketio.emit("update too fast", {"count":count_active(db, "too-fast")}, broadcast=True)
-    socketio.emit("update chilling", {"count":count_active(db, "chilling")}, broadcast=True)
+    updateAll()
+
+    #reset buttons
+    socketio.emit("reset buttons", broadcast=True)
 
 
 # When there is a 404, we send it to react so it can deal with it
@@ -222,11 +222,9 @@ def handleMessage():
     emit("update chilling", {"count":count_active(db, "chilling")}, broadcast=True)
     # return None
 
-@socketio.on("reset database")
+@socketio.on("create snapshot")
 def handleMessage():
-    print("Deleting the database")
-    client.drop_database("lecture-feedback")
-    updateAll()
+    create_new_snapshot()
 
 
 if __name__ == "__main__":

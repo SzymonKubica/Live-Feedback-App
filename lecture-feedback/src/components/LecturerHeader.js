@@ -17,7 +17,7 @@ const Header = () => {
       <SocketContext.Provider value={socket}>
         <Button
           onClick={() => {
-            socket.emit('reset database');
+            socket.emit('create snapshot');
           }}
         >
           Reset
