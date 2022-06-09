@@ -1,9 +1,12 @@
 from flask import Flask
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit
-import time
+from datetime import datetime
+import pymongo
 from pymongo import MongoClient
 import os
+import json
+from bson import json_util
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,21 +25,93 @@ db = client["lecture-feedback"]
 
 studentCount = 0
 
+snapshot = db["snapshots"].find_one(sort=[("end", pymongo.DESCENDING)])
+if snapshot is None:
+    currentSnapshot = datetime.min #should be start time of meeting
+else:
+    currentSnapshot = snapshot['end']
+
+def parse_mongo_json(data):
+    return json.loads(json_util.dumps(data))
+
+# logs when insight is added
 def add_insight(db, table, content):
     tb = db[table]
     tb.insert_one(content)
 
+# creates a basic insight
 def generate_insight(type):
         return {
         "type": type,
-        "time": time.time()
+        "time": datetime.now()
     }
 
+#counts insights
 def count_active(db, table):
-    add_count = db[table].count_documents({"type":"add"})
-    remove_count = db[table].count_documents({"type":"remove"})
+    # add_count = db[table].count_documents({"type":"add"})
+    # remove_count = db[table].count_documents({"type":"remove"})
+
+    # return add_count - remove_count
+    return count_active_between(table, currentSnapshot, datetime.now())
+
+def count_active_between(table, start, end):
+    # is there a cleaner way?
+    add_count = db[table].count_documents({
+        "time": {
+            "$gte": start,
+            "$lte": end
+        },
+        "type":"add"
+    })
+
+    remove_count = db[table].count_documents({
+        "time": {
+            "$gte": start,
+            "$lte": end
+        },
+        "type":"remove"
+    })
 
     return add_count - remove_count
+
+def get_summarised(start, end):
+    good = count_active_between("good", start, end)
+
+    confused = count_active_between("confused", start, end)
+
+    too_fast = count_active_between("too-fast", start, end)
+
+    chilling = count_active_between("chilling", start, end)
+
+    return {
+        "good": good,
+        "confused": confused,
+        "too-fast": too_fast,
+        "chilling": chilling
+    }
+
+
+
+#NOTE: When we end the lecture, we should also add an end time like we do here to the current
+#snapshot, we also need a way of adding initial start time (can be done with start for example)
+def create_new_snapshot():
+    global currentSnapshot
+
+    nextSnapshot = datetime.now()
+    
+    db["snapshots"].insert_one({
+        "start":currentSnapshot, #for now
+        "end": nextSnapshot,
+        "summarised_data": get_summarised(currentSnapshot, nextSnapshot)
+    })
+
+    currentSnapshot = nextSnapshot
+
+    # need to update counts now
+    updateAll()
+
+    #reset buttons
+    socketio.emit("reset buttons", broadcast=True)
 
 
 # When there is a 404, we send it to react so it can deal with it
@@ -54,6 +129,23 @@ def index():
 def test():
     import random
     return {"test":random.randint(0,100)}
+
+@app.route("/api/create-snapshot")
+@cross_origin()
+def create_snapshot():
+    create_new_snapshot()
+    print("created snapshot")
+    return None
+
+@app.route("/api/snapshots")
+@cross_origin()
+def get_snapshots():
+    snapshots = parse_mongo_json(list(db['snapshots'].find({})))
+    return {"snapshots":snapshots}
+
+@socketio.on('connect')
+def test_connect():
+    print("connected")
 
 def updateAll():
     emit("update confused", {"count":count_active(db, "confused")})
@@ -141,10 +233,10 @@ def handleMessage():
     emit("update chilling", {"count":count_active(db, "chilling")}, broadcast=True)
     # return None
 
-@socketio.on("reset database")
+@socketio.on("create snapshot")
 def handleMessage():
-    print("Deleting the database")
-    client.drop_database("lecture-feedback")
-    updateAll()
+    create_new_snapshot()
+
+
 if __name__ == "__main__":
     socketio.run()
