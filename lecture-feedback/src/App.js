@@ -3,23 +3,13 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
+  Link,
 } from "react-router-dom"  
 
-import {
-  ChakraProvider,
-  Box,
-  Text,
-  Link,
-  VStack,
-  Code,
-  Grid,
-  theme,
-} from '@chakra-ui/react';
-import { ColorModeSwitcher } from './ColorModeSwitcher';
-import { Logo } from './Logo';
 import { StudentView } from './components/StudentView';
+import { HomeView } from './components/HomeView';
+import { SimpleStudentView } from './components/SimpleStudentView';
 import { LecturerView } from './components/LecturerView';
-import { RandomNumber } from './components/RandomNumber';
 
 function App() {
   const [state, setState] = useState("")
@@ -32,12 +22,14 @@ function App() {
 
   return (
     <Router>
-      <Fragment> 
-      <Routes>
-        <Route path="student" element={<StudentView />}/>
-        <Route path="lecturer" element={<LecturerView />}/>
-      </Routes>
-      </Fragment>
+        <Fragment> 
+        <Routes>
+          <Route path="" element={<HomeView />}/>
+          <Route path="student" element={<StudentView />}/>
+          <Route path="lecturer" element={<LecturerView />}/>
+          <Route path="simpleStudent" element={<SimpleStudentView />}/>
+        </Routes>
+        </Fragment>
     </Router>
   );
 }
