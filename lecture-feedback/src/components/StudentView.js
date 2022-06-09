@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { socket, SocketContext } from "../context/socket";
 import { ToggleButton } from "./ToggleButton";
 import { Link } from "react-router-dom";
@@ -24,10 +24,10 @@ export const StudentView = () => {
                 <ToggleButton reaction="confused"/>            
                 <ToggleButton reaction="too fast"/>            
                 <ToggleButton reaction="chilling"/>            
-            </SocketContext.Provider>
                   <Link to="/">
-                    <Button>Home</Button>
+                    <Button onClick={() => socket.emit("disconnect student")}>Home</Button>
                   </Link>
+            </SocketContext.Provider>
             </Grid>
             </Box>
         </ChakraProvider>
