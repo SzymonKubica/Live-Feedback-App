@@ -3,32 +3,24 @@ import { socket, SocketContext } from '../context/socket';
 import { SocketCounter } from './SocketCounter';
 import { Link } from 'react-router-dom';
 
-import { ChakraProvider, Box, Grid, Button, theme } from '@chakra-ui/react';
+import { ChakraProvider, Box, Grid, Button, theme, VStack, Heading, Stack, Center } from '@chakra-ui/react';
 import { ColorModeSwitcher } from '../ColorModeSwitcher';
+import NavBtn from './NavBtn';
+import Header from './Header';
+
 
 
 export const HomeView = () => {
   return (
     <ChakraProvider theme={theme}>
-      <Box textAlign="center" fontSize="xl">
-        <Grid minH="100vh" p={3}>
-          <ColorModeSwitcher justifySelf="flex-end" />
-                  <Link to="/">
-                    <Button>Home</Button>
-                  </Link>
-                  <SocketContext.Provider value={socket}>
-                  <Link to="/simpleStudent">
-                    <Button onClick={() => socket.emit("connect student")}>Simple Student Page</Button>
-                  </Link>
-                  <Link to="/student">
-                    <Button onClick={() => socket.emit("connect student")}>Student Page</Button>
-                  </Link>
-                  </SocketContext.Provider>
-                  <Link to="/lecturer">
-                    <Button>Lecturer Page</Button>
-                  </Link>
-        </Grid>
-      </Box>
-    </ChakraProvider>
+      <Stack>
+        <Header />
+        <VStack spacing='20px' marginTop='10px'>
+          <Heading>Home</Heading>
+          <NavBtn onClick={() => socket.emit("connect student")} name="Student" dst="student" />
+          <NavBtn name="Teacher" dst="teacher" />
+        </VStack>
+      </Stack>
+    </ChakraProvider >
   );
 };
