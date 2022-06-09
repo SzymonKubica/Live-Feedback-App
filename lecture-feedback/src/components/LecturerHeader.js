@@ -5,6 +5,8 @@ import HomeButton from './HomeBtn';
 import PercentageSwitcher from './PercentageSwitcher';
 import { useLocation } from 'react-router-dom';
 import { socket, SocketContext } from '../context/socket';
+import NavBtn from './NavBtn';
+
 
 const Header = () => {
   const location = useLocation();
@@ -22,6 +24,7 @@ const Header = () => {
         >
           Reset
         </Button>
+        <NavBtn name="Snapshots" dst="snapshots" />
       </SocketContext.Provider>
       <ColorModeSwitcher />
     </Flex>

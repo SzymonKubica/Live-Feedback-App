@@ -5,6 +5,8 @@ from datetime import datetime
 import pymongo
 from pymongo import MongoClient
 import os
+import json
+from bson import json_util
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -28,6 +30,9 @@ if snapshot is None:
     currentSnapshot = datetime.min #should be start time of meeting
 else:
     currentSnapshot = snapshot['end']
+
+def parse_mongo_json(data):
+    return json.loads(json_util.dumps(data))
 
 # logs when insight is added
 def add_insight(db, table, content):
@@ -131,6 +136,12 @@ def create_snapshot():
     create_new_snapshot()
     print("created snapshot")
     return None
+
+@app.route("/api/snapshots")
+@cross_origin()
+def get_snapshots():
+    snapshots = parse_mongo_json(list(db['snapshots'].find({})))
+    return {"snapshots":snapshots}
 
 @socketio.on('connect')
 def test_connect():

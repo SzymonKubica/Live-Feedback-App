@@ -10,6 +10,8 @@ import {
 import { HomeView } from './components/HomeView';
 import { StudentView } from './components/StudentView';
 import { TeacherView } from './components/TeacherView';
+import { SnapshotView } from './components/SnapshotView';
+
 
 function App() {
   const [state, setState] = useState("")
@@ -27,6 +29,8 @@ function App() {
             <Route path="" element={<HomeView />}/>
             <Route path="student" element={<StudentView />}/>
             <Route path="teacher" element={<TeacherView />}/>
+            <Route path="teacher/snapshots" element={<SnapshotView />}/>
+
           </Routes>
           </Fragment>
       </Router>
