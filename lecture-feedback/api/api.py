@@ -55,22 +55,22 @@ def test():
     import random
     return {"test":random.randint(0,100)}
 
-@socketio.on('connect')
-def test_connect():
-    print("connected")
+def updateAll():
     emit("update confused", {"count":count_active(db, "confused")})
     emit("update good", {"count":count_active(db, "good")})
     emit("update too fast", {"count":count_active(db, "too-fast")})
     emit("update chilling", {"count":count_active(db, "chilling")})
     emit("update students connected", {"count":studentCount})
 
+
+
+@socketio.on('connect')
+def test_connect():
+    print("connected")
+    updateAll()
 @socketio.on('connect teacher')
 def handleMessage():
-    emit("update confused", {"count":count_active(db, "confused")})
-    emit("update good", {"count":count_active(db, "good")})
-    emit("update too fast", {"count":count_active(db, "too-fast")})
-    emit("update chilling", {"count":count_active(db, "chilling")})
-    emit("update students connected", {"count":studentCount})
+    updateAll()
 
 
 @socketio.on('connect student') 
@@ -145,5 +145,6 @@ def handleMessage():
 def handleMessage():
     print("Deleting the database")
     client.drop_database("lecture-feedback")
+    updateAll()
 if __name__ == "__main__":
     socketio.run()

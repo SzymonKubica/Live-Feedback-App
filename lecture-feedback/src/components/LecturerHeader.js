@@ -4,7 +4,7 @@ import { ColorModeSwitcher } from '../ColorModeSwitcher';
 import HomeButton from './HomeBtn';
 import PercentageSwitcher from './PercentageSwitcher';
 import { useLocation } from 'react-router-dom';
-import { socket, SocketContext } from "../context/socket";
+import { socket, SocketContext } from '../context/socket';
 
 const Header = () => {
   const location = useLocation();
@@ -12,13 +12,12 @@ const Header = () => {
   return (
     <Flex width="100%">
       {location.pathname !== '/' && <HomeButton />}
-      <Spacer/>
-      <PercentageSwitcher/> 
+      <Spacer />
+      <PercentageSwitcher />
       <SocketContext.Provider value={socket}>
         <Button
           onClick={() => {
             socket.emit('reset database');
-            socket.emit('connect teacher');
           }}
         >
           Reset
