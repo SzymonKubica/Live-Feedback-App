@@ -15,6 +15,20 @@ function getColourGradient(button, selected) {
     return defaultColor
 }
 
+//
+function getReaction(color) {
+    switch(color) {
+        case "green": 
+            return "good"
+        case "orange":
+            return "too fast"
+        case "red":
+            return "confused"
+        case "twitter":
+            return "chilling"
+    }
+}
+
 const StudentFeedbackBtn = ({ title, color, selected, setSelected, reaction }) => {
     
     function handleButton() {
@@ -27,18 +41,11 @@ const StudentFeedbackBtn = ({ title, color, selected, setSelected, reaction }) =
             setSelected(color)
         } else {
             // switched reactions
-            socket.emit("no longer" + selected)
+            socket.emit("no longer " + getReaction(selected))
             socket.emit(reaction)
 
             setSelected(color)
         }
-        
-        // setState(s => !s);
-        // if (!isToggled) {
-        //     socket.emit(props.reaction);
-        // } else {
-        //     socket.emit("no longer " + props.reaction)
-        // }
     }
     
     return (
