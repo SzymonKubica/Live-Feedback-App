@@ -14,10 +14,7 @@ import {
     HStack,
     Spacer,
 } from '@chakra-ui/react';
-import { ColorModeSwitcher } from '../ColorModeSwitcher';
-import HomeButton from './HomeBtn';
 import Header from './Header';
-import StudentFeedbackBtn from './StudentFeedbackBtn';
 import StudentFeedbackGrid from './StudentFeedbackGrid';
 
 const NilButton = 'nil'

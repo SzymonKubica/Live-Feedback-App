@@ -64,6 +64,14 @@ def test_connect():
     emit("update chilling", {"count":count_active(db, "chilling")})
     emit("update students connected", {"count":studentCount})
 
+@socketio.on('connect teacher')
+def handleMessage():
+    emit("update confused", {"count":count_active(db, "confused")})
+    emit("update good", {"count":count_active(db, "good")})
+    emit("update too fast", {"count":count_active(db, "too-fast")})
+    emit("update chilling", {"count":count_active(db, "chilling")})
+    emit("update students connected", {"count":studentCount})
+
 
 @socketio.on('connect student') 
 def handleMessage():
@@ -132,5 +140,10 @@ def handleMessage():
     add_insight(db, "chilling", generate_insight("remove"))
     emit("update chilling", {"count":count_active(db, "chilling")}, broadcast=True)
     # return None
+
+@socketio.on("reset database")
+def handleMessage():
+    print("Deleting the database")
+    client.drop_database("lecture-feedback")
 if __name__ == "__main__":
     socketio.run()
