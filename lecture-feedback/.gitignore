@@ -6,6 +6,8 @@
 .pnp.js
 env
 
+/api/.env
+
 # testing
 /coverage
 
