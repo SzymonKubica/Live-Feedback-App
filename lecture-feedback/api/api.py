@@ -19,7 +19,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 cluster = os.environ.get('MONGODB_URI')
 client = MongoClient(cluster)
-db = client["lecture-feedback-karim"]
+db = client["lecture-feedback"]
 
 studentCount = 0
 
