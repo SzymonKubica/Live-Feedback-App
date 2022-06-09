@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from "react";
-import socketIOClient from "socket.io-client";
 import { socket } from "../context/socket";
 
 
@@ -7,6 +6,7 @@ export const SocketCounter = (props) => {
     const [counter, setCounter] = useState(0);
 
     useEffect(() => {
+        socket.send("connect");
         socket.on("update " + props.reaction, data => {
             setCounter(data.count)
 
@@ -17,6 +17,7 @@ export const SocketCounter = (props) => {
         //
 
     }, [])
+
 
     return (
     <div>
