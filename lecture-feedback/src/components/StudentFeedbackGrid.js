@@ -11,10 +11,10 @@ const StudentFeedbackGrid = ({selected, setSelected}) => {
                 height='90%'
                 columns='2'>
 
-                <StudentFeedbackBtn title='Good' color='green' selected={selected} setSelected={setSelected} />
-                <StudentFeedbackBtn title='Confused' color='red' selected={selected} setSelected={setSelected} />
-                <StudentFeedbackBtn title='Too Fast' color='orange' selected={selected} setSelected={setSelected} />
-                <StudentFeedbackBtn title='Chilling' color='twitter' selected={selected} setSelected={setSelected} />
+                <StudentFeedbackBtn title='Good' color='green' selected={selected} setSelected={setSelected} reaction='good' />
+                <StudentFeedbackBtn title='Confused' color='red' selected={selected} setSelected={setSelected} reaction='confused'/>
+                <StudentFeedbackBtn title='Too Fast' color='orange' selected={selected} setSelected={setSelected} reaction='too fast'/>
+                <StudentFeedbackBtn title='Chilling' color='twitter' selected={selected} setSelected={setSelected} reaction='chilling'/>
             </SimpleGrid>
         </Center>
     )

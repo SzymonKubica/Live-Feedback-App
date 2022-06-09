@@ -17,8 +17,8 @@ export const HomeView = () => {
         <Header />
         <VStack spacing='20px' marginTop='10px'>
           <Heading>Home</Heading>
-          <NavBtn dst="Student" />
-          <NavBtn dst="Teacher" />
+          <NavBtn onClick={() => socket.emit("connect student")} name="Student" dst="student" />
+          <NavBtn name="Teacher" dst="teacher" />
         </VStack>
       </Stack>
     </ChakraProvider >

@@ -22,7 +22,7 @@ import StudentFeedbackGrid from './StudentFeedbackGrid';
 
 const NilButton = 'nil'
 
-const Student = () => {
+export const StudentView = () => {
     const [selected, setSelected] = useState(NilButton)
 
     return (
@@ -37,5 +37,3 @@ const Student = () => {
         </ChakraProvider>
     );
 }
-
-export default Student

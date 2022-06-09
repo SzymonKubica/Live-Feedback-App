@@ -20,6 +20,8 @@ cluster = os.environ.get('MONGODB_URI')
 client = MongoClient(cluster)
 db = client["lecture-feedback"]
 
+studentCount = 0
+
 def add_insight(db, table, content):
     tb = db[table]
     tb.insert_one(content)
@@ -60,6 +62,8 @@ def test_connect():
     emit("update good", {"count":count_active(db, "good")})
     emit("update too fast", {"count":count_active(db, "too-fast")})
     emit("update chilling", {"count":count_active(db, "chilling")})
+    emit("update students connected", {"count":studentCount})
+
 
 @socketio.on('connect student') 
 def handleMessage():

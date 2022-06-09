@@ -1,26 +1,40 @@
 import { Box, ChakraProvider, Heading, Progress, Stack, Button } from '@chakra-ui/react'
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, {useState, useEffect} from 'react'
 import Header from './Header'
+import { socket } from "../context/socket";
 import TeacherFeedbackBar from './TeacherFeedbackBar'
 
-const Teacher = () => {
+export const TeacherView = () => {
+    const [studentCounter, setStudentCounter] = useState(0);
+
+    useEffect(() => {
+        socket.on("update students connected", data => {
+            setStudentCounter(data.count)
+
+        });
+
+        // Disconnect when unmounts
+        return () => socket.off("update students connected");
+        //
+
+    }, [])
+    
+    
     return (
         <ChakraProvider>
             <Header />
             <Stack marginStart={10} marginTop={10} width='90%' spacing='10%'>
                 <Box width='60%' >
                     <Stack spacing={20}>
-                        <TeacherFeedbackBar title='Good' color='green' />
-                        <TeacherFeedbackBar title='Confused' color='red' />
-                        <TeacherFeedbackBar title='Too Fast' color='orange' />
-                        <TeacherFeedbackBar title='Chilling' color='twitter' />
+                        <TeacherFeedbackBar studentCount={studentCounter} title='Good' color='green' reaction='good'/>
+                        <TeacherFeedbackBar studentCount={studentCounter} title='Confused' color='red' reaction='confused'/>
+                        <TeacherFeedbackBar studentCount={studentCounter} title='Too Fast' color='orange' reaction='too fast'/>
+                        <TeacherFeedbackBar studentCount={studentCounter} title='Chilling' color='twitter' reaction='chilling'/>
                     </Stack>
                 </Box>
-                <Heading alignSelf='end'>42 students</Heading>
+                {/* <SocketCounter reaction="students connected"/> */}
+                <Heading alignSelf='end'>{studentCounter} students</Heading>
             </Stack>
         </ChakraProvider>
     )
 }
-
-export default Teacher

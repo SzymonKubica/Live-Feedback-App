@@ -1,6 +1,15 @@
 import React, {useState, useEffect, Fragment}from 'react';
 
+import { 
+  BrowserRouter as Router,
+  Routes,
+  Route,
+} from "react-router-dom"  
+
+
 import { HomeView } from './components/HomeView';
+import { StudentView } from './components/StudentView';
+import { TeacherView } from './components/TeacherView';
 
 function App() {
   const [state, setState] = useState("")
@@ -12,7 +21,16 @@ function App() {
   },[])
 
   return (
-    <HomeView />
+      <Router>
+          <Fragment> 
+          <Routes>
+            <Route path="" element={<HomeView />}/>
+            <Route path="student" element={<StudentView />}/>
+            <Route path="teacher" element={<TeacherView />}/>
+          </Routes>
+          </Fragment>
+      </Router>
+
   );
 }
 
