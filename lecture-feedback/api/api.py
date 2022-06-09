@@ -61,6 +61,19 @@ def test_connect():
     emit("update too fast", {"count":count_active(db, "too-fast")})
     emit("update chilling", {"count":count_active(db, "chilling")})
 
+@socketio.on('connect student') 
+def handleMessage():
+    global studentCount
+    studentCount += 1
+    print("student connected")
+    emit("update students connected", {"count":studentCount}, broadcast=True)
+
+@socketio.on('disconnect student') 
+def handleMessage():
+    global studentCount
+    studentCount -= 1
+    print("student connected")
+    emit("update students connected", {"count":studentCount}, broadcast=True)
 
 @socketio.on('disconnect')
 def test_disconnect():

@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { ChakraProvider, Box, Grid, Button, theme } from '@chakra-ui/react';
 import { ColorModeSwitcher } from '../ColorModeSwitcher';
 
+
 export const HomeView = () => {
   return (
     <ChakraProvider theme={theme}>
@@ -15,12 +16,14 @@ export const HomeView = () => {
                   <Link to="/">
                     <Button>Home</Button>
                   </Link>
+                  <SocketContext.Provider value={socket}>
                   <Link to="/simpleStudent">
-                    <Button>Simple Student Page</Button>
+                    <Button onClick={() => socket.emit("connect student")}>Simple Student Page</Button>
                   </Link>
                   <Link to="/student">
-                    <Button>Student Page</Button>
+                    <Button onClick={() => socket.emit("connect student")}>Student Page</Button>
                   </Link>
+                  </SocketContext.Provider>
                   <Link to="/lecturer">
                     <Button>Lecturer Page</Button>
                   </Link>
