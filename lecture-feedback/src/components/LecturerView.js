@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { socket, SocketContext } from "../context/socket";
 import { SocketCounter } from "./SocketCounter";
 import { Link } from "react-router-dom"
+import { Button} from '@chakra-ui/react'
 
 import {
   ChakraProvider,
