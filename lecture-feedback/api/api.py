@@ -3,6 +3,7 @@ from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit
 
 goodCount = 0
+studentCount = 0
 confusedCount = 0
 tooFastCount = 0
 chillingCount = 0
@@ -39,6 +40,19 @@ def test_connect():
     emit("update too fast", {"count":tooFastCount})
     emit("update chilling", {"count":chillingCount})
 
+@socketio.on('connect student') 
+def handleMessage():
+    global studentCount
+    studentCount += 1
+    print("student connected")
+    emit("update students connected", {"count":studentCount}, broadcast=True)
+
+@socketio.on('disconnect student') 
+def handleMessage():
+    global studentCount
+    studentCount -= 1
+    print("student connected")
+    emit("update students connected", {"count":studentCount}, broadcast=True)
 
 @socketio.on('disconnect')
 def test_disconnect():
