@@ -15,7 +15,7 @@ const Header = () => {
     <Flex width="100%">
       {location.pathname !== '/' && <HomeButton />}
       <Spacer />
-      <PercentageSwitcher />
+      {/* <PercentageSwitcher /> */}
       <SocketContext.Provider value={socket}>
         <Button
           onClick={() => {
