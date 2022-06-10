@@ -17,19 +17,19 @@ import {
   } from '@chakra-ui/react'
 
 export const SnapshotView = () => {
-    const [snapshots, setSnapshots] = useState({});
+    // const [snapshots, setSnapshots] = useState({});
     const [tableBody, setTableBody] = useState(<Tbody></Tbody>);
 
     useEffect(() => {
         fetch("/api/snapshots").then(res => res.json()).then(data=> {
-            setSnapshots(data.snapshots);
+            // setSnapshots(data.snapshots);
             setTableBody(
             <Tbody>            
                     {Object.keys(data.snapshots).map(key => {
                         console.log(key);
                         return(<Tr key={key}>
-                            <Td>{JSON.stringify(snapshots[key].start)}</Td>
-                            <Td>{JSON.stringify(snapshots[key].end)}</Td>
+                            <Td>{JSON.stringify(data.snapshots[key].start)}</Td>
+                            <Td>{JSON.stringify(data.snapshots[key].end)}</Td>
                             <Td>{data.snapshots[key].summarised_data.confused}</Td>
                             <Td>{data.snapshots[key].summarised_data.good}</Td>
                             <Td>{data.snapshots[key].summarised_data["too-fast"]}</Td>
