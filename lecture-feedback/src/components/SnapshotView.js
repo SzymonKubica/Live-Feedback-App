@@ -25,19 +25,19 @@ export const SnapshotView = () => {
             setSnapshots(data.snapshots);
             setTableBody(
             <Tbody>            
-                    {Object.keys(snapshots).map(key => {
+                    {Object.keys(data.snapshots).map(key => {
                         console.log(key);
                         return(<Tr key={key}>
                             <Td>{JSON.stringify(snapshots[key].start)}</Td>
                             <Td>{JSON.stringify(snapshots[key].end)}</Td>
-                            <Td>{snapshots[key].summarised_data.confused}</Td>
-                            <Td>{snapshots[key].summarised_data.good}</Td>
-                            <Td>{snapshots[key].summarised_data["too-fast"]}</Td>
-                            <Td>{snapshots[key].summarised_data.chilling}</Td>
+                            <Td>{data.snapshots[key].summarised_data.confused}</Td>
+                            <Td>{data.snapshots[key].summarised_data.good}</Td>
+                            <Td>{data.snapshots[key].summarised_data["too-fast"]}</Td>
+                            <Td>{data.snapshots[key].summarised_data.chilling}</Td>
                         </Tr> )
                     })}            
             </Tbody>
-            )
+            )            
         })
     },[]) 
     
