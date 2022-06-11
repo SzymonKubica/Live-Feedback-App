@@ -23,6 +23,9 @@ export const LecturerView = () => {
             <SocketContext.Provider value={socket}>
                 <Grid>
                     <GridItem>
+                        <SocketCounter reaction="students connected"/>
+                    </GridItem>
+                    <GridItem>
                         <SocketCounter reaction="good"/>
                     </GridItem>
                     <GridItem>
