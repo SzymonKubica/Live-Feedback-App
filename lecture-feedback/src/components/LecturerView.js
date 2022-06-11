@@ -32,7 +32,7 @@ export const LecturerView = () => {
                         <SocketCounter reaction="confused"/>
                     </GridItem>
                     <GridItem>
-                        <SocketCounter reaction="too fast"/>
+                        <SocketCounter reaction="too-fast"/>
                     </GridItem>
                     <GridItem>
                         <SocketCounter reaction="chilling"/>

@@ -1,6 +1,7 @@
 import { Button } from '@chakra-ui/react'
 import React from 'react'
 import { socket } from '../context/socket'
+import { Reaction } from "./Reactions"
 
 const defaultColor = 500
 const selectedColor = 900
@@ -19,13 +20,13 @@ function getColourGradient(button, selected) {
 function getReaction(color) {
     switch(color) {
         case "green": 
-            return "good"
+            return Reaction.GOOD
         case "orange":
-            return "too fast"
+            return Reaction.TOO_FAST
         case "red":
-            return "confused"
+            return Reaction.CONFUSED
         case "twitter":
-            return "chilling"
+            return Reaction.CHILLING
     }
 }
 

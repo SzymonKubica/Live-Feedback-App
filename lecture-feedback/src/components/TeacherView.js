@@ -1,6 +1,6 @@
 import { Box, ChakraProvider, Heading, Progress, Stack, Button } from '@chakra-ui/react'
 import React, {useState, useEffect} from 'react'
-import LecturerHeader from './LecturerHeader'
+import TeacherHeader from './TeacherHeader'
 import { socket } from "../context/socket";
 import TeacherFeedbackBar from './TeacherFeedbackBar'
 
@@ -22,13 +22,13 @@ export const TeacherView = () => {
     
     return (
         <ChakraProvider>
-            <LecturerHeader />
+            <TeacherHeader />
             <Stack marginStart={10} marginTop={10} width='90%' spacing='10%'>
                 <Box width='60%' >
                     <Stack spacing={20}>
                         <TeacherFeedbackBar studentCount={studentCounter} title='Good' color='green' reaction='good'/>
                         <TeacherFeedbackBar studentCount={studentCounter} title='Confused' color='red' reaction='confused'/>
-                        <TeacherFeedbackBar studentCount={studentCounter} title='Too Fast' color='orange' reaction='too fast'/>
+                        <TeacherFeedbackBar studentCount={studentCounter} title='Too Fast' color='orange' reaction='too-fast'/>
                         <TeacherFeedbackBar studentCount={studentCounter} title='Chilling' color='twitter' reaction='chilling'/>
                     </Stack>
                 </Box>

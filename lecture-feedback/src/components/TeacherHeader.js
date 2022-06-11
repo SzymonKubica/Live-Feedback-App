@@ -8,7 +8,7 @@ import { socket, SocketContext } from '../context/socket';
 import NavBtn from './NavBtn';
 
 
-const Header = () => {
+const TeacherHeader = () => {
   const location = useLocation();
 
   return (
@@ -31,4 +31,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default TeacherHeader;

@@ -1,8 +1,5 @@
-import { Box, ChakraProvider, Heading, Progress, Stack, Button } from '@chakra-ui/react'
+import { ChakraProvider } from '@chakra-ui/react'
 import React, {useState, useEffect} from 'react'
-import LecturerHeader from './LecturerHeader'
-import { socket } from "../context/socket";
-import TeacherFeedbackBar from './TeacherFeedbackBar'
 
 import {
     Table,
