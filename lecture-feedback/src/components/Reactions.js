@@ -1,6 +1,13 @@
-const Reaction = {
-    GOOD: Symbol("good"),
-    CONFUSED: Symbol("confused"),
-    TOO_FAST: Symbol("too-fast"),
-    CHILLING: Symbol("chilling")
+export const Reaction = {
+    GOOD: "good",
+    CONFUSED: "confused",
+    TOO_FAST: "too-fast",
+    CHILLING: "chilling"
 }
+
+export const getString = (reaction) => {
+    return Object.values(Reaction)[Object.values(Reaction).indexOf(reaction)]
+}
+
+export default Reaction
+

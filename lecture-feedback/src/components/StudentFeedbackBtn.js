@@ -1,7 +1,7 @@
 import { Button } from '@chakra-ui/react'
 import React from 'react'
 import { socket } from '../context/socket'
-import { Reaction } from "./Reactions"
+import { Reaction, getString } from "./Reactions"
 
 const defaultColor = 500
 const selectedColor = 900
@@ -26,7 +26,7 @@ function getReaction(color) {
         case "red":
             return Reaction.CONFUSED
         case "twitter":
-            return Reaction.CHILLING
+            return Reaction.CHILLING 
     }
 }
 
@@ -35,20 +35,21 @@ const StudentFeedbackBtn = ({ title, color, selected, setSelected, reaction }) =
     function handleButton() {
         if (color === selected) {
             setSelected(NilButton)
-            socket.emit("no longer " + reaction)
+            socket.emit("remove reaction", getString(reaction))
+            console.log(getString(reaction))
             
         } else if (selected === NilButton) {
-            socket.emit(reaction)
+            socket.emit("add reaction", getString(reaction))
+            console.log(getString(reaction))
             setSelected(color)
         } else {
             // switched reactions
-            socket.emit("no longer " + getReaction(selected))
-            socket.emit(reaction)
-
+            socket.emit("remove reaction", getString(getReaction(selected)))
+            console.log(getString(getReaction(selected)))
+            socket.emit("add reaction", getString(reaction))
             setSelected(color)
         }
     }
-    
     return (
         <Button
             colorScheme={color}
