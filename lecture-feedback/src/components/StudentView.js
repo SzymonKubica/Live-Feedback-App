@@ -1,35 +1,50 @@
-import React from "react";
-import { socket, SocketContext } from "../context/socket";
-import { ToggleButton } from "./ToggleButton";
-import { Link } from "react-router-dom";
+import React, {useState, useEffect} from 'react'
+import { socket} from "../context/socket";
+
+import { Link } from 'react-router-dom';
 
 import {
-  ChakraProvider,
-  Box,
-  Grid,
-  theme,
-  Button,
+    ChakraProvider,
+    Stack,
+    theme,
+    Button,
+    Center,
+    SimpleGrid,
+    Box,
+    Flex,
+    HStack,
+    Spacer,
 } from '@chakra-ui/react';
-import { ColorModeSwitcher } from '../ColorModeSwitcher';
+import Header from './Header';
+import StudentFeedbackGrid from './StudentFeedbackGrid';
+
+const NilButton = 'nil'
 
 export const StudentView = () => {
-    return(
+    const [selected, setSelected] = useState(NilButton)
+
+    // reset the button when lecturer creates a snapshot
+    useEffect(() => {
+        socket.on("reset buttons", () => {
+            setSelected(NilButton)
+
+        });
+
+        // Disconnect when unmounts
+        return () => socket.off("reset buttons");
+        //
+
+    }, [])
+
+    return (
         <ChakraProvider theme={theme}>
-            <Box textAlign="center" fontSize="xl">
-            <Grid minH="100vh" p={3}>
-                <ColorModeSwitcher justifySelf="flex-end" />
-                Hello Mr Student
-            <SocketContext.Provider value={socket}>
-                <ToggleButton reaction="good"/>            
-                <ToggleButton reaction="confused"/>            
-                <ToggleButton reaction="too fast"/>            
-                <ToggleButton reaction="chilling"/>            
-            </SocketContext.Provider>
-                  <Link to="/">
-                    <Button>Home</Button>
-                  </Link>
-            </Grid>
-            </Box>
+            <Stack width='100%'>
+                <Header />
+
+                <StudentFeedbackGrid
+                    selected={selected}
+                    setSelected={setSelected} />
+            </Stack>
         </ChakraProvider>
-    )
+    );
 }

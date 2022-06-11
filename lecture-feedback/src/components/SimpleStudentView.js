@@ -15,10 +15,10 @@ export const SimpleStudentView = () => {
           Hello Mr Simple Student
           <SocketContext.Provider value={socket}>
             <SocketButton />
-          </SocketContext.Provider>
         <Link to="/">
-          <Button>Home</Button>
+          <Button onClick={() => socket.emit("disconnect student")}>Home</Button>
         </Link>
+          </SocketContext.Provider>
         </Grid>
       </Box>
     </ChakraProvider>

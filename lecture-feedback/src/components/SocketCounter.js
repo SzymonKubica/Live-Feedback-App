@@ -12,7 +12,7 @@ export const SocketCounter = (props) => {
         });
 
         // Disconnect when unmounts
-        return () => socket.off("fromApi");
+        return () => socket.off("update " + props.reaction);
         //
 
     }, [])
