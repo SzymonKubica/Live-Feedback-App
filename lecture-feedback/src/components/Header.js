@@ -1,19 +1,21 @@
-import { Flex, Spacer } from '@chakra-ui/react'
-import React from 'react'
-import { ColorModeSwitcher } from '../ColorModeSwitcher'
-import HomeButton from './HomeBtn'
-import { useLocation } from 'react-router-dom'
+import React from "react"
+import { useLocation } from "react-router-dom"
+
+import { Flex, Spacer } from "@chakra-ui/react"
+import { ColorModeSwitcher } from "../ColorModeSwitcher"
+
+import HomeButton from "./HomeButton"
 
 const Header = () => {
-    const location = useLocation();
+  const location = useLocation()
 
-    return (
-        <Flex width='100%'>
-            {location.pathname !== '/' && <HomeButton />}
-            <Spacer />
-            <ColorModeSwitcher />
-        </Flex>
-    )
+  return (
+    <Flex width="100%">
+      {location.pathname !== "/" && <HomeButton />}
+      <Spacer />
+      <ColorModeSwitcher />
+    </Flex>
+  )
 }
 
 export default Header
