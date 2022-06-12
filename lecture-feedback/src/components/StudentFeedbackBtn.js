@@ -1,17 +1,16 @@
-import { Button } from '@chakra-ui/react';
-import React from 'react';
-import { socket } from '../context/socket';
-import { Reaction, getString } from './Reactions';
+import Button from "@chakra-ui/react"
+import React from "react"
+import socket from "../context/socket"
+import { getString, NilReaction } from "./Reactions"
 
-const defaultColor = 500;
-const selectedColor = 900;
-const NilReaction = 'nil';
+const defaultColor = 500
+const selectedColor = 900
 
 function getColourGradient(reaction, selectedReaction) {
   if (reaction === selectedReaction) {
-    return selectedColor;
+    return selectedColor
   }
-  return defaultColor;
+  return defaultColor
 }
 
 const StudentFeedbackBtn = ({
@@ -24,17 +23,17 @@ const StudentFeedbackBtn = ({
   function handleButton() {
     if (reaction === selectedReaction) {
       // When a button is selected and we tap it again to deselect it.
-      setSelectedReaction(NilReaction);
-      socket.emit('remove reaction', getString(reaction));
+      setSelectedReaction(NilReaction)
+      socket.emit("remove reaction", getString(reaction))
     } else if (selectedReaction === NilReaction) {
       // When nothing is selected and we press one button
-      socket.emit('add reaction', getString(reaction));
-      setSelectedReaction(reaction);
+      socket.emit("add reaction", getString(reaction))
+      setSelectedReaction(reaction)
     } else {
       // When one button is selected and we press another one to change the reaction.
-      socket.emit('remove reaction', getString(selectedReaction));
-      socket.emit('add reaction', getString(reaction));
-      setSelectedReaction(reaction);
+      socket.emit("remove reaction", getString(selectedReaction))
+      socket.emit("add reaction", getString(reaction))
+      setSelectedReaction(reaction)
     }
   }
   return (
@@ -46,7 +45,7 @@ const StudentFeedbackBtn = ({
     >
       {title}
     </Button>
-  );
-};
+  )
+}
 
-export default StudentFeedbackBtn;
+export default StudentFeedbackBtn

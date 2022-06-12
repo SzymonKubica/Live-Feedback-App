@@ -8,9 +8,9 @@ import database
 
 load_dotenv()
 
-app = Flask(__name__, static_folder='../build', static_url_path='/')
+app = Flask(__name__, static_folder="../build", static_url_path="/")
 
-app.config['SECRET_KEY'] = 'mysecret'
+app.config["SECRET_KEY"] = "mysecret"
 
 CORS(app)
 
@@ -55,27 +55,27 @@ def get_snapshots():
 
     return {"snapshots":snapshots}
 
-@socketio.on('connect')
+@socketio.on("connect")
 def test_connect():
     print("connected")
     update_counts()
 
-@socketio.on('disconnect')
+@socketio.on("disconnect")
 def test_disconnect():
     print("disconnected")
 
-@socketio.on('connect teacher')
+@socketio.on("connect teacher")
 def handle_message():
     update_counts()
 
-@socketio.on('connect student') 
+@socketio.on("connect student") 
 def handle_message():
     global studentCount
     studentCount += 1
     print("student connected")
     emit("update students connected", {"count":studentCount}, broadcast=True)
 
-@socketio.on('disconnect student') 
+@socketio.on("disconnect student") 
 def handle_message():
     global studentCount
     studentCount -= 1
