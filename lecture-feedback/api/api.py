@@ -2,13 +2,8 @@ from reaction import Reaction
 from flask import Flask
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit
-import json
 from dotenv import load_dotenv
 import database
-import sys
-import os
-
-sys.path.append(os.path.dirname(__file__))
 
 load_dotenv()
 
@@ -28,12 +23,13 @@ database.fetch_snapshot()
 # When there is a 404, we send it to react so it can deal with it
 @app.errorhandler(404)
 def not_found(e):
-    pass
+    return app.send_static_file("index.html")
+
 
 @app.route("/")
 @cross_origin()
 def index():
-    return app.send_static_file("public/index.html")
+    return app.send_static_file("index.html")
 
 @app.route("/api/create-snapshot")
 @cross_origin()
