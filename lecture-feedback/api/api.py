@@ -5,6 +5,10 @@ from flask_socketio import SocketIO, send, emit
 import json
 from dotenv import load_dotenv
 import database
+import sys
+import os
+
+sys.path.append(os.path.dirname(__file__))
 
 load_dotenv()
 
