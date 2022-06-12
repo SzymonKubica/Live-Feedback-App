@@ -1,6 +1,7 @@
-import Switch from "@chakra-ui/react"
 import React from "react"
 import useLocation from "react-router-dom"
+
+import Switch from "@chakra-ui/react"
 
 const PercentageSwitcher = () => {
   const location = useLocation()
