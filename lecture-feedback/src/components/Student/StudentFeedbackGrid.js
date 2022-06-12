@@ -3,7 +3,7 @@ import React from "react"
 import { Center, SimpleGrid } from "@chakra-ui/react"
 
 import StudentFeedbackButton from "./StudentFeedbackButton"
-import { Reaction } from "./Reactions"
+import { Reaction } from "../Reactions"
 
 const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction }) => {
   return (

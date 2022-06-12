@@ -5,6 +5,7 @@ import { Box, ChakraProvider, Heading, Stack } from "@chakra-ui/react"
 import { socket } from "../../context/socket"
 import TeacherHeader from "./TeacherHeader"
 import TeacherFeedbackBar from "./TeacherFeedbackBar"
+import { Reaction, getString } from "../Reactions"
 
 export const TeacherView = () => {
   const [studentCounter, setStudentCounter] = useState(0)
@@ -28,25 +29,25 @@ export const TeacherView = () => {
               studentCount={studentCounter}
               title="Good"
               color="green"
-              reaction="good"
+              reaction={getString(Reaction.GOOD)}
             />
             <TeacherFeedbackBar
               studentCount={studentCounter}
               title="Confused"
               color="red"
-              reaction="confused"
+              reaction={getString(Reaction.CONFUSED)}
             />
             <TeacherFeedbackBar
               studentCount={studentCounter}
               title="Too Fast"
               color="orange"
-              reaction="too-fast"
+              reaction={getString(Reaction.TOO_FAST)}
             />
             <TeacherFeedbackBar
               studentCount={studentCounter}
               title="Chilling"
               color="twitter"
-              reaction="chilling"
+              reaction={getString(Reaction.CHILLING)}
             />
           </Stack>
         </Box>
