@@ -2,11 +2,11 @@ import React from "react"
 import { useLocation } from "react-router-dom"
 
 import { Flex, Spacer, Button } from "@chakra-ui/react"
-import { ColorModeSwitcher } from "../ColorModeSwitcher"
+import { ColorModeSwitcher } from "../../ColorModeSwitcher"
 
-import { socket, SocketContext } from "../context/socket"
-import HomeButton from "./HomeButton"
-import NavBtn from "./NavButton"
+import { socket, SocketContext } from "../../context/socket"
+import HomeButton from "../HomeButton"
+import NavBtn from "../NavButton"
 
 const TeacherHeader = () => {
   const location = useLocation()

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 
 import { Box, ChakraProvider, Heading, Stack } from "@chakra-ui/react"
 
-import { socket } from "../context/socket"
+import { socket } from "../../context/socket"
 import TeacherHeader from "./TeacherHeader"
 import TeacherFeedbackBar from "./TeacherFeedbackBar"
 

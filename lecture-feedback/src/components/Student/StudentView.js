@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react"
 
 import { ChakraProvider, Stack, theme } from "@chakra-ui/react"
 
-import { socket } from "../context/socket"
-import Header from "./Header"
+import { socket } from "../../context/socket"
+import Header from "../Header"
 import StudentFeedbackGrid from "./StudentFeedbackGrid"
 
 const NilReaction = "nil"

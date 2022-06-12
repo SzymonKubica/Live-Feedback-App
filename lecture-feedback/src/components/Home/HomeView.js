@@ -2,9 +2,9 @@ import React from "react"
 
 import { ChakraProvider, theme, VStack, Heading, Stack } from "@chakra-ui/react"
 
-import { socket } from "../context/socket"
-import NavButton from "./NavButton"
-import Header from "./Header"
+import { socket } from "../../context/socket"
+import NavButton from "../NavButton"
+import Header from "../Header"
 
 export const HomeView = () => {
   return (

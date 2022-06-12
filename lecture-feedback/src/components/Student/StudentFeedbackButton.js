@@ -2,8 +2,8 @@ import React from "react"
 
 import { Button } from "@chakra-ui/react"
 
-import { socket } from "../context/socket"
-import { getString, NilReaction } from "./Reactions"
+import { socket } from "../../context/socket"
+import { getString, NilReaction } from "../Reactions"
 
 const defaultColor = 500
 const selectedColor = 900
