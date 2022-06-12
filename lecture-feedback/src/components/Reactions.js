@@ -5,6 +5,8 @@ export const Reaction = {
   CHILLING: "chilling",
 }
 
+export const NilReaction = "nil"
+
 export const getString = reaction => {
   return Object.values(Reaction)[Object.values(Reaction).indexOf(reaction)]
 }

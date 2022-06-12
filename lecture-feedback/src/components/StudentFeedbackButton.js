@@ -1,6 +1,6 @@
-import Button from "@chakra-ui/react"
+import { Button } from "@chakra-ui/react"
 import React from "react"
-import socket from "../context/socket"
+import { socket } from "../context/socket"
 import { getString, NilReaction } from "./Reactions"
 
 const defaultColor = 500
@@ -13,7 +13,7 @@ function getColourGradient(reaction, selectedReaction) {
   return defaultColor
 }
 
-const StudentFeedbackBtn = ({
+const StudentFeedbackButton = ({
   title,
   color,
   reaction,
@@ -48,4 +48,4 @@ const StudentFeedbackBtn = ({
   )
 }
 
-export default StudentFeedbackBtn
+export default StudentFeedbackButton

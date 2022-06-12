@@ -1,7 +1,7 @@
 import { Flex, Spacer } from "@chakra-ui/react"
 import React from "react"
 import { ColorModeSwitcher } from "../ColorModeSwitcher"
-import HomeButton from "./HomeBtn"
+import HomeButton from "./HomeButton"
 import { useLocation } from "react-router-dom"
 
 const Header = () => {

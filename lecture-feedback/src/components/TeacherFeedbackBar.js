@@ -1,6 +1,6 @@
 import { Heading, Progress, Stack } from "@chakra-ui/react"
 import React, { useState, useEffect } from "react"
-import socket from "../context/socket"
+import { socket } from "../context/socket"
 
 const TeacherFeedbackBar = ({ studentCount, title, color, reaction }) => {
   const [counter, setCounter] = useState(0)

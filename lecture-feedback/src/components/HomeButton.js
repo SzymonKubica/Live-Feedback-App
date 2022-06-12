@@ -1,8 +1,8 @@
-import Button from "@chakra-ui/react"
+import { Button } from "@chakra-ui/react"
 import React from "react"
-import Link from "react-router-dom"
-import socket from "../context/socket"
-import useLocation from "react-router-dom"
+import { Link } from "react-router-dom"
+import { socket } from "../context/socket"
+import { useLocation } from "react-router-dom"
 
 const HomeButton = () => {
   const location = useLocation()

@@ -1,8 +1,8 @@
 import React from "react"
-import socket from "../context/socket"
+import { socket } from "../context/socket"
 
 import { ChakraProvider, theme, VStack, Heading, Stack } from "@chakra-ui/react"
-import NavBtn from "./NavBtn"
+import NavButton from "./NavButton"
 import Header from "./Header"
 
 export const HomeView = () => {
@@ -12,13 +12,13 @@ export const HomeView = () => {
         <Header />
         <VStack spacing="20px" marginTop="10px">
           <Heading>Home</Heading>
-          <NavBtn
+          <NavButton
             onClick={() => socket.emit("connect student")}
             name="Student"
             dst="student"
             size="lg"
           />
-          <NavBtn
+          <NavButton
             onClick={() => socket.emit("connect teacher")}
             name="Teacher"
             dst="teacher"

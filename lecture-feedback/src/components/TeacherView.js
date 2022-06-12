@@ -1,7 +1,7 @@
 import { Box, ChakraProvider, Heading, Stack } from "@chakra-ui/react"
 import React, { useState, useEffect } from "react"
 import TeacherHeader from "./TeacherHeader"
-import socket from "../context/socket"
+import { socket } from "../context/socket"
 import TeacherFeedbackBar from "./TeacherFeedbackBar"
 
 export const TeacherView = () => {
