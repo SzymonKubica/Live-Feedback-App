@@ -18,15 +18,15 @@ import {
 import Header from './Header';
 import StudentFeedbackGrid from './StudentFeedbackGrid';
 
-const NilButton = 'nil'
+const NilReaction = 'nil'
 
 export const StudentView = () => {
-    const [selected, setSelected] = useState(NilButton)
+    const [selectedReaction, setSelectedReaction] = useState(NilReaction)
 
     // reset the button when lecturer creates a snapshot
     useEffect(() => {
         socket.on("reset buttons", () => {
-            setSelected(NilButton)
+            setSelectedReaction(NilReaction)
 
         });
 
@@ -42,8 +42,8 @@ export const StudentView = () => {
                 <Header />
 
                 <StudentFeedbackGrid
-                    selected={selected}
-                    setSelected={setSelected} />
+                    selectedReaction={selectedReaction}
+                    setSelectedReaction={setSelectedReaction} />
             </Stack>
         </ChakraProvider>
     );

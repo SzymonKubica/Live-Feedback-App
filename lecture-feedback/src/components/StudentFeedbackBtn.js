@@ -1,64 +1,52 @@
-import { Button } from '@chakra-ui/react'
-import React from 'react'
-import { socket } from '../context/socket'
-import { Reaction, getString } from "./Reactions"
+import { Button } from '@chakra-ui/react';
+import React from 'react';
+import { socket } from '../context/socket';
+import { Reaction, getString } from './Reactions';
 
-const defaultColor = 500
-const selectedColor = 900
-const NilButton = 'nil'
+const defaultColor = 500;
+const selectedColor = 900;
+const NilReaction = 'nil';
 
-
-function getColourGradient(button, selected) {
-    if (button === selected) {
-        return selectedColor
-    }
-
-    return defaultColor
+function getColourGradient(reaction, selectedReaction) {
+  if (reaction === selectedReaction) {
+    return selectedColor;
+  }
+  return defaultColor;
 }
 
-//
-function getReaction(color) {
-    switch(color) {
-        case "green": 
-            return Reaction.GOOD
-        case "orange":
-            return Reaction.TOO_FAST
-        case "red":
-            return Reaction.CONFUSED
-        case "twitter":
-            return Reaction.CHILLING 
+const StudentFeedbackBtn = ({
+  title,
+  color,
+  reaction,
+  selectedReaction,
+  setSelectedReaction,
+}) => {
+  function handleButton() {
+    if (reaction === selectedReaction) {
+      // When a button is selected and we tap it again to deselect it.
+      setSelectedReaction(NilReaction);
+      socket.emit('remove reaction', getString(reaction));
+    } else if (selectedReaction === NilReaction) {
+      // When nothing is selected and we press one button
+      socket.emit('add reaction', getString(reaction));
+      setSelectedReaction(reaction);
+    } else {
+      // When one button is selected and we press another one to change the reaction.
+      socket.emit('remove reaction', getString(selectedReaction));
+      socket.emit('add reaction', getString(reaction));
+      setSelectedReaction(reaction);
     }
-}
+  }
+  return (
+    <Button
+      colorScheme={color}
+      bg={`${color}.${getColourGradient(reaction, selectedReaction)}`}
+      onClick={handleButton}
+      height="100%"
+    >
+      {title}
+    </Button>
+  );
+};
 
-const StudentFeedbackBtn = ({ title, color, selected, setSelected, reaction }) => {
-    
-    function handleButton() {
-        if (color === selected) {
-            setSelected(NilButton)
-            socket.emit("remove reaction", getString(reaction))
-            console.log(getString(reaction))
-            
-        } else if (selected === NilButton) {
-            socket.emit("add reaction", getString(reaction))
-            console.log(getString(reaction))
-            setSelected(color)
-        } else {
-            // switched reactions
-            socket.emit("remove reaction", getString(getReaction(selected)))
-            console.log(getString(getReaction(selected)))
-            socket.emit("add reaction", getString(reaction))
-            setSelected(color)
-        }
-    }
-    return (
-        <Button
-            colorScheme={color}
-            bg={`${color}.${getColourGradient(color, selected)}`}
-            onClick={handleButton}
-            height='100%' >
-            {title}
-        </Button>
-    )
-}
-
-export default StudentFeedbackBtn
+export default StudentFeedbackBtn;

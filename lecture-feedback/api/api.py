@@ -46,7 +46,7 @@ def update_counts():
     emit("update students connected", {"count":studentCount})
 
 def reset_buttons():
-    socketio.emit("reset buttons", broadcast=True)
+    emit("reset buttons", broadcast=True)
 
 @app.route("/api/snapshots")
 @cross_origin()
