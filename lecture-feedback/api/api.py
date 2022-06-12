@@ -18,6 +18,9 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 studentCount = 0
 
+database.initialise_database()
+database.fetch_snapshot()
+
 # When there is a 404, we send it to react so it can deal with it
 @app.errorhandler(404)
 def not_found(e):
@@ -26,7 +29,7 @@ def not_found(e):
 @app.route("/")
 @cross_origin()
 def index():
-    return app.send_static_file("index.html")
+    return app.send_static_file("public/index.html")
 
 @app.route("/api/create-snapshot")
 @cross_origin()

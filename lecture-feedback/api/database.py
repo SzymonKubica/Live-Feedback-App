@@ -6,17 +6,31 @@ from bson import json_util
 from pymongo import MongoClient
 from reaction import Reaction
 
-cluster = os.environ.get('MONGODB_URI')
-client = MongoClient(cluster)
-db = client["lecture-feedback"]
+snapshot = None
+currentSnapshot = None
+cluster = None
+client = None
+db = None
+
+def initialise_database():
+    global cluster 
+    cluster = os.environ.get('MONGODB_URI')
+    global client 
+    client = MongoClient(cluster)
+    global db 
+    db = client["lecture-feedback"]
+
 
 # Find the most recent snapshot in the database
-snapshot = db["snapshots"].find_one(sort=[("end", pymongo.DESCENDING)])
+def fetch_snapshot():
+    global snapshot
+    global currentSnapshot
+    snapshot = db["snapshots"].find_one(sort=[("end", pymongo.DESCENDING)])
+    if snapshot is None:
+        currentSnapshot = datetime.min #should be start time of meeting
+    else:
+        currentSnapshot = snapshot['end']
 
-if snapshot is None:
-    currentSnapshot = datetime.min #should be start time of meeting
-else:
-    currentSnapshot = snapshot['end']
 
 # Functions for adding insights exposed to the api
 def add_insight(type):
@@ -56,7 +70,8 @@ def count_entries(table, start, end, type):
     })
 
 def find_snapshots():
-    return parse_mongo_json(list(db['snapshots'].find({})))
+    return 0
+#    return parse_mongo_json(list(db['snapshots'].find({})))
 
 def parse_mongo_json(data):
     return json.loads(json_util.dumps(data))
