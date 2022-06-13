@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
-import { Avatar, Flex, Text } from "@chakra-ui/react";
+import { Avatar, Flex, Text, Box} from "@chakra-ui/react";
 
 // https://ordinarycoders.com/blog/article/react-chakra-ui
 
-const Messages = ({ messages }) => {
+const Messages = ({ messages, h}) => {
   const AlwaysScrollToBottom = () => {
 	const elementRef = useRef();
 	useEffect(() => elementRef.current.scrollIntoView());
@@ -12,8 +12,8 @@ const Messages = ({ messages }) => {
 
   return (	
 	
-	<Flex w="100%" h="100%" overflowY="scroll" flexDirection="column" p="3">
-  	{messages.map((item, index) => {
+	<Flex w="100%" h={h} overflowY="scroll" flexDirection="column" p="3">
+	{messages.map((item, index) => {
       	return (
         	<Flex key={index} w="100%">
           	<Flex

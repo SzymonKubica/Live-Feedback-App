@@ -38,14 +38,11 @@ export default function CommentLog() {
         return () => socket.off("update comments")
       }, [])
   
-  
-    // const comments = ["comment daslkjdsajdjsadjlksajddasdsadadassaj 1", "comment 2", "comment 3", "comment 4",]
-
 
     return (    
-    <Flex w="100%" h="40%" justify="center" align="center">
+    <Flex w="100%" h="100%" justify="center" align="center">
       <Flex w={["100%", "100%", "40%"]} h="90%" flexDir="column">
-        <Messages messages={comments} />
+        <Messages h="calc(40vh)" messages={comments} />
       </Flex>
     </Flex>
     )

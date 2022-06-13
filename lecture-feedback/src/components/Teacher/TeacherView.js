@@ -38,7 +38,7 @@ export const TeacherView = () => {
         <Stack marginStart={10} marginTop={10} width="90%" spacing="10%">
           
             {/* <HStack spacing="10%"> */}
-            <Grid templateColumns='repeat(2, 1fr)' height="60%">
+            <Grid templateColumns='repeat(2, 1fr)'>
             <GridItem>
               <Box width="100%">
               <Stack spacing={20}>
@@ -70,7 +70,6 @@ export const TeacherView = () => {
             </Box>
           </GridItem>
           <GridItem>
-            
             <CommentLog />
           </GridItem>
           </Grid>
