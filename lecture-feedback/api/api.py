@@ -1,7 +1,7 @@
 from reaction import Reaction
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS, cross_origin
-from flask_socketio import SocketIO, send, emit
+from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from dotenv import load_dotenv
 import database
 
@@ -46,10 +46,14 @@ def update_counts():
     for reaction in Reaction:
         update_reaction_count(reaction)
 
+    # print("hi")
     emit("update students connected", {"count":studentCount})
 
 def reset_buttons():
     emit("reset buttons", broadcast=True)
+
+def in_room(room):
+    return room in socketio.server.rooms(request.sid)
 
 @app.route("/api/snapshots")
 @cross_origin()
@@ -65,7 +69,36 @@ def test_connect():
 
 @socketio.on("disconnect")
 def test_disconnect():
+    global studentCount
+    # Hacky for now, need a way to keep track of all of these nicely
+    # print(socketio.server.rooms(request.sid))
+    if in_room("student"):
+        studentCount -= 1
+        emit("update students connected", {"count":studentCount}, broadcast=True)
+
     print("disconnected")
+
+#for now, since one room, we will call the room student
+@socketio.on("join")
+def on_join(data):
+    global studentCount
+    room = data['room']
+    if room == "student" and not in_room("student"):
+        studentCount += 1
+        emit("update students connected", {"count":studentCount}, broadcast=True)
+    join_room(room)
+    print("joined room")
+
+@socketio.on("leave")
+def on_leave(data):
+    global studentCount
+    room = data['room']
+    if room == "student" and in_room("student"):
+        studentCount -= 1
+        emit("update students connected", {"count":studentCount}, broadcast=True)
+    leave_room(room)
+    print("left room")
+####
 
 @socketio.on("connect teacher")
 def handle_message():

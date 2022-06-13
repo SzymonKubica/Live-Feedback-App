@@ -17,8 +17,13 @@ export const StudentView = () => {
       setSelectedReaction(NilReaction)
     })
 
+    socket.emit("join", {"room":"student"})
+
     // Disconnect when unmounts
-    return () => socket.off("reset buttons")
+    return () => {
+      socket.off("reset buttons")
+      socket.emit("leave", {"room":"student"})
+    }
     //
   }, [])
 
