@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react"
 
-import { ChakraProvider, Stack, theme } from "@chakra-ui/react"
+import { ChakraProvider, Stack, theme, Textarea} from "@chakra-ui/react"
 
 import { socket, SocketContext } from "../../context/socket"
 import Header from "../Header"
 import StudentFeedbackGrid from "./StudentFeedbackGrid"
+import CommentSection from "./CommentSection"
 
 const NilReaction = "nil"
 
@@ -37,6 +38,7 @@ export const StudentView = () => {
             selectedReaction={selectedReaction}
             setSelectedReaction={setSelectedReaction}
           />
+         <CommentSection />
         </Stack>
       </SocketContext.Provider>
     </ChakraProvider>

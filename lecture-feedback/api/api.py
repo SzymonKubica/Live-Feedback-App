@@ -155,5 +155,22 @@ def handle_message():
     #reset buttons
     socketio.emit("reset buttons", broadcast=True)
 
+@app.route("/api/leave-comment", methods=['PUT'])
+@cross_origin()
+def add_comment():
+        # also add room later on
+        comment = request.json["comment"]
+        # when we actually associate them with reactions
+        # reaction = request.json["reaction"]
+        database.add_comment(comment)
+        socketio.emit("update comments", broadcast=True)
+        return {"success":True}
+
+@app.route("/api/get-comments")
+@cross_origin()
+def get_comments():
+        # also add room later on
+        return {"comments": database.get_current_comments()}
+
 if __name__ == "__main__":
     socketio.run()

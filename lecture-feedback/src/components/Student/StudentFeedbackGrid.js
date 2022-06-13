@@ -4,10 +4,12 @@ import { Center, SimpleGrid } from "@chakra-ui/react"
 
 import StudentFeedbackButton from "./StudentFeedbackButton"
 import { Reaction } from "../Reactions"
+import CommentSection from "./CommentSection"
+
 
 const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction }) => {
   return (
-    <Center width="100%" height="calc(85vh)">
+    <Center width="100%" height="calc(70vh)">
       <SimpleGrid marginBlock="5%" width="90%" height="90%" columns="2">
         <StudentFeedbackButton
           title="Good"
