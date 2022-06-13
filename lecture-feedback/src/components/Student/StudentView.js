@@ -11,11 +11,13 @@ const NilReaction = "nil"
 
 export const StudentView = () => {
   const [selectedReaction, setSelectedReaction] = useState(NilReaction)
+  const [visibleComment, setVisibleComment] = useState(false)
 
   // reset the button when lecturer creates a snapshot
   useEffect(() => {
     socket.on("reset buttons", () => {
       setSelectedReaction(NilReaction)
+      setVisibleComment(false)
     })
 
     socket.emit("join", {"room":"student"})
@@ -38,7 +40,11 @@ export const StudentView = () => {
             selectedReaction={selectedReaction}
             setSelectedReaction={setSelectedReaction}
           />
-         <CommentSection />
+          <CommentSection 
+            visible={visibleComment}
+            setVisible={setVisibleComment} 
+            selectedReaction={selectedReaction} 
+          />
         </Stack>
       </SocketContext.Provider>
     </ChakraProvider>
