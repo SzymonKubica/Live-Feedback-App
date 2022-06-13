@@ -161,8 +161,8 @@ def add_comment():
         # also add room later on
         comment = request.json["comment"]
         # when we actually associate them with reactions
-        # reaction = request.json["reaction"]
-        database.add_comment(comment)
+        reaction = request.json["reaction"]
+        database.add_comment(comment, reaction)
         socketio.emit("update comments", broadcast=True)
         return {"success":True}
 

@@ -100,9 +100,10 @@ def get_summarised(start, end):
     return output
 
 # Functions for comments
-def add_comment(comment):
+def add_comment(comment, reaction):
     db["comments"].insert_one({
         "comment": comment,
+        "reaction": reaction,
         "time": datetime.now()
     })
 
@@ -116,7 +117,7 @@ def get_comments_between(start, end):
 
     parsed_comments = []
     for comment in comments:
-        parsed_comments.append(comment["comment"])
+        parsed_comments.append({"comment":comment["comment"], "reaction":comment["reaction"]})
     return parsed_comments
 
 def get_current_comments():
