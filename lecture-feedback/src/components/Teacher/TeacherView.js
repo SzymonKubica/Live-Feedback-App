@@ -15,6 +15,7 @@ import TeacherFeedbackBar from "./TeacherFeedbackBar"
 import CommentLog from "./CommentLog"
 import { Reaction, getString } from "../Reactions"
 import TeacherGraph from "./TeacherGraph"
+import TeacherGraph2 from "./TeacherGraph2"
 
 export const TeacherView = () => {
   const [studentCounter, setStudentCounter] = useState(0)
@@ -43,53 +44,20 @@ export const TeacherView = () => {
     <ChakraProvider>
       <SocketContext.Provider value={socket}>
         <TeacherHeader />
-        <Stack marginStart={10} marginTop={10} width="90%" spacing="10%">
-          {/* <HStack spacing="10%"> */}
-          <Grid templateColumns="repeat(2, 1fr)" height="60%">
-            <GridItem>
-              <Box width="100%">
-                <Flex height="calc(85vh)" width="100%">
-                  <TeacherGraph
-                    labels={["Good", "Confused", "Too Fast", "Chilling"]}
-                    colors={["green", "red", "orange", "blue"]}
-                    colorblind={false}
-                  />
-                </Flex>
-                <Stack spacing={20}>
-                  <TeacherFeedbackBar
-                    studentCount={studentCounter}
-                    title="Good"
-                    color="green"
-                    reaction={getString(Reaction.GOOD)}
-                  />
-                  <TeacherFeedbackBar
-                    studentCount={studentCounter}
-                    title="Confused"
-                    color="red"
-                    reaction={getString(Reaction.CONFUSED)}
-                  />
-                  <TeacherFeedbackBar
-                    studentCount={studentCounter}
-                    title="Too Fast"
-                    color="orange"
-                    reaction={getString(Reaction.TOO_FAST)}
-                  />
-                  <TeacherFeedbackBar
-                    studentCount={studentCounter}
-                    title="Chilling"
-                    color="twitter"
-                    reaction={getString(Reaction.CHILLING)}
-                  />
-                </Stack>
-              </Box>
-            </GridItem>
-            <GridItem>
-              <CommentLog />
-            </GridItem>
-          </Grid>
-          {/* <SocketCounter reaction="students connected"/> */}
-          <Heading alignSelf="end">{studentCounter} students</Heading>
-        </Stack>
+        <Grid templateColumns="repeat(2, 1fr)" >
+          <GridItem>
+            <TeacherGraph2 />
+          </GridItem>
+          <GridItem>
+            <CommentLog />
+          </GridItem>
+        </Grid>
+
+        <Flex>
+          <Spacer />
+          <Heading>{studentCounter} students</Heading>
+        </Flex>
+
       </SocketContext.Provider>
     </ChakraProvider>
   )
