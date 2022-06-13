@@ -98,3 +98,26 @@ def get_summarised(start, end):
         output[reaction] = count_active_between(reaction, start, end)
 
     return output
+
+# Functions for comments
+def add_comment(comment):
+    db["comments"].insert_one({
+        "comment": comment,
+        "time": datetime.now()
+    })
+
+def get_comments_between(start, end):
+    comments = db["comments"].find({
+        "time": {
+            "$gte": start,
+            "$lte": end
+        }
+    })
+
+    parsed_comments = []
+    for comment in comments:
+        parsed_comments.append(comment["comment"])
+    return parsed_comments
+
+def get_current_comments():
+    return get_comments_between(currentSnapshot, datetime.now())
