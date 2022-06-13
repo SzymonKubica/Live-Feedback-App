@@ -1,8 +1,7 @@
 import React from "react"
 
 import { Button } from "@chakra-ui/react"
-
-import { socket } from "../../context/socket"
+import { SocketContext } from '../../context/socket'
 import { getString, NilReaction } from "../Reactions"
 
 const defaultColor = 500
@@ -22,6 +21,9 @@ const StudentFeedbackButton = ({
   selectedReaction,
   setSelectedReaction,
 }) => {
+
+  const socket = React.useContext(SocketContext);  
+
   function handleButton() {
     if (reaction === selectedReaction) {
       // When a button is selected and we tap it again to deselect it.

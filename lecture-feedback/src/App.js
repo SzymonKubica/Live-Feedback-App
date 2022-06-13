@@ -10,14 +10,6 @@ import { SnapshotView } from "./components/Teacher/SnapshotView"
 function App() {
   const [state, setState] = useState("")
 
-  useEffect(() => {
-    fetch("/test")
-      .then(res => res.json())
-      .then(data => {
-        setState(data.test)
-      })
-  }, [])
-
   return (
     <Router>
       <Fragment>
