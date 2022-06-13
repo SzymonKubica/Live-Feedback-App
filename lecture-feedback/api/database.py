@@ -4,6 +4,7 @@ import os
 import pymongo
 from bson import json_util
 from pymongo import MongoClient
+import certifi
 from reaction import Reaction
 
 snapshot = None
@@ -16,7 +17,7 @@ def initialise_database():
     global cluster 
     cluster = os.environ.get('MONGODB_URI')
     global client 
-    client = MongoClient(cluster)
+    client = MongoClient(cluster, tlsCAFile=certifi.where())
     global db 
     db = client["lecture-feedback"]
 
