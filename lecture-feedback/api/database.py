@@ -70,8 +70,7 @@ def count_entries(table, start, end, type):
     })
 
 def find_snapshots():
-    return 0
-#    return parse_mongo_json(list(db['snapshots'].find({})))
+    return parse_mongo_json(list(db['snapshots'].find({})))
 
 def parse_mongo_json(data):
     return json.loads(json_util.dumps(data))
