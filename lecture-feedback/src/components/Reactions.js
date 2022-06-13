@@ -1,7 +1,7 @@
 export const Reaction = {
   GOOD: "good",
   CONFUSED: "confused",
-  TOO_FAST: "too-fast",
+  TOO_FAST: "tooFast",
   CHILLING: "chilling",
 }
 

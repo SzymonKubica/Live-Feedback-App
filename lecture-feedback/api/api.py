@@ -103,6 +103,7 @@ def on_leave(data):
 @socketio.on("connect teacher")
 def handle_message():
     update_counts()
+    update_all_reactions()
 
 @socketio.on("connect student") 
 def handle_message():
@@ -121,17 +122,25 @@ def handle_message():
 def handle_reaction(reaction):
     database.add_insight(reaction)
     update_reaction_count(reaction)
+    update_all_reactions()
 
 @socketio.on("remove reaction")
 def handle_reaction(reaction):
     database.remove_insight(reaction)
     update_reaction_count(reaction)
+    update_all_reactions()
     
 def update_reaction_count(reaction):
     emit(
         "update " + reaction, 
         {"count":database.count_active(reaction)}, 
         broadcast=True)
+
+def update_all_reactions():
+    output = {}
+    for reaction in Reaction:
+        output[reaction] = database.count_active(reaction)
+    emit("update all", output, broadcast=True)
 
 @app.route("/api/reaction-count", methods=['POST'])
 @cross_origin()
@@ -146,6 +155,17 @@ def get_student_count():
         # also add room later on
         # reaction = request.json["reaction"]
         return {"count":studentCount}
+
+@app.route("/api/all_reactions", methods=['POST'])
+@cross_origin()
+def get_all_reactions():
+        # also add room later on
+        output = {}
+        for reaction in Reaction:
+            output[reaction] = database.count_active(reaction)
+        print (output)
+        return output
+
 
 @socketio.on("create snapshot")
 def handle_message():
