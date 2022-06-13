@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Avatar, Flex, Text, Box} from "@chakra-ui/react";
+import { getColour } from "../Reactions";
 
 // https://ordinarycoders.com/blog/article/react-chakra-ui
 
@@ -17,6 +18,16 @@ const Messages = ({ messages, h}) => {
       	return (
         	<Flex key={index} w="100%">
           	<Flex
+				bg={getColour(item.reaction)}
+				color="black"
+				minW="10px"
+				maxW="10px"
+				my="1"
+				p="3"	
+			>
+					
+			</Flex>
+			<Flex
             	bg="gray.100"
             	color="black"
             	minW="100px"
@@ -24,7 +35,7 @@ const Messages = ({ messages, h}) => {
             	my="1"
             	p="3"
           	>
-            	<Text>{item}</Text>
+            	<Text>{item.comment}</Text>
           	</Flex>
         	</Flex>
       	);

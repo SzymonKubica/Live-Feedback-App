@@ -25,7 +25,7 @@ export default function CommentSection({visible, setVisible, selectedReaction}) 
         const requestOptions = {
             'method': 'PUT',
             'headers': {'Content-Type': 'application/json'},
-            body: JSON.stringify({'comment': comment})
+            body: JSON.stringify({'comment': comment, 'reaction':selectedReaction})
           }
           
         fetch('/api/leave-comment', requestOptions)
