@@ -2,14 +2,7 @@ import React, { useState, useEffect } from "react"
 import { SocketContext } from '../../context/socket'
 
 
-import {
-    List,
-    ListItem,
-    ListIcon,
-    OrderedList,
-    UnorderedList,
-    Flex
-  } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
 
 import Messages from "./Messages"
 
