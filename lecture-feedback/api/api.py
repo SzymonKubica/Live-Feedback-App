@@ -133,6 +133,20 @@ def update_reaction_count(reaction):
         {"count":database.count_active(reaction)}, 
         broadcast=True)
 
+@app.route("/api/reaction-count", methods=['POST'])
+@cross_origin()
+def get_reaction_count():
+        # also add room later on
+        reaction = request.json["reaction"]
+        return {"count":database.count_active(reaction)}
+
+@app.route("/api/student-count", methods=['POST'])
+@cross_origin()
+def get_student_count():
+        # also add room later on
+        # reaction = request.json["reaction"]
+        return {"count":studentCount}
+
 @socketio.on("create snapshot")
 def handle_message():
     database.create_new_snapshot()

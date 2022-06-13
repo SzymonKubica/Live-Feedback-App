@@ -15,6 +15,17 @@ export const TeacherView = () => {
       setStudentCounter(data.count)
     })
 
+    const requestOptions = {
+      'method': 'POST',
+      'headers': {'Content-Type': 'application/json'},
+    }
+    
+    fetch('/api/student-count', requestOptions)
+    .then(res => res.json())
+    .then(data => {
+      setStudentCounter(data.count)
+    })
+
     // Disconnect when unmounts
     return () => socket.off("update students connected")
   }, [])

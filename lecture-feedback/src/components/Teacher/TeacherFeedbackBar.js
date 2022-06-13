@@ -14,6 +14,20 @@ const TeacherFeedbackBar = ({ studentCount, title, color, reaction }) => {
       setCounter(data.count)
     })
 
+    const requestOptions = {
+      'method': 'POST',
+      'headers': {'Content-Type': 'application/json'},
+      body: JSON.stringify({'reaction': reaction})
+    }
+    
+    fetch('/api/reaction-count', requestOptions)
+    .then(res => res.json())
+    .then(data => {
+      setCounter(data.count)
+    })
+
+
+
     // Disconnect when unmounts
     return () => socket.off("update " + reaction)
   }, [])
