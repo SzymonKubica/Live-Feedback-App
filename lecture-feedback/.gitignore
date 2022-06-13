@@ -23,6 +23,7 @@ env
 
 __pycache__
 .python-version
+.history
 
 npm-debug.log*
 yarn-debug.log*
