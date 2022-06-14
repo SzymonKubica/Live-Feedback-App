@@ -3,6 +3,7 @@ from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 import database
 
 load_dotenv()
@@ -121,12 +122,30 @@ def handle_message():
 @socketio.on("add reaction")
 def handle_reaction(reaction):
     database.add_insight(reaction)
+    database.save_totals()
     update_reaction_count(reaction)
     update_all_reactions()
+    print(get_graph_data())
+
+@socketio.on("update line graph")
+def handle_message():
+    data = []
+    request_time = datetime.now()
+    for i in range(10):
+        data.append(database.get_totals_for(request_time - timedelta(seconds = 30 * i)))
+    print(data)
+
+def get_graph_data():
+    data = []
+    request_time = datetime.now()
+    for i in range(10):
+        data.append(database.get_totals_for(request_time - timedelta(seconds = 30 * i)))
+    return data
 
 @socketio.on("remove reaction")
 def handle_reaction(reaction):
     database.remove_insight(reaction)
+    database.save_totals()
     update_reaction_count(reaction)
     update_all_reactions()
     
