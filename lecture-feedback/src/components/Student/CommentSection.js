@@ -8,9 +8,10 @@ export default function CommentSection({visible, setVisible, selectedReaction}) 
   
     const [comment, setComment] = useState("")
     
+    
     // Only allow comment when there is a new reaction (not allowed to be empty)
     useEffect(() => {
-      if (selectedReaction != NilReaction) {
+      if (selectedReaction !== NilReaction) {
         setVisible(true)
       } else {
         setVisible(false)
