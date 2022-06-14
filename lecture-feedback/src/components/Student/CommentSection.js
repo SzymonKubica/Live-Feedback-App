@@ -12,6 +12,8 @@ export default function CommentSection({visible, setVisible, selectedReaction}) 
     useEffect(() => {
       if (selectedReaction != NilReaction) {
         setVisible(true)
+      } else {
+        setVisible(false)
       }
     }, [selectedReaction])
     
