@@ -1,4 +1,4 @@
-from reaction import Reaction
+from reaction import Reaction, getString
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
@@ -125,21 +125,34 @@ def handle_reaction(reaction):
     database.save_totals()
     update_reaction_count(reaction)
     update_all_reactions()
-    print(get_graph_data())
 
 @socketio.on("update line graph")
 def handle_message():
-    data = []
-    request_time = datetime.now()
-    for i in range(10):
-        data.append(database.get_totals_for(request_time - timedelta(seconds = 30 * i)))
-    print(data)
+    emit("update line graph", get_graph_data(), broadcast=True)
 
+graph_data = None
 def get_graph_data():
-    data = []
+    global graph_data
+    if not graph_data:
+        graph_data = fetch_graph_data()
+    else:
+        for reaction in Reaction:
+            print(graph_data[getString(reaction)])
+            graph_data[getString(reaction)] = graph_data[getString(reaction)][1:] + [database.get_totals_for(datetime.now())[reaction]]
+            #graph_data[getString(reaction)].pop(0)
+            #graph_data[getString(reaction)] = graph_data[getString(reaction)] + [database.get_totals_for(datetime.now)[reaction]]
+
+    return graph_data
+
+def fetch_graph_data():
     request_time = datetime.now()
-    for i in range(10):
-        data.append(database.get_totals_for(request_time - timedelta(seconds = 30 * i)))
+    data = {}
+    for reaction in Reaction:
+        counts = []
+        for i in range(10):
+            counts = [database.get_totals_for(request_time - timedelta(seconds = 30 * i))[reaction]] + counts
+
+        data[getString(reaction)] = counts
     return data
 
 @socketio.on("remove reaction")
@@ -185,6 +198,10 @@ def get_all_reactions():
         print (output)
         return output
 
+@app.route("/api/line_graph_data", methods=['POST'])
+@cross_origin()
+def send_graph_data():
+    return get_graph_data()
 
 @socketio.on("create snapshot")
 def handle_message():

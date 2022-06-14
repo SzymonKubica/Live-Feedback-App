@@ -71,7 +71,6 @@ def save_totals():
         print("saving total " + reaction + " count " + str(count) + " " + str(datetime.now()))
         counts[reaction] = count
     add_entry(db, "totals", generate_total(time, counts))
-    #print(counts)
 
 def get_totals_for(time):
     totals = db["totals"].find_one({
@@ -80,7 +79,6 @@ def get_totals_for(time):
         }
     }, sort=[("time" , pymongo.DESCENDING)])    
     return totals
-    #return list(totals.sort("time", -1))[0]
 
 
 # Count insights of given type

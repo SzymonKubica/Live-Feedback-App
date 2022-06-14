@@ -15,12 +15,13 @@ import { socket, SocketContext } from "../../context/socket"
 import TeacherHeader from "./TeacherHeader"
 import CommentLog from "./CommentLog"
 import TeacherGraph2 from "./TeacherGraph2"
+import TeacherGraph3 from "./TeacherGraph3"
 import TeacherFeedbackBar from "./TeacherFeedbackBar"
 import { getString, Reaction } from "../Reactions"
 
 export const TeacherView = () => {
   const [studentCounter, setStudentCounter] = useState(0)
-  const [chartView, setChartView] = useState(true)
+  const [layout, setLayout] = useState(true)
 
   useEffect(() => {
     socket.on("update students connected", data => {
@@ -45,12 +46,12 @@ export const TeacherView = () => {
   return (
     <ChakraProvider>
       <SocketContext.Provider value={socket}>
-        <TeacherHeader state={chartView} setState={setChartView} />
+        <TeacherHeader state={layout} setState={setLayout} />
         <Grid templateColumns="repeat(2, 1fr)">
           <GridItem>
-            {chartView ? (
+            {layout == 0 ? (
               <TeacherGraph2 />
-            ) : (
+            ) : layout == 1 ? (
               <Stack marginStart={10} marginTop={10} width="90%" spacing="10%">
                 <Box width="100%">
                   <Stack spacing={20}>
@@ -81,6 +82,8 @@ export const TeacherView = () => {
                   </Stack>
                 </Box>
               </Stack>
+            ) : (
+              <TeacherGraph3 />
             )}
           </GridItem>
           <GridItem>
