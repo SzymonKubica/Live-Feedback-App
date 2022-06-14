@@ -172,6 +172,7 @@ def handle_message():
     database.create_new_snapshot()
     # need to update counts now
     update_counts()
+    update_all_reactions()
     #reset buttons
     socketio.emit("reset buttons", broadcast=True)
 
