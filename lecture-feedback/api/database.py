@@ -137,7 +137,7 @@ def get_new_code():
 
 # Adds code to database as active, if it already exists, returns false
 # probably not thread safe
-def add_active_code(code):
+def add_active_code(code: int):
     is_new_code = 0 == db["active_codes"].count_documents({
             "code": code
         })#.limit(1)
@@ -147,3 +147,7 @@ def add_active_code(code):
         db["active_codes"].insert_one({"code": code})
 
     return not is_new_code
+
+def is_active_code(code: int):
+    return db["active_codes"].find_one({"code":code}) is not None
+    
