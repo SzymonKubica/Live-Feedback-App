@@ -124,6 +124,7 @@ def get_comments_between(start, end):
 def get_current_comments():
     return get_comments_between(currentSnapshot, datetime.now())
 
+
 def get_new_code():
     def gen_code(): return random.randrange(10**(6-1),10**6)
     
@@ -137,10 +138,6 @@ def get_new_code():
 # Adds code to database as active, if it already exists, returns false
 # probably not thread safe
 def add_active_code(code):
-    # return 0 == db["active_codes"].count_documents({
-    #     "code": code
-    # }).limit(1)
-    # db["active_codes"].insert_one()
     is_new_code = 0 == db["active_codes"].count_documents({
             "code": code
         })#.limit(1)
