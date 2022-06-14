@@ -193,5 +193,13 @@ def get_comments():
         # also add room later on
         return {"comments": database.get_current_comments()}
 
+
+# code stuff
+@app.route("/api/new-code")
+@cross_origin()
+def get_new_code():
+    code = database.get_new_code()
+    return {"code":code}
+
 if __name__ == "__main__":
     socketio.run()

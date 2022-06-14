@@ -6,6 +6,7 @@ from bson import json_util
 from pymongo import MongoClient
 import certifi
 from reaction import Reaction
+import random
 
 snapshot = None
 currentSnapshot = None
@@ -122,3 +123,30 @@ def get_comments_between(start, end):
 
 def get_current_comments():
     return get_comments_between(currentSnapshot, datetime.now())
+
+def get_new_code():
+    def gen_code(): return random.randrange(10**(6-1),10**6)
+    
+    code = gen_code()
+    
+    while add_active_code(code):
+        code = gen_code()
+
+    return code
+
+# Adds code to database as active, if it already exists, returns false
+# probably not thread safe
+def add_active_code(code):
+    # return 0 == db["active_codes"].count_documents({
+    #     "code": code
+    # }).limit(1)
+    # db["active_codes"].insert_one()
+    is_new_code = 0 == db["active_codes"].count_documents({
+            "code": code
+        })#.limit(1)
+
+
+    if is_new_code:
+        db["active_codes"].insert_one({"code": code})
+
+    return not is_new_code
