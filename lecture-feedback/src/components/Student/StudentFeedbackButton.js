@@ -46,6 +46,7 @@ const StudentFeedbackButton = ({
       bg={`${color}.${getColourGradient(reaction, selectedReaction)}`}
       onClick={handleButton}
       height="100%"
+      _hover='0'
     >
       {title}
     </Button>
