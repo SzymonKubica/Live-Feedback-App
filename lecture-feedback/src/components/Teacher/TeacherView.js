@@ -17,11 +17,14 @@ import CommentLog from "./CommentLog"
 import TeacherGraph2 from "./TeacherGraph2"
 import TeacherFeedbackBar from "./TeacherFeedbackBar"
 import { getString, Reaction } from "../Reactions"
+import { useParams } from "react-router-dom";
 
 export const TeacherView = () => {
   const [studentCounter, setStudentCounter] = useState(0)
   const [chartView, setChartView] = useState(true)
 
+  let { code } = useParams();
+  
   useEffect(() => {
     socket.on("update students connected", data => {
       setStudentCounter(data.count)
@@ -46,6 +49,8 @@ export const TeacherView = () => {
     <ChakraProvider>
       <SocketContext.Provider value={socket}>
         <TeacherHeader state={chartView} setState={setChartView} />
+        <Heading textAlign='center'>Reaction Analysis</Heading>
+        <Heading textAlign='center'> Code: {code} </Heading>
         <Grid templateColumns="repeat(2, 1fr)">
           <GridItem>
             {chartView ? (
@@ -84,6 +89,7 @@ export const TeacherView = () => {
             )}
           </GridItem>
           <GridItem>
+            {/* TODO: add get code button */}
             <CommentLog />
           </GridItem>
         </Grid>
