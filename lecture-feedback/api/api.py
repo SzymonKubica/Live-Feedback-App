@@ -1,11 +1,13 @@
-from reaction import Reaction, getString
 from flask import Flask, request, session
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
+from flask_session import Session
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+
+# Our modules
 import database
-from flask_session import Session
+from reaction import Reaction, getString
 
 load_dotenv()
 
@@ -43,18 +45,11 @@ def index():
 def create_snapshot():
     room = sid_to_room[request.sid]
     database.create_new_snapshot(room, students_sid)
-    update_counts(room)
+    update(room)
     reset_buttons(room)
-
     print("created snapshot")
     return None
 
-def update_counts(room):
-    for reaction in Reaction:
-        update_reaction_count(reaction, room)
-
-    # print("hi")
-    emit("update students connected", {"count":studentCount})
 
 def reset_buttons(room):
     emit("reset buttons", to=room)
@@ -62,18 +57,11 @@ def reset_buttons(room):
 def in_room(room):
     return room in socketio.server.rooms(request.sid)
 
-@app.route("/api/snapshots")
-@cross_origin()
-def get_snapshots():
-    snapshots = database.find_snapshots()
-
-    return {"snapshots":snapshots}
 
 @socketio.on("connect")
 def test_connect():
     print("connected")
     print(request.sid)
-    # update_counts()
 
 @socketio.on("disconnect")
 def test_disconnect():
@@ -83,9 +71,10 @@ def test_disconnect():
         emit("update students connected", {"count":student_room_counts[room]}, to=room)
         students_sid.remove(request.sid)
         sid_to_room.pop(request.sid)
-        update_all_reactions(room)
+        update(room)
         print("student disconnected")
     else:
+        # TODO: Add some handling for the case when a teacher was disconnected due to some error
         print("teacher disconnected")
 
 @socketio.on("join")
@@ -118,21 +107,17 @@ def on_leave(data):
         student_room_counts[room] -= 1
         students_sid.remove(request.sid)
         sid_to_room.pop(request.sid)
-        emit("update students connected", {"count":student_room_counts[room]}, to=room)
-        update_all_reactions(room)
+        update(room)
 
     leave_room(room)
-    if request.sid in students_sid:
-        session.pop("room") # since they have now left the meeting
+    session.pop("room") # since they have now left the meeting
     print("left room")
 
 @socketio.on("add reaction")
 def handle_reaction(reaction, room):
     sid = request.sid
     database.add_insight(reaction, room, sid)
-    database.save_totals(room, students_sid) ## need to rewrite this to consider rooms
-    update_reaction_count(reaction, room)
-    update_all_reactions(room)
+    update(room)
 
 @socketio.on("update line graph")
 def handle_message():
@@ -179,27 +164,39 @@ def fetch_graph_data(room):
 def handle_reaction(reaction, room):
     sid = request.sid
     database.remove_insight(reaction, room, sid)
-    database.save_totals(room, sid) ## need to rewrite this also
-    update_reaction_count(reaction, room)
-    update_all_reactions(room)
+    update(room)
     
-def update_reaction_count(reaction, room):
-    emit(
-        "update " + reaction, 
-        {"count":database.count_active(reaction, room, students_sid)}, 
-        to=room)
+# Updates all of the data associated with a given room
+def update(room):
+    print("updating room: " + str(room))
+    emit("update", count_active_reactions_in(room), to=room)
+    emit("update line graph", to=room) ## TODO: Insert line graph data here
+    emit("update students connected", {"count":student_room_counts[room]}, to=room)
 
-def update_all_reactions(room):
+def count_active_reactions_in(room):
     output = {}
     for reaction in Reaction:
         output[reaction] = database.count_active(reaction, room, students_sid)
-    emit("update all", output, to=room)
-    emit("update line graph", to=room)
+    return output
+
+
+@socketio.on("create snapshot")
+def handle_message():
+    room = sid_to_room[request.sid]
+    database.create_new_snapshot(room, students_sid)
+    update(room)
+    reset_buttons(room)
+
+
+@app.route("/api/snapshots")
+@cross_origin()
+def get_snapshots():
+    snapshots = database.find_snapshots()
+    return {"snapshots":snapshots}
 
 @app.route("/api/reaction-count", methods=['POST'])
 @cross_origin()
 def get_reaction_count():
-        # also add room later on
         reaction = request.json["reaction"]
         room = request.json["room"]
         return {"count":database.count_active(reaction, room, students_sid)}
@@ -219,27 +216,13 @@ def get_student_count():
 @cross_origin()
 def get_all_reactions():
         room = request.json["room"]
-        output = {}
-        for reaction in Reaction:
-            output[reaction] = database.count_active(reaction, room, students_sid)
-        print (output)
-        return output
+        return count_active_reactions_in(room)
 
 @app.route("/api/line_graph_data", methods=['POST'])
 @cross_origin()
 def send_graph_data():
     room = request.json["room"]
     return get_graph_data(room)
-
-@socketio.on("create snapshot")
-def handle_message():
-    room = sid_to_room[request.sid]
-    database.create_new_snapshot(room, students_sid)
-    # need to update counts now
-    update_counts(room)
-    update_all_reactions(room)
-    #reset buttons
-    socketio.emit("reset buttons", to=room)
 
 @socketio.on("leave comment")
 def add_comment(comment, reaction, room):
@@ -255,7 +238,6 @@ def get_comments():
         comments = database.get_current_comments(room, students_sid)
         print(comments)
         return {"comments": comments}
-
 
 # code stuff
 @app.route("/api/new-code")

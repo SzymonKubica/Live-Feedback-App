@@ -4,32 +4,7 @@ import { Heading, Progress, Stack } from "@chakra-ui/react"
 
 import { SocketContext } from "../../context/socket"
 
-const TeacherFeedbackBar = ({ studentCount, title, color, reaction, room}) => {
-  const [counter, setCounter] = useState(0)
-
-  const socket = React.useContext(SocketContext)
-
-  useEffect(() => {
-    socket.on("update " + reaction, data => {
-      setCounter(data.count)
-    })
-
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reaction: reaction , room: room}),
-    }
-
-    fetch("/api/reaction-count", requestOptions)
-      .then(res => res.json())
-      .then(data => {
-        setCounter(data.count)
-      })
-
-    // Disconnect when unmounts
-    return () => socket.off("update " + reaction)
-  }, [])
-
+const TeacherFeedbackBar = ({ counter, studentCount, title, color }) => {
   return (
     <Stack>
       <Heading>

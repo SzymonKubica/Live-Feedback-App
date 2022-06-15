@@ -16,7 +16,7 @@ import TeacherHeader from "./TeacherHeader"
 import CommentLog from "./CommentLog"
 import TeacherGraph2 from "./TeacherGraph2"
 import TeacherGraph3 from "./TeacherGraph3"
-import TeacherFeedbackBar from "./TeacherFeedbackBar"
+import TeacherFeedbackBars from "./TeacherFeedbackBars"
 import { getString, Reaction } from "../Reactions"
 import { useParams } from "react-router-dom"
 
@@ -62,40 +62,7 @@ export const TeacherView = () => {
             {chartView == 0 ? (
               <TeacherGraph2 room={code} />
             ) : chartView == 1 ? (
-              <Stack marginStart={10} marginTop={10} width="90%" spacing="10%">
-                <Box width="100%">
-                  <Stack spacing={20}>
-                    <TeacherFeedbackBar
-                      studentCount={studentCounter}
-                      title="Good"
-                      color="green"
-                      reaction={getString(Reaction.GOOD)}
-                      room={code}
-                    />
-                    <TeacherFeedbackBar
-                      studentCount={studentCounter}
-                      title="Confused"
-                      color="red"
-                      reaction={getString(Reaction.CONFUSED)}
-                      room={code}
-                    />
-                    <TeacherFeedbackBar
-                      studentCount={studentCounter}
-                      title="Too Fast"
-                      color="orange"
-                      reaction={getString(Reaction.TOO_FAST)}
-                      room={code}
-                    />
-                    <TeacherFeedbackBar
-                      studentCount={studentCounter}
-                      title="Chilling"
-                      color="twitter"
-                      reaction={getString(Reaction.CHILLING)}
-                      room={code}
-                    />
-                  </Stack>
-                </Box>
-              </Stack>
+              <TeacherFeedbackBars room={code} />
             ) : (
               <TeacherGraph3 room={code} />
             )}
