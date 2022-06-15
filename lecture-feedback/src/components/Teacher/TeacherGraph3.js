@@ -87,7 +87,7 @@ const TeacherGraph3 = props => {
   useEffect(() => {
     socket.emit("update line graph")
     const interval = setInterval(() => {
-      socket.emit("update line graph")
+      socket.emit("update line graph", props.room)
     }, REFRESH_TIME)
 
     socket.on("update line graph", data => {
@@ -97,6 +97,7 @@ const TeacherGraph3 = props => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ room: props.room }),
     }
 
     fetch("/api/line_graph_data", requestOptions)
