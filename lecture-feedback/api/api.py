@@ -82,7 +82,7 @@ def test_disconnect():
         student_room_counts[room] -= 1
         emit("update students connected", {"count":student_room_counts[room]}, to=room)
         students_sid.remove(request.sid)
-        #sid_to_room.pop(request.sid)
+        sid_to_room.pop(request.sid)
         update_all_reactions(room)
         print("student disconnected")
     else:
@@ -130,7 +130,7 @@ def on_leave(data):
 def handle_reaction(reaction, room):
     sid = request.sid
     database.add_insight(reaction, room, sid)
-    #database.save_totals(room, students_sid) ## need to rewrite this to consider rooms
+    database.save_totals(room, students_sid) ## need to rewrite this to consider rooms
     update_reaction_count(reaction, room)
     update_all_reactions(room)
 
@@ -179,7 +179,7 @@ def fetch_graph_data(room):
 def handle_reaction(reaction, room):
     sid = request.sid
     database.remove_insight(reaction, room, sid)
-    #database.save_totals(room, sid) ## need to rewrite this also
+    database.save_totals(room, sid) ## need to rewrite this also
     update_reaction_count(reaction, room)
     update_all_reactions(room)
     
