@@ -1,8 +1,9 @@
-from reaction import Reaction
+from reaction import Reaction, getString
 from flask import Flask, request, session
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 import database
 from flask_session import Session
 
@@ -127,13 +128,45 @@ def on_leave(data):
 def handle_reaction(reaction, room):
     sid = request.sid
     database.add_insight(reaction, room, sid)
+    database.save_totals(room, students_sid) ## need to rewrite this to consider rooms
     update_reaction_count(reaction, room)
     update_all_reactions(room)
+
+@socketio.on("update line graph")
+def handle_message():
+    room = sid_to_room[request.sid]
+    emit("update line graph", get_graph_data(room), broadcast=True)
+
+graph_data = None
+def get_graph_data(room):
+    global graph_data
+    if not graph_data:
+        graph_data = fetch_graph_data(room)
+    else:
+        totals = database.get_totals_for(datetime.now(), room)
+        for reaction in Reaction:
+            graph_data[getString(reaction)] = graph_data[getString(reaction)][1:] + [totals[reaction]]
+
+    return graph_data
+
+def fetch_graph_data(room):
+    request_time = datetime.now()
+    data = {}
+
+    for reaction in Reaction:
+        data[reaction] = []
+
+    for i in range (21):
+        totals = database.get_totals_for(request_time - timedelta(seconds = 30 * i), room)
+        for reaction in Reaction:
+            data[getString(reaction)] = [totals[reaction]] + data[getString(reaction)]
+    return data
 
 @socketio.on("remove reaction")
 def handle_reaction(reaction, room):
     sid = request.sid
     database.remove_insight(reaction, room, sid)
+    database.save_totals() ## need to rewrite this also
     update_reaction_count(reaction, room)
     update_all_reactions(room)
     
@@ -178,6 +211,10 @@ def get_all_reactions():
         print (output)
         return output
 
+@app.route("/api/line_graph_data", methods=['POST'])
+@cross_origin()
+def send_graph_data():
+    return get_graph_data()
 
 @socketio.on("create snapshot")
 def handle_message():

@@ -15,13 +15,14 @@ import { socket, SocketContext } from "../../context/socket"
 import TeacherHeader from "./TeacherHeader"
 import CommentLog from "./CommentLog"
 import TeacherGraph2 from "./TeacherGraph2"
+import TeacherGraph3 from "./TeacherGraph3"
 import TeacherFeedbackBar from "./TeacherFeedbackBar"
 import { getString, Reaction } from "../Reactions"
 import { useParams } from "react-router-dom";
 
 export const TeacherView = () => {
   const [studentCounter, setStudentCounter] = useState(0)
-  const [chartView, setChartView] = useState(true)
+  const [chartView, setChartView] = useState(0)
 
   let { code } = useParams();
   
@@ -60,9 +61,9 @@ export const TeacherView = () => {
         <Heading textAlign='center'> Code: {code} </Heading>
         <Grid templateColumns="repeat(2, 1fr)">
           <GridItem>
-            {chartView ? (
+            {chartView==0 ? (
               <TeacherGraph2 room={code} />
-            ) : (
+            ) : chartView==1 ? (
               <Stack marginStart={10} marginTop={10} width="90%" spacing="10%">
                 <Box width="100%">
                   <Stack spacing={20}>
@@ -97,6 +98,8 @@ export const TeacherView = () => {
                   </Stack>
                 </Box>
               </Stack>
+            ) : (
+              <TeacherGraph3 />
             )}
           </GridItem>
           <GridItem>

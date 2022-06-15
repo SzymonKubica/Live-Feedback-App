@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import os
 import pymongo
@@ -58,6 +58,37 @@ def generate_insight(type, room, sid):
         "sid": sid,
         "time": datetime.now()
     }
+
+def generate_total(time, counts, room):
+    return {
+        "type": "totals",
+        "time": time,
+        "good": counts[str(Reaction.GOOD)],
+        "confused": counts[str(Reaction.CONFUSED)],
+        "tooFast": counts[str(Reaction.TOO_FAST)],
+        "chilling": counts[str(Reaction.CHILLING)],
+        "room": room
+    }
+
+def save_totals(room, active_students):
+    time = datetime.now()
+    counts = {}
+    i = 0
+    for reaction in Reaction:
+        count = count_active(reaction, room, active_students)
+        print("saving total " + reaction + " count " + str(count) + " " + str(datetime.now()))
+        counts[reaction] = count
+    add_entry(db, "totals", generate_total(time, counts, room))
+
+def get_totals_for(time, room):
+    totals = db["totals"].find_one({
+        "time": {
+            "$lte": time
+        },
+        "room": room
+    }, sort=[("time" , pymongo.DESCENDING)])    
+    return totals
+
 
 # Count insights of given type
 def count_active(table, room, active_students):
