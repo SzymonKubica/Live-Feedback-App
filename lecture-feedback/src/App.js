@@ -6,6 +6,7 @@ import { HomeView } from "./components/Home/HomeView"
 import { StudentView } from "./components/Student/StudentView"
 import { TeacherView } from "./components/Teacher/TeacherView"
 import { SnapshotView } from "./components/Teacher/SnapshotView"
+import { TeacherMenu } from "./components/Teacher/TeacherMenu"
 
 function App() {
   const [state, setState] = useState("")
@@ -15,9 +16,10 @@ function App() {
       <Fragment>
         <Routes>
           <Route path="" element={<HomeView />} />
-          <Route path="student" element={<StudentView />} />
-          <Route path="teacher" element={<TeacherView />} />
+          <Route path="student/meeting/:code" element={<StudentView />} />
+          <Route path="teacher/meeting/:code" element={<TeacherView />} />
           <Route path="teacher/snapshots" element={<SnapshotView />} />
+          <Route path="teacher/menu" element={< TeacherMenu/>} />
         </Routes>
       </Fragment>
     </Router>

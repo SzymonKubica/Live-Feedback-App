@@ -4,7 +4,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { SocketContext } from "../../context/socket";
 
 
-const TeacherGraph2 = (props) => {
+const TeacherGraph2 = ({room}) => {
 
     ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -12,7 +12,7 @@ const TeacherGraph2 = (props) => {
         labels: ["Good", "Confused", "Too Fast", "Chilling"],
         datasets: [
             {
-                data: [1, 2, 3, 4],
+                data: [0, 0, 0, 0],
                 backgroundColor: [
                     'rgba(0, 255, 0, 0.5)',
                     'rgba(255, 0, 0, 0.5)',
@@ -52,6 +52,7 @@ const TeacherGraph2 = (props) => {
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({"room": room})
         }
 
         fetch("/api/all_reactions", requestOptions)
