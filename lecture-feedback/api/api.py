@@ -19,8 +19,8 @@ Session(app)
 socketio = SocketIO(app, cors_allowed_origins="*", manage_session=False)
 
 
-studentCounts = {}
-students = set() #stores the socket id of all students (so when disconnects we can close it)
+student_room_counts = {} #stores the number of students in each room
+students_sid = set() #stores the socket id of all active students
 studentCount = 0
 
 database.initialise_database()
@@ -76,9 +76,9 @@ def test_connect():
 
 @socketio.on("disconnect")
 def test_disconnect():
-    if request.sid in students:
-        studentCounts[session["room"]] -= 1
-        emit("update students connected", {"count":studentCounts[session["room"]]}, to=session["room"])
+    if request.sid in students_sid:
+        student_room_counts[session["room"]] -= 1
+        emit("update students connected", {"count":student_room_counts[session["room"]]}, to=session["room"])
 
     print("disconnected")
 
@@ -87,15 +87,15 @@ def on_join(data):
     room = data['room']
 
     if data['type'] == "student":
-        students.add(request.sid)
-        studentCounts[room] += 1
-        emit("update students connected", {"count":studentCounts[room]}, to=room)
+        students_sid.add(request.sid)
+        student_room_counts[room] += 1
+        emit("update students connected", {"count":student_room_counts[room]}, to=room)
 
     # need to remember to remove these rooms from counts when meeting ended otherwise we
     # will have wrong data saved over
 
-    if data['type'] == "teacher" and room not in studentCounts:
-        studentCounts[room] = 0 # intialise the room to 0
+    if data['type'] == "teacher" and room not in student_room_counts:
+        student_room_counts[room] = 0 # intialise the room to 0
 
     session["type"] = data["type"] # stores student or teacher
     session["room"] = room
@@ -106,10 +106,10 @@ def on_join(data):
 def on_leave(data):
     room = data['room']
 
-    if request.sid in students:
-        studentCounts[room] -= 1
-        emit("update students connected", {"count":studentCounts[room]}, to=room)
-        students.remove(request.sid)
+    if request.sid in students_sid:
+        student_room_counts[room] -= 1
+        emit("update students connected", {"count":student_room_counts[room]}, to=room)
+        students_sid.remove(request.sid)
 
     leave_room(room)
     session.pop("room") # since they have now left the meeting
@@ -152,8 +152,8 @@ def get_reaction_count():
 def get_student_count():
         room = request.json["room"]
         # weird bug where not initially initialised? will need to fix this
-        if room in studentCounts:
-            count = studentCounts[room]
+        if room in student_room_counts:
+            count = student_room_counts[room]
         else:
             count = 0
         return {"count":count}
