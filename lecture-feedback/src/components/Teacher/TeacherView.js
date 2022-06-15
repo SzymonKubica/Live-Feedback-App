@@ -62,7 +62,7 @@ export const TeacherView = () => {
         <Heading textAlign='center'>Reaction Analysis</Heading>
         <Heading textAlign='center'> Code: {code} </Heading>
         <Grid templateColumns="repeat(3, 1fr)" height='calc(78vh)'>
-          <GridItem rowSpan={2} colSpan={2} bg='tomato'>
+          <GridItem rowSpan={2} colSpan={2}>
             <Center>
               <Container height='100%' width='100%'>
 
@@ -76,7 +76,7 @@ export const TeacherView = () => {
               </Container>
             </Center>
           </GridItem>
-          <GridItem rowSpan={2} bg='blue'>
+          <GridItem rowSpan={2}>
             {/* TODO: add get code button */}
             <CommentLog room={code} />
           </GridItem>
