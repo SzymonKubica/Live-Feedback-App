@@ -21,6 +21,7 @@ socketio = SocketIO(app, cors_allowed_origins="*", manage_session=False)
 
 student_room_counts = {} #stores the number of students in each room
 students_sid = set() #stores the socket id of all active students
+sid_to_room = {} # map from sid to room
 studentCount = 0
 
 database.initialise_database()
@@ -77,10 +78,12 @@ def test_connect():
 @socketio.on("disconnect")
 def test_disconnect():
     if request.sid in students_sid:
-        student_room_counts[session["room"]] -= 1
+        room = sid_to_room[request.sid]
+        student_room_counts[room] -= 1
+        emit("update students connected", {"count":student_room_counts[room]}, to=room)
         students_sid.remove(request.sid)
-        emit("update students connected", {"count":student_room_counts[session["room"]]}, to=session["room"])
-        update_all_reactions(session["room"])
+        sid_to_room.pop(request.sid)
+        update_all_reactions(room)
 
     print("disconnected")
 
@@ -90,6 +93,7 @@ def on_join(data):
 
     if data['type'] == "student":
         students_sid.add(request.sid)
+        sid_to_room[request.sid] = room
         student_room_counts[room] += 1
         emit("update students connected", {"count":student_room_counts[room]}, to=room)
 
@@ -111,8 +115,9 @@ def on_leave(data):
     if request.sid in students_sid:
         student_room_counts[room] -= 1
         students_sid.remove(request.sid)
+        sid_to_room.pop(request.sid)
         emit("update students connected", {"count":student_room_counts[room]}, to=room)
-        update_all_reactions(session["room"])
+        update_all_reactions(room)
 
     leave_room(room)
     session.pop("room") # since they have now left the meeting
