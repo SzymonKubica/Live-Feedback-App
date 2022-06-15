@@ -82,9 +82,10 @@ const TeacherGraph3 = props => {
     }
   }
 
-  const REFRESH_TIME = 30000
+  const REFRESH_TIME = 10000
 
   useEffect(() => {
+    socket.emit("update line graph")
     const interval = setInterval(() => {
       socket.emit("update line graph")
     }, REFRESH_TIME)
