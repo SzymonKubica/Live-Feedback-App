@@ -20,38 +20,53 @@ export const StudentView = () => {
   // reset the button when lecturer creates a snapshot
   useEffect(() => {
     
-    async function setup() {
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({"code": parseInt(code)}) 
-      }
+    // async function setup() {
+    //   const requestOptions = {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({"code": parseInt(code)}) 
+    //   }
 
-      const response = await fetch("/api/is-code-active", requestOptions)
-      const data = await response.json();
-      // setValidCode(data.valid)
-      // if (data.valid) {
-      //   navigate("/student/meeting/" + code, { replace: true })
-      // }
+    //   const response = await fetch("/api/is-code-active", requestOptions)
+    //   const data = await response.json();
+    //   // setValidCode(data.valid)
+    //   // if (data.valid) {
+    //   //   navigate("/student/meeting/" + code, { replace: true })
+    //   // }
       
-      if (data.valid){
-        socket.on("reset buttons", () => {
-          setSelectedReaction(NilReaction)
-          setVisibleComment(false)
-        })
+    //   if (data.valid){
+    //     socket.on("reset buttons", () => {
+    //       setSelectedReaction(NilReaction)
+    //       setVisibleComment(false)
+    //     })
     
-        socket.emit("join", {"room":"student"})
+    //     socket.emit("join", {"room":code, "type":"student"})
     
-        // Disconnect when unmounts
-        return () => {
-          socket.off("reset buttons")
-          socket.emit("leave", {"room":"student"})
-        }
-      } else {
-        navigate("/", { replace: true })
-      }
+    //     // Disconnect when unmounts
+    //     return () => {
+    //       socket.off("reset buttons")
+    //       console.log("hello")
+    //       socket.emit("leave", {"room":code})
+    //     }
+    //   } else {
+    //     navigate("/", { replace: true })
+    //   }
+    // }
+    // setup()
+
+    socket.on("reset buttons", () => {
+      setSelectedReaction(NilReaction)
+      setVisibleComment(false)
+    })
+
+    socket.emit("join", {"room":code, "type":"student"})
+
+    // Disconnect when unmounts
+    return () => {
+      socket.off("reset buttons")
+      console.log("hello")
+      socket.emit("leave", {"room":code})
     }
-    setup()
     //
   }, [])
 
@@ -65,11 +80,13 @@ export const StudentView = () => {
           <StudentFeedbackGrid
             selectedReaction={selectedReaction}
             setSelectedReaction={setSelectedReaction}
+            room={code}
           />
           <CommentSection 
             visible={visibleComment}
             setVisible={setVisibleComment} 
-            selectedReaction={selectedReaction} 
+            selectedReaction={selectedReaction}
+            room={code}
           />
         </Stack>
       </SocketContext.Provider>

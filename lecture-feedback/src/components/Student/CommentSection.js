@@ -4,7 +4,7 @@ import { Center} from "@chakra-ui/react"
 import { NilReaction } from '../Reactions'
 
 
-export default function CommentSection({visible, setVisible, selectedReaction}) {
+export default function CommentSection({visible, setVisible, selectedReaction, room}) {
   
     const [comment, setComment] = useState("")
     
@@ -28,7 +28,7 @@ export default function CommentSection({visible, setVisible, selectedReaction}) 
         const requestOptions = {
             'method': 'PUT',
             'headers': {'Content-Type': 'application/json'},
-            body: JSON.stringify({'comment': comment, 'reaction':selectedReaction})
+            body: JSON.stringify({'comment': comment, 'reaction':selectedReaction, 'room':room})
           }
           
         fetch('/api/leave-comment', requestOptions)

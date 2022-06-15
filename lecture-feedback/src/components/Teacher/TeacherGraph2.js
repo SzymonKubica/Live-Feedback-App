@@ -4,7 +4,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { SocketContext } from "../../context/socket";
 
 
-const TeacherGraph2 = (props) => {
+const TeacherGraph2 = ({room}) => {
 
     ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -52,6 +52,7 @@ const TeacherGraph2 = (props) => {
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({"room": room})
         }
 
         fetch("/api/all_reactions", requestOptions)

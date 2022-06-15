@@ -15,6 +15,7 @@ const TeacherGraph = props => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      room: JSON.stringify({"room": props.room})
     }
 
     fetch("/api/all_reactions", requestOptions)

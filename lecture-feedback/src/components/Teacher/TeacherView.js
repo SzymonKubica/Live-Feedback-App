@@ -29,10 +29,12 @@ export const TeacherView = () => {
     socket.on("update students connected", data => {
       setStudentCounter(data.count)
     })
+    socket.emit("join", {"room":code, "type":"teacher"})
 
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({"room": code})
     }
 
     fetch("/api/student-count", requestOptions)
@@ -41,8 +43,13 @@ export const TeacherView = () => {
         setStudentCounter(data.count)
       })
 
+    
+
     // Disconnect when unmounts
-    return () => socket.off("update students connected")
+    return () => {
+      socket.off("update students connected")
+      socket.emit("leave", {"room":code})
+    }
   }, [])
 
   return (
@@ -54,7 +61,7 @@ export const TeacherView = () => {
         <Grid templateColumns="repeat(2, 1fr)">
           <GridItem>
             {chartView ? (
-              <TeacherGraph2 />
+              <TeacherGraph2 room={code} />
             ) : (
               <Stack marginStart={10} marginTop={10} width="90%" spacing="10%">
                 <Box width="100%">
@@ -64,24 +71,28 @@ export const TeacherView = () => {
                       title="Good"
                       color="green"
                       reaction={getString(Reaction.GOOD)}
+                      room={code}
                     />
                     <TeacherFeedbackBar
                       studentCount={studentCounter}
                       title="Confused"
                       color="red"
                       reaction={getString(Reaction.CONFUSED)}
+                      room={code}
                     />
                     <TeacherFeedbackBar
                       studentCount={studentCounter}
                       title="Too Fast"
                       color="orange"
                       reaction={getString(Reaction.TOO_FAST)}
+                      room={code}
                     />
                     <TeacherFeedbackBar
                       studentCount={studentCounter}
                       title="Chilling"
                       color="twitter"
                       reaction={getString(Reaction.CHILLING)}
+                      room={code}
                     />
                   </Stack>
                 </Box>
@@ -90,7 +101,7 @@ export const TeacherView = () => {
           </GridItem>
           <GridItem>
             {/* TODO: add get code button */}
-            <CommentLog />
+            <CommentLog room={code} />
           </GridItem>
         </Grid>
 
