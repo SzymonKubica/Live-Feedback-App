@@ -6,22 +6,28 @@ import { Flex } from '@chakra-ui/react'
 
 import Messages from "./Messages"
 
-export default function CommentLog() {
+export default function CommentLog({room}) {
     
     const [comments, setComments] = useState([])
     const socket = React.useContext(SocketContext);    
   
     useEffect(() => {
-        socket.on("update comments", () => {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({"room": room}),
+      }  
+
+      socket.on("update comments", () => {
           
-          fetch('/api/get-comments')
+          fetch('/api/get-comments', requestOptions)
           .then(res => res.json())
           .then(data => {
             setComments(data.comments)
           })
         })
 
-        fetch('/api/get-comments')
+        fetch('/api/get-comments', requestOptions)
         .then(res => res.json())
         .then(data => {
           setComments(data.comments)

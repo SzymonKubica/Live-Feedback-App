@@ -7,7 +7,7 @@ import { Reaction } from "../Reactions"
 import CommentSection from "./CommentSection"
 
 
-const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction }) => {
+const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction, room}) => {
   return (
     <Center width="100%" height="calc(70vh)">
       <SimpleGrid marginBlock="5%" width="90%" height="90%" columns="2">
@@ -17,6 +17,7 @@ const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction }) => {
           reaction={Reaction.GOOD}
           selectedReaction={selectedReaction}
           setSelectedReaction={setSelectedReaction}
+          room={room}
         />
         <StudentFeedbackButton
           title="Confused"
@@ -24,6 +25,7 @@ const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction }) => {
           reaction={Reaction.CONFUSED}
           selectedReaction={selectedReaction}
           setSelectedReaction={setSelectedReaction}
+          room={room}
         />
         <StudentFeedbackButton
           title="Too Fast"
@@ -31,6 +33,7 @@ const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction }) => {
           reaction={Reaction.TOO_FAST}
           selectedReaction={selectedReaction}
           setSelectedReaction={setSelectedReaction}
+          room={room}
         />
         <StudentFeedbackButton
           title="Chilling"
@@ -38,6 +41,7 @@ const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction }) => {
           reaction={Reaction.CHILLING}
           selectedReaction={selectedReaction}
           setSelectedReaction={setSelectedReaction}
+          room={room}
         />
       </SimpleGrid>
     </Center>
