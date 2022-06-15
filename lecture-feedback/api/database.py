@@ -35,11 +35,11 @@ def fetch_snapshot():
 
 
 # Functions for adding insights exposed to the api
-def add_insight(type, room):
-    add_entry(db, type, generate_insight("add", room))
+def add_insight(type, room, sid):
+    add_entry(db, type, generate_insight("add", room, sid))
 
-def remove_insight(type, room):
-    add_entry(db, type, generate_insight("remove", room))
+def remove_insight(type, room, sid):
+    add_entry(db, type, generate_insight("remove", room, sid))
 
 # Add an insight to a table in the database
 def add_entry(db, table, content):
@@ -47,10 +47,11 @@ def add_entry(db, table, content):
     tb.insert_one(content)
 
 # Create a basic insight
-def generate_insight(type, room):
+def generate_insight(type, room, sid):
     return {
         "type": type,
         "room": room,
+        "sid": sid,
         "time": datetime.now()
     }
 
@@ -106,12 +107,13 @@ def get_summarised(start, end, room):
     return output
 
 # Functions for comments
-def add_comment(comment, reaction, room):
+def add_comment(comment, reaction, room, sid):
     db["comments"].insert_one({
         "comment": comment,
         "reaction": reaction,
         "time": datetime.now(),
-        "room": room
+        "room": room,
+        "sid": sid
     })
 
 def get_comments_between(start, end, room):

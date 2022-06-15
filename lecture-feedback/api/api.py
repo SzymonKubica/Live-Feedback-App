@@ -117,13 +117,15 @@ def on_leave(data):
 
 @socketio.on("add reaction")
 def handle_reaction(reaction, room):
-    database.add_insight(reaction, room)
+    sid = request.sid
+    database.add_insight(reaction, room, sid)
     update_reaction_count(reaction, room)
     update_all_reactions(room)
 
 @socketio.on("remove reaction")
 def handle_reaction(reaction, room):
-    database.remove_insight(reaction, room)
+    sid = request.sid
+    database.remove_insight(reaction, room, sid)
     update_reaction_count(reaction, room)
     update_all_reactions(room)
     
@@ -180,7 +182,8 @@ def handle_message():
 
 @socketio.on("leave comment")
 def add_comment(comment, reaction, room):
-    database.add_comment(comment, reaction, room)
+    sid = request.sid
+    database.add_comment(comment, reaction, room, sid)
     socketio.emit("update comments", to=room)
     return {"success":True}
 
