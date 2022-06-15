@@ -8,8 +8,8 @@ import certifi
 from reaction import Reaction
 import random
 
-snapshot = None
-currentSnapshot = None
+# snapshot = None
+current_room_snapshot = {}
 cluster = None
 client = None
 db = None
@@ -24,14 +24,18 @@ def initialise_database():
 
 
 # Find the most recent snapshot in the database
-def fetch_snapshot():
-    global snapshot
-    global currentSnapshot
-    snapshot = db["snapshots"].find_one(sort=[("end", pymongo.DESCENDING)])
+def fetch_snapshot(room):
+    # global snapshot
+    global current_room_snapshot
+    snapshot = db["snapshots"].find_one(
+        {
+            "room":room
+        }
+        ,sort=[("end", pymongo.DESCENDING)])
     if snapshot is None:
-        currentSnapshot = datetime.min #should be start time of meeting
+        current_room_snapshot[room] = datetime.min #should be start time of meeting
     else:
-        currentSnapshot = snapshot['end']
+        current_room_snapshot[room] = snapshot['end']
 
 
 # Functions for adding insights exposed to the api
@@ -57,7 +61,7 @@ def generate_insight(type, room, sid):
 
 # Count insights of given type
 def count_active(table, room, active_students):
-    return count_active_between(table, currentSnapshot, datetime.now(), room, active_students)
+    return count_active_between(table, current_room_snapshot[room], datetime.now(), room, active_students)
 
 def count_active_between(table, start, end, room,active_students):
     add_count = count_entries(table, start, end, "add", room, active_students)
@@ -89,19 +93,20 @@ def parse_mongo_json(data):
 
 #NOTE: When we end the lecture, we should also add an end time like we do here to the current
 #snapshot, we also need a way of adding initial start time (can be done with start for example)
-def create_new_snapshot(room):
-    global currentSnapshot
+def create_new_snapshot(room, active_students):
+    # global currentSnapshot
+    currnet_snapshot = current_room_snapshot[room]
 
-    nextSnapshot = datetime.now()
+    next_snapshot = datetime.now()
     
     db["snapshots"].insert_one({
-        "start":currentSnapshot, #for now
-        "end": nextSnapshot,
-        "summarised_data": get_summarised(currentSnapshot, nextSnapshot),
+        "start":currnet_snapshot, #for now
+        "end": next_snapshot,
+        "summarised_data": get_summarised(currnet_snapshot, next_snapshot, room, active_students),
         "room": room
     })
 
-    currentSnapshot = nextSnapshot
+    current_room_snapshot[room] = next_snapshot
 
 def get_summarised(start, end, room, active_students):
     output = {}
@@ -139,7 +144,7 @@ def get_comments_between(start, end, room, active_students):
     return parsed_comments
 
 def get_current_comments(room, active_students):
-    return get_comments_between(currentSnapshot, datetime.now(), room, active_students)
+    return get_comments_between(current_room_snapshot[room], datetime.now(), room, active_students)
 
 
 def get_new_code():

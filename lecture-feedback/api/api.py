@@ -25,7 +25,6 @@ sid_to_room = {} # map from sid to room
 studentCount = 0
 
 database.initialise_database()
-database.fetch_snapshot()
 
 # When there is a 404, we send it to react so it can deal with it
 @app.errorhandler(404)
@@ -41,23 +40,23 @@ def index():
 @app.route("/api/create-snapshot")
 @cross_origin()
 def create_snapshot():
-
-    database.create_new_snapshot()
-    update_counts()
-    reset_buttons()
+    room = sid_to_room[request.sid]
+    database.create_new_snapshot(room, students_sid)
+    update_counts(room)
+    reset_buttons(room)
 
     print("created snapshot")
     return None
 
-def update_counts():
+def update_counts(room):
     for reaction in Reaction:
-        update_reaction_count(reaction)
+        update_reaction_count(reaction, room)
 
     # print("hi")
     emit("update students connected", {"count":studentCount})
 
-def reset_buttons():
-    emit("reset buttons", broadcast=True)
+def reset_buttons(room):
+    emit("reset buttons", to=room)
 
 def in_room(room):
     return room in socketio.server.rooms(request.sid)
@@ -91,9 +90,10 @@ def test_disconnect():
 def on_join(data):
     room = data['room']
 
+    sid_to_room[request.sid] = room
+    
     if data['type'] == "student":
         students_sid.add(request.sid)
-        sid_to_room[request.sid] = room
         student_room_counts[room] += 1
         emit("update students connected", {"count":student_room_counts[room]}, to=room)
 
@@ -181,12 +181,13 @@ def get_all_reactions():
 
 @socketio.on("create snapshot")
 def handle_message():
-    database.create_new_snapshot(session["room"])
+    room = sid_to_room[request.sid]
+    database.create_new_snapshot(room, students_sid)
     # need to update counts now
-    update_counts(session["room"])
-    update_all_reactions(session["room"])
+    update_counts(room)
+    update_all_reactions(room)
     #reset buttons
-    socketio.emit("reset buttons", to=session["room"])
+    socketio.emit("reset buttons", to=room)
 
 @socketio.on("leave comment")
 def add_comment(comment, reaction, room):
@@ -209,6 +210,7 @@ def get_comments():
 @cross_origin()
 def get_new_code():
     code = database.get_new_code()
+    database.fetch_snapshot(str(code))   
     return {"code":code}
 
 @app.route("/api/is-code-active", methods=['POST'])
