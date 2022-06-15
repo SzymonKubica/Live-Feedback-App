@@ -178,15 +178,11 @@ def handle_message():
     #reset buttons
     socketio.emit("reset buttons", to=session["room"])
 
-@app.route("/api/leave-comment", methods=['PUT'])
-@cross_origin()
-def add_comment():
-        comment = request.json["comment"]
-        reaction = request.json["reaction"]
-        room = request.json["room"]
-        database.add_comment(comment, reaction, room)
-        socketio.emit("update comments", to=room)
-        return {"success":True}
+@socketio.on("leave comment")
+def add_comment(comment, reaction, room):
+    database.add_comment(comment, reaction, room)
+    socketio.emit("update comments", to=room)
+    return {"success":True}
 
 @app.route("/api/get-comments", methods=['POST'])
 @cross_origin()
