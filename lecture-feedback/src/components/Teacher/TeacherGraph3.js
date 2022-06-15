@@ -39,28 +39,26 @@ const TeacherGraph3 = props => {
   })
 
   const socket = React.useContext(SocketContext)
+  function getLabels() {
+    let labels = []
+    let i
+    for (i = 0; i < 21; i++) {
+      labels.push(String(i * -0.5))
+    }
+    labels.reverse()
+    return labels
+  }
 
   function getSettings(props) {
     return {
-      labels: [
-        "-5",
-        "-4.5",
-        "-4",
-        "-3.5",
-        "-3",
-        "-2.5",
-        "-2",
-        "-1.5",
-        "-1",
-        "-0.5",
-        "0",
-      ],
+      labels: getLabels(),
       datasets: [
         {
           label: "Good",
           data: props.good,
           backgroundColor: "rgba(0, 255, 0, 0.5)",
           borderColor: "rgb(0, 255, 0)",
+          // hidden: true,
         },
         {
           label: "Confused",
@@ -84,7 +82,7 @@ const TeacherGraph3 = props => {
     }
   }
 
-  const REFRESH_TIME = 3000
+  const REFRESH_TIME = 30000
 
   useEffect(() => {
     const interval = setInterval(() => {
