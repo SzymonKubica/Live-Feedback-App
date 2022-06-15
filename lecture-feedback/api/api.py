@@ -4,6 +4,7 @@ from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from flask_session import Session
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+import line_graph
 
 # Our modules
 import database
@@ -28,6 +29,7 @@ sid_to_room = {} # map from sid to room
 studentCount = 0
 
 database.initialise_database()
+line_graph.initialise_graph_data(data_points=21)
 
 # When there is a 404, we send it to react so it can deal with it
 @app.errorhandler(404)
@@ -122,43 +124,8 @@ def handle_reaction(reaction, room):
 @socketio.on("update line graph")
 def handle_message():
     room = sid_to_room[request.sid]
-    emit("update line graph", get_graph_data(room), broadcast=True)
-
-graph_data = None
-def get_graph_data(room):
-    global graph_data
-    if not graph_data:
-        graph_data = fetch_graph_data(room)
-    else:
-        totals = database.get_totals_for(datetime.now(), room)
-        for reaction in Reaction:
-            if totals == None:
-                new_entry = [0]
-            else: 
-                new_entry = [totals[reaction]]
-
-            graph_data[getString(reaction)] = graph_data[getString(reaction)][1:] + new_entry
-
-    return graph_data
-
-REFRESH_INTERVAL = 10 # seconds
-def fetch_graph_data(room):
-    request_time = datetime.now()
-    data = {}
-
-    for reaction in Reaction:
-        data[reaction] = []
-
-    for i in range (21):
-        totals = database.get_totals_for(request_time - timedelta(seconds = REFRESH_INTERVAL * i), room)
-        for reaction in Reaction:
-            if totals == None:
-               new_entry = [0]
-            else:
-               new_entry = [totals[reaction]]
-
-            data[getString(reaction)] = new_entry + data[getString(reaction)]
-    return data
+    line_graph.update_graph_data(room, students_sid)
+    emit("update line graph", line_graph.room_to_graph_data[room], broadcast=True)
 
 @socketio.on("remove reaction")
 def handle_reaction(reaction, room):
@@ -170,7 +137,6 @@ def handle_reaction(reaction, room):
 def update(room):
     print("updating room: " + str(room))
     emit("update", count_active_reactions_in(room), to=room)
-    emit("update line graph", to=room) ## TODO: Insert line graph data here
     emit("update students connected", {"count":student_room_counts[room]}, to=room)
 
 def count_active_reactions_in(room):
@@ -222,7 +188,9 @@ def get_all_reactions():
 @cross_origin()
 def send_graph_data():
     room = request.json["room"]
-    return get_graph_data(room)
+    print("json received: " + str(room))
+    line_graph.update_graph_data(room, students_sid)
+    return line_graph.room_to_graph_data(room)
 
 @socketio.on("leave comment")
 def add_comment(comment, reaction, room):
@@ -253,7 +221,5 @@ def is_code_active():
     code = request.json['code']
     return {"valid":database.is_active_code(code)}
     
-
-
 if __name__ == "__main__":
     socketio.run()
