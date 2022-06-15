@@ -35,11 +35,11 @@ def fetch_snapshot():
 
 
 # Functions for adding insights exposed to the api
-def add_insight(type):
-    add_entry(db, type, generate_insight("add"))
+def add_insight(type, room):
+    add_entry(db, type, generate_insight("add", room))
 
-def remove_insight(type):
-    add_entry(db, type, generate_insight("remove"))
+def remove_insight(type, room):
+    add_entry(db, type, generate_insight("remove", room))
 
 # Add an insight to a table in the database
 def add_entry(db, table, content):
@@ -47,39 +47,43 @@ def add_entry(db, table, content):
     tb.insert_one(content)
 
 # Create a basic insight
-def generate_insight(type):
+def generate_insight(type, room):
     return {
         "type": type,
+        "room": room,
         "time": datetime.now()
     }
 
 # Count insights of given type
-def count_active(table):
-    return count_active_between(table, currentSnapshot, datetime.now())
+def count_active(table, room):
+    return count_active_between(table, currentSnapshot, datetime.now(), room)
 
-def count_active_between(table, start, end):
-    add_count = count_entries(table, start, end, "add")
-    remove_count = count_entries(table, start, end, "remove")
+def count_active_between(table, start, end, room):
+    add_count = count_entries(table, start, end, "add", room)
+    remove_count = count_entries(table, start, end, "remove", room)
     return add_count - remove_count
 
-def count_entries(table, start, end, type):
+def count_entries(table, start, end, type, room):
     return db[table].count_documents({
         "time": {
             "$gte": start,
             "$lte": end
         },
-        "type":type
+        "type":type,
+        "room": room
     })
 
-def find_snapshots():
-    return parse_mongo_json(list(db['snapshots'].find({})))
+def find_snapshots(room):
+    return parse_mongo_json(list(db['snapshots'].find({
+        "room": room
+        })))
 
 def parse_mongo_json(data):
     return json.loads(json_util.dumps(data))
 
 #NOTE: When we end the lecture, we should also add an end time like we do here to the current
 #snapshot, we also need a way of adding initial start time (can be done with start for example)
-def create_new_snapshot():
+def create_new_snapshot(room):
     global currentSnapshot
 
     nextSnapshot = datetime.now()
@@ -87,33 +91,36 @@ def create_new_snapshot():
     db["snapshots"].insert_one({
         "start":currentSnapshot, #for now
         "end": nextSnapshot,
-        "summarised_data": get_summarised(currentSnapshot, nextSnapshot)
+        "summarised_data": get_summarised(currentSnapshot, nextSnapshot),
+        "room": room
     })
 
     currentSnapshot = nextSnapshot
 
-def get_summarised(start, end):
+def get_summarised(start, end, room):
     output = {}
 
     for reaction in Reaction:
-        output[reaction] = count_active_between(reaction, start, end)
+        output[reaction] = count_active_between(reaction, start, end, room)
 
     return output
 
 # Functions for comments
-def add_comment(comment, reaction):
+def add_comment(comment, reaction, room):
     db["comments"].insert_one({
         "comment": comment,
         "reaction": reaction,
-        "time": datetime.now()
+        "time": datetime.now(),
+        "room": room
     })
 
-def get_comments_between(start, end):
+def get_comments_between(start, end, room):
     comments = db["comments"].find({
         "time": {
             "$gte": start,
             "$lte": end
-        }
+        },
+        "room": room
     })
 
     parsed_comments = []
@@ -121,8 +128,8 @@ def get_comments_between(start, end):
         parsed_comments.append({"comment":comment["comment"], "reaction":comment["reaction"]})
     return parsed_comments
 
-def get_current_comments():
-    return get_comments_between(currentSnapshot, datetime.now())
+def get_current_comments(room):
+    return get_comments_between(currentSnapshot, datetime.now(), room)
 
 
 def get_new_code():
@@ -140,7 +147,7 @@ def get_new_code():
 def add_active_code(code: int):
     is_new_code = 0 == db["active_codes"].count_documents({
             "code": code
-        })#.limit(1)
+        })
 
 
     if is_new_code:

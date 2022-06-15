@@ -1,20 +1,26 @@
 from reaction import Reaction
-from flask import Flask, request
+from flask import Flask, request, session
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from dotenv import load_dotenv
 import database
+from flask_session import Session
 
 load_dotenv()
 
 app = Flask(__name__, static_folder="../build", static_url_path="/")
 
+app.config['SESSION_TYPE'] = 'filesystem'
 app.config["SECRET_KEY"] = "mysecret"
 
 CORS(app)
+Session(app)
 
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", manage_session=False)
 
+
+studentCounts = {}
+students = set() #stores the socket id of all students (so when disconnects we can close it)
 studentCount = 0
 
 database.initialise_database()
@@ -65,133 +71,130 @@ def get_snapshots():
 @socketio.on("connect")
 def test_connect():
     print("connected")
-    update_counts()
+    print(request.sid)
+    # update_counts()
 
 @socketio.on("disconnect")
 def test_disconnect():
-    global studentCount
-    # Hacky for now, need a way to keep track of all of these nicely
-    # print(socketio.server.rooms(request.sid))
-    if in_room("student"):
-        studentCount -= 1
-        emit("update students connected", {"count":studentCount}, broadcast=True)
+    if request.sid in students:
+        studentCounts[session["room"]] -= 1
+        emit("update students connected", {"count":studentCounts[session["room"]]}, to=session["room"])
 
     print("disconnected")
 
-#for now, since one room, we will call the room student
 @socketio.on("join")
 def on_join(data):
-    global studentCount
     room = data['room']
-    if room == "student" and not in_room("student"):
-        studentCount += 1
-        emit("update students connected", {"count":studentCount}, broadcast=True)
+
+    if data['type'] == "student":
+        students.add(request.sid)
+        studentCounts[room] += 1
+        emit("update students connected", {"count":studentCounts[room]}, to=room)
+
+    # need to remember to remove these rooms from counts when meeting ended otherwise we
+    # will have wrong data saved over
+
+    if data['type'] == "teacher" and room not in studentCounts:
+        studentCounts[room] = 0 # intialise the room to 0
+
+    session["type"] = data["type"] # stores student or teacher
+    session["room"] = room
     join_room(room)
-    print("joined room")
+    print("{} joined room".format(data["type"]))
 
 @socketio.on("leave")
 def on_leave(data):
-    global studentCount
     room = data['room']
-    if room == "student" and in_room("student"):
-        studentCount -= 1
-        emit("update students connected", {"count":studentCount}, broadcast=True)
+
+    if request.sid in students:
+        studentCounts[room] -= 1
+        emit("update students connected", {"count":studentCounts[room]}, to=room)
+        students.remove(request.sid)
+
     leave_room(room)
+    session.pop("room") # since they have now left the meeting
     print("left room")
-####
-
-@socketio.on("connect teacher")
-def handle_message():
-    update_counts()
-    update_all_reactions()
-
-@socketio.on("connect student") 
-def handle_message():
-    global studentCount
-    studentCount += 1
-    print("student connected")
-    emit("update students connected", {"count":studentCount}, broadcast=True)
-
-@socketio.on("disconnect student") 
-def handle_message():
-    global studentCount
-    studentCount -= 1
-    emit("update students connected", {"count":studentCount}, broadcast=True)
 
 @socketio.on("add reaction")
-def handle_reaction(reaction):
-    database.add_insight(reaction)
-    update_reaction_count(reaction)
-    update_all_reactions()
+def handle_reaction(reaction, room):
+    database.add_insight(reaction, room)
+    update_reaction_count(reaction, room)
+    update_all_reactions(room)
 
 @socketio.on("remove reaction")
-def handle_reaction(reaction):
-    database.remove_insight(reaction)
-    update_reaction_count(reaction)
-    update_all_reactions()
+def handle_reaction(reaction, room):
+    database.remove_insight(reaction, room)
+    update_reaction_count(reaction, room)
+    update_all_reactions(room)
     
-def update_reaction_count(reaction):
+def update_reaction_count(reaction, room):
     emit(
         "update " + reaction, 
-        {"count":database.count_active(reaction)}, 
-        broadcast=True)
+        {"count":database.count_active(reaction, room)}, 
+        to=room)
 
-def update_all_reactions():
+def update_all_reactions(room):
     output = {}
     for reaction in Reaction:
-        output[reaction] = database.count_active(reaction)
-    emit("update all", output, broadcast=True)
+        output[reaction] = database.count_active(reaction, room)
+    emit("update all", output, to=room)
 
 @app.route("/api/reaction-count", methods=['POST'])
 @cross_origin()
 def get_reaction_count():
         # also add room later on
         reaction = request.json["reaction"]
-        return {"count":database.count_active(reaction)}
+        room = request.json["room"]
+        return {"count":database.count_active(reaction, room)}
 
 @app.route("/api/student-count", methods=['POST'])
 @cross_origin()
 def get_student_count():
-        # also add room later on
-        # reaction = request.json["reaction"]
-        return {"count":studentCount}
+        room = request.json["room"]
+        # weird bug where not initially initialised? will need to fix this
+        if room in studentCounts:
+            count = studentCounts[room]
+        else:
+            count = 0
+        return {"count":count}
 
 @app.route("/api/all_reactions", methods=['POST'])
 @cross_origin()
 def get_all_reactions():
-        # also add room later on
+        room = request.json["room"]
         output = {}
         for reaction in Reaction:
-            output[reaction] = database.count_active(reaction)
+            output[reaction] = database.count_active(reaction, room)
         print (output)
         return output
 
 
 @socketio.on("create snapshot")
 def handle_message():
-    database.create_new_snapshot()
+    database.create_new_snapshot(session["room"])
     # need to update counts now
-    update_counts()
-    update_all_reactions()
+    update_counts(session["room"])
+    update_all_reactions(session["room"])
     #reset buttons
-    socketio.emit("reset buttons", broadcast=True)
+    socketio.emit("reset buttons", to=session["room"])
 
 @app.route("/api/leave-comment", methods=['PUT'])
 @cross_origin()
 def add_comment():
-        # also add room later on
         comment = request.json["comment"]
-        # when we actually associate them with reactions
         reaction = request.json["reaction"]
-        database.add_comment(comment, reaction)
-        socketio.emit("update comments", broadcast=True)
+        room = request.json["room"]
+        database.add_comment(comment, reaction, room)
+        socketio.emit("update comments", to=room)
         return {"success":True}
 
-@app.route("/api/get-comments")
+@app.route("/api/get-comments", methods=['POST'])
 @cross_origin()
 def get_comments():
-        # also add room later on
-        return {"comments": database.get_current_comments()}
+        room = request.json["room"]
+        comments = database.get_current_comments(room)
+        print(comments)
+        return {"comments": comments}
 
 
 # code stuff
