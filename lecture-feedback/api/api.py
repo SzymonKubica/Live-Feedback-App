@@ -136,23 +136,23 @@ def get_graph_data():
     if not graph_data:
         graph_data = fetch_graph_data()
     else:
+        totals = database.get_totals_for(datetime.now())
         for reaction in Reaction:
-            print(graph_data[getString(reaction)])
-            graph_data[getString(reaction)] = graph_data[getString(reaction)][1:] + [database.get_totals_for(datetime.now())[reaction]]
-            #graph_data[getString(reaction)].pop(0)
-            #graph_data[getString(reaction)] = graph_data[getString(reaction)] + [database.get_totals_for(datetime.now)[reaction]]
+            graph_data[getString(reaction)] = graph_data[getString(reaction)][1:] + [totals[reaction]]
 
     return graph_data
 
 def fetch_graph_data():
     request_time = datetime.now()
     data = {}
-    for reaction in Reaction:
-        counts = []
-        for i in range(10):
-            counts = [database.get_totals_for(request_time - timedelta(seconds = 30 * i))[reaction]] + counts
 
-        data[getString(reaction)] = counts
+    for reaction in Reaction:
+        data[reaction] = []
+
+    for i in range (21):
+        totals = database.get_totals_for(request_time - timedelta(seconds = 30 * i))
+        for reaction in Reaction:
+            data[getString(reaction)] = [totals[reaction]] + data[getString(reaction)]
     return data
 
 @socketio.on("remove reaction")
