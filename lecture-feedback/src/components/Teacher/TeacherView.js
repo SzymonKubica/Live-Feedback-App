@@ -17,19 +17,24 @@ import CommentLog from "./CommentLog"
 import TeacherGraph2 from "./TeacherGraph2"
 import TeacherFeedbackBar from "./TeacherFeedbackBar"
 import { getString, Reaction } from "../Reactions"
+import { useParams } from "react-router-dom";
 
 export const TeacherView = () => {
   const [studentCounter, setStudentCounter] = useState(0)
   const [chartView, setChartView] = useState(true)
 
+  let { code } = useParams();
+  
   useEffect(() => {
     socket.on("update students connected", data => {
       setStudentCounter(data.count)
     })
+    socket.emit("join", {"room":code, "type":"teacher"})
 
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({"room": code})
     }
 
     fetch("/api/student-count", requestOptions)
@@ -38,18 +43,25 @@ export const TeacherView = () => {
         setStudentCounter(data.count)
       })
 
+    
+
     // Disconnect when unmounts
-    return () => socket.off("update students connected")
+    return () => {
+      socket.off("update students connected")
+      socket.emit("leave", {"room":code})
+    }
   }, [])
 
   return (
     <ChakraProvider>
       <SocketContext.Provider value={socket}>
         <TeacherHeader state={chartView} setState={setChartView} />
+        <Heading textAlign='center'>Reaction Analysis</Heading>
+        <Heading textAlign='center'> Code: {code} </Heading>
         <Grid templateColumns="repeat(2, 1fr)">
           <GridItem>
             {chartView ? (
-              <TeacherGraph2 />
+              <TeacherGraph2 room={code} />
             ) : (
               <Stack marginStart={10} marginTop={10} width="90%" spacing="10%">
                 <Box width="100%">
@@ -59,24 +71,28 @@ export const TeacherView = () => {
                       title="Good"
                       color="green"
                       reaction={getString(Reaction.GOOD)}
+                      room={code}
                     />
                     <TeacherFeedbackBar
                       studentCount={studentCounter}
                       title="Confused"
                       color="red"
                       reaction={getString(Reaction.CONFUSED)}
+                      room={code}
                     />
                     <TeacherFeedbackBar
                       studentCount={studentCounter}
                       title="Too Fast"
                       color="orange"
                       reaction={getString(Reaction.TOO_FAST)}
+                      room={code}
                     />
                     <TeacherFeedbackBar
                       studentCount={studentCounter}
                       title="Chilling"
                       color="twitter"
                       reaction={getString(Reaction.CHILLING)}
+                      room={code}
                     />
                   </Stack>
                 </Box>
@@ -84,7 +100,8 @@ export const TeacherView = () => {
             )}
           </GridItem>
           <GridItem>
-            <CommentLog />
+            {/* TODO: add get code button */}
+            <CommentLog room={code} />
           </GridItem>
         </Grid>
 

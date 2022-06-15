@@ -20,6 +20,7 @@ const StudentFeedbackButton = ({
   reaction,
   selectedReaction,
   setSelectedReaction,
+  room
 }) => {
 
   const socket = React.useContext(SocketContext);  
@@ -28,15 +29,15 @@ const StudentFeedbackButton = ({
     if (reaction === selectedReaction) {
       // When a button is selected and we tap it again to deselect it.
       setSelectedReaction(NilReaction)
-      socket.emit("remove reaction", getString(reaction))
+      socket.emit("remove reaction", getString(reaction), room)
     } else if (selectedReaction === NilReaction) {
       // When nothing is selected and we press one button
-      socket.emit("add reaction", getString(reaction))
+      socket.emit("add reaction", getString(reaction), room)
       setSelectedReaction(reaction)
     } else {
       // When one button is selected and we press another one to change the reaction.
-      socket.emit("remove reaction", getString(selectedReaction))
-      socket.emit("add reaction", getString(reaction))
+      socket.emit("remove reaction", getString(selectedReaction), room)
+      socket.emit("add reaction", getString(reaction), room)
       setSelectedReaction(reaction)
     }
   }

@@ -2,15 +2,18 @@ import { Box, Button, Textarea} from '@chakra-ui/react'
 import React, {useState, useEffect} from 'react'
 import { Center} from "@chakra-ui/react"
 import { NilReaction } from '../Reactions'
+import { SocketContext } from '../../context/socket'
 
 
-export default function CommentSection({visible, setVisible, selectedReaction}) {
+export default function CommentSection({visible, setVisible, selectedReaction, room}) {
   
     const [comment, setComment] = useState("")
+    const socket = React.useContext(SocketContext);  
+    
     
     // Only allow comment when there is a new reaction (not allowed to be empty)
     useEffect(() => {
-      if (selectedReaction != NilReaction) {
+      if (selectedReaction !== NilReaction) {
         setVisible(true)
       } else {
         setVisible(false)
@@ -24,17 +27,7 @@ export default function CommentSection({visible, setVisible, selectedReaction}) 
     }
 
     function handleSend(){
-        const requestOptions = {
-            'method': 'PUT',
-            'headers': {'Content-Type': 'application/json'},
-            body: JSON.stringify({'comment': comment, 'reaction':selectedReaction})
-          }
-          
-        fetch('/api/leave-comment', requestOptions)
-        .then(res => res.json())
-        .then(data => {
-          // if not successful do something, response returns {"success": True}
-        })
+        socket.emit("leave comment", comment, selectedReaction, room)
 
         setVisible(false)
     }
