@@ -12,7 +12,7 @@ const TeacherGraph2 = ({room}) => {
         labels: ["Good", "Confused", "Too Fast", "Chilling"],
         datasets: [
             {
-                data: [1, 2, 3, 4],
+                data: [0, 0, 0, 0],
                 backgroundColor: [
                     'rgba(0, 255, 0, 0.5)',
                     'rgba(255, 0, 0, 0.5)',
