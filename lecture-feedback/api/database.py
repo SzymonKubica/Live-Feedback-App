@@ -56,22 +56,27 @@ def generate_insight(type, room, sid):
     }
 
 # Count insights of given type
-def count_active(table, room):
-    return count_active_between(table, currentSnapshot, datetime.now(), room)
+def count_active(table, room, active_students):
+    return count_active_between(table, currentSnapshot, datetime.now(), room, active_students)
 
-def count_active_between(table, start, end, room):
-    add_count = count_entries(table, start, end, "add", room)
-    remove_count = count_entries(table, start, end, "remove", room)
+def count_active_between(table, start, end, room,active_students):
+    add_count = count_entries(table, start, end, "add", room, active_students)
+    remove_count = count_entries(table, start, end, "remove", room, active_students)
     return add_count - remove_count
 
-def count_entries(table, start, end, type, room):
+# Note only counts if the student is currently connected (with associated sid)
+def count_entries(table, start, end, type, room, active_students):
     return db[table].count_documents({
         "time": {
             "$gte": start,
             "$lte": end
         },
         "type":type,
-        "room": room
+        "room": room,
+        "sid": {
+            "$in": list(active_students)
+        }
+
     })
 
 def find_snapshots(room):
@@ -98,11 +103,11 @@ def create_new_snapshot(room):
 
     currentSnapshot = nextSnapshot
 
-def get_summarised(start, end, room):
+def get_summarised(start, end, room, active_students):
     output = {}
 
     for reaction in Reaction:
-        output[reaction] = count_active_between(reaction, start, end, room)
+        output[reaction] = count_active_between(reaction, start, end, room, active_students)
 
     return output
 
@@ -116,13 +121,16 @@ def add_comment(comment, reaction, room, sid):
         "sid": sid
     })
 
-def get_comments_between(start, end, room):
+def get_comments_between(start, end, room, active_students):
     comments = db["comments"].find({
         "time": {
             "$gte": start,
             "$lte": end
         },
-        "room": room
+        "room": room,
+        "sid": {
+            "$in": list(active_students)
+        }
     })
 
     parsed_comments = []
@@ -130,8 +138,8 @@ def get_comments_between(start, end, room):
         parsed_comments.append({"comment":comment["comment"], "reaction":comment["reaction"]})
     return parsed_comments
 
-def get_current_comments(room):
-    return get_comments_between(currentSnapshot, datetime.now(), room)
+def get_current_comments(room, active_students):
+    return get_comments_between(currentSnapshot, datetime.now(), room, active_students)
 
 
 def get_new_code():

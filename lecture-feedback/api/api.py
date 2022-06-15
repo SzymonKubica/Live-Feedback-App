@@ -78,7 +78,9 @@ def test_connect():
 def test_disconnect():
     if request.sid in students_sid:
         student_room_counts[session["room"]] -= 1
+        students_sid.remove(request.sid)
         emit("update students connected", {"count":student_room_counts[session["room"]]}, to=session["room"])
+        update_all_reactions(session["room"])
 
     print("disconnected")
 
@@ -108,8 +110,9 @@ def on_leave(data):
 
     if request.sid in students_sid:
         student_room_counts[room] -= 1
-        emit("update students connected", {"count":student_room_counts[room]}, to=room)
         students_sid.remove(request.sid)
+        emit("update students connected", {"count":student_room_counts[room]}, to=room)
+        update_all_reactions(session["room"])
 
     leave_room(room)
     session.pop("room") # since they have now left the meeting
@@ -132,13 +135,13 @@ def handle_reaction(reaction, room):
 def update_reaction_count(reaction, room):
     emit(
         "update " + reaction, 
-        {"count":database.count_active(reaction, room)}, 
+        {"count":database.count_active(reaction, room, students_sid)}, 
         to=room)
 
 def update_all_reactions(room):
     output = {}
     for reaction in Reaction:
-        output[reaction] = database.count_active(reaction, room)
+        output[reaction] = database.count_active(reaction, room, students_sid)
     emit("update all", output, to=room)
 
 @app.route("/api/reaction-count", methods=['POST'])
@@ -147,7 +150,7 @@ def get_reaction_count():
         # also add room later on
         reaction = request.json["reaction"]
         room = request.json["room"]
-        return {"count":database.count_active(reaction, room)}
+        return {"count":database.count_active(reaction, room, students_sid)}
 
 @app.route("/api/student-count", methods=['POST'])
 @cross_origin()
@@ -166,7 +169,7 @@ def get_all_reactions():
         room = request.json["room"]
         output = {}
         for reaction in Reaction:
-            output[reaction] = database.count_active(reaction, room)
+            output[reaction] = database.count_active(reaction, room, students_sid)
         print (output)
         return output
 
@@ -191,7 +194,7 @@ def add_comment(comment, reaction, room):
 @cross_origin()
 def get_comments():
         room = request.json["room"]
-        comments = database.get_current_comments(room)
+        comments = database.get_current_comments(room, students_sid)
         print(comments)
         return {"comments": comments}
 
