@@ -18,24 +18,24 @@ import TeacherGraph2 from "./TeacherGraph2"
 import TeacherGraph3 from "./TeacherGraph3"
 import TeacherFeedbackBar from "./TeacherFeedbackBar"
 import { getString, Reaction } from "../Reactions"
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router-dom"
 
 export const TeacherView = () => {
   const [studentCounter, setStudentCounter] = useState(0)
   const [chartView, setChartView] = useState(0)
 
-  let { code } = useParams();
-  
+  let { code } = useParams()
+
   useEffect(() => {
     socket.on("update students connected", data => {
       setStudentCounter(data.count)
     })
-    socket.emit("join", {"room":code, "type":"teacher"})
+    socket.emit("join", { room: code, type: "teacher" })
 
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({"room": code})
+      body: JSON.stringify({ room: code }),
     }
 
     fetch("/api/student-count", requestOptions)
@@ -44,12 +44,10 @@ export const TeacherView = () => {
         setStudentCounter(data.count)
       })
 
-    
-
     // Disconnect when unmounts
     return () => {
       socket.off("update students connected")
-      socket.emit("leave", {"room":code})
+      socket.emit("leave", { room: code })
     }
   }, [])
 
@@ -57,13 +55,13 @@ export const TeacherView = () => {
     <ChakraProvider>
       <SocketContext.Provider value={socket}>
         <TeacherHeader state={chartView} setState={setChartView} />
-        <Heading textAlign='center'>Reaction Analysis</Heading>
-        <Heading textAlign='center'> Code: {code} </Heading>
+        <Heading textAlign="center">Reaction Analysis</Heading>
+        <Heading textAlign="center"> Code: {code} </Heading>
         <Grid templateColumns="repeat(2, 1fr)">
           <GridItem>
-            {chartView==0 ? (
+            {chartView == 0 ? (
               <TeacherGraph2 room={code} />
-            ) : chartView==1 ? (
+            ) : chartView == 1 ? (
               <Stack marginStart={10} marginTop={10} width="90%" spacing="10%">
                 <Box width="100%">
                   <Stack spacing={20}>
@@ -99,7 +97,7 @@ export const TeacherView = () => {
                 </Box>
               </Stack>
             ) : (
-              <TeacherGraph3 />
+              <TeacherGraph3 room={code} />
             )}
           </GridItem>
           <GridItem>
