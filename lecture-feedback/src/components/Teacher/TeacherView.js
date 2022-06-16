@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react"
 
 import { socket, SocketContext } from "../../context/socket"
+import { useViewport } from "../../hooks/useViewport"
 import TeacherHeader from "./TeacherHeader"
 import CommentLog from "./CommentLog"
 import TeacherGraph2 from "./TeacherGraph2"
@@ -25,6 +26,7 @@ import { getString, Reaction } from "../Reactions"
 export const TeacherView = () => {
   const [studentCounter, setStudentCounter] = useState(0)
   const [chartView, setChartView] = useState(0)
+  const { width, height } = useViewport()
 
   let { code } = useParams()
 
@@ -113,23 +115,25 @@ export const TeacherView = () => {
         <TeacherHeader state={chartView} setState={setChartView} />
         <Heading textAlign="center">Reaction Analysis</Heading>
         <Heading textAlign="center"> Code: {code} </Heading>
-        <Grid templateColumns="repeat(3, 1fr)" height="calc(78vh)">
+        <Grid templateColumns="repeat(3, 1fr)" height="calc(76vh)">
           <GridItem rowSpan={2} colSpan={2}>
-            <Center>
-              <Container height="100%" width="100%">
-                {chartView == 0 ? (
+            <Container maxW="100%" id="graphsDiv">
+              {chartView == 0 ? (
+                <Container maxW={Math.min(0.66 * width, 0.76 * height)}>
                   <TeacherGraph2 room={code} data={circleGraphData} />
-                ) : chartView == 1 ? (
-                  <TeacherFeedbackBars
-                    room={code}
-                    data={data}
-                    studentCounter={studentCounter}
-                  />
-                ) : (
+                </Container>
+              ) : chartView == 1 ? (
+                <TeacherFeedbackBars
+                  studentCounter={studentCounter}
+                  data={data}
+                  room={code}
+                />
+              ) : (
+                <Container maxW={width * 0.66} maxH={height * 0.76}>
                   <TeacherGraph3 room={code} />
-                )}
-              </Container>
-            </Center>
+                </Container>
+              )}
+            </Container>
           </GridItem>
           <GridItem rowSpan={2}>
             {/* TODO: add get code button */}
