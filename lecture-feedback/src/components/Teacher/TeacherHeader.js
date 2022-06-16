@@ -8,6 +8,7 @@ import { SocketContext } from "../../context/socket"
 import HomeButton from "../HomeButton"
 import NavButton from "../NavButton"
 import LayoutSwitcher from "./LayoutSwitcher"
+import { LogoutButton } from "../LogoutButton"
 
 const TeacherHeader = props => {
   const location = useLocation()
@@ -29,6 +30,7 @@ const TeacherHeader = props => {
         Reset
       </Button>
       <NavButton name="Snapshots" dst="snapshots" />
+      <LogoutButton isAuth={props.isAuth} setAuth={props.setAuth} />
       <ColorModeSwitcher marginStart="5px" marginTop="15px" />
     </Flex>
   )

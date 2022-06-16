@@ -203,4 +203,16 @@ def add_active_code(code: int):
 
 def is_active_code(code: int):
     return db["active_codes"].find_one({"code":code}) is not None
+
+def user_exists(email) -> bool:
+    return db["users"].find_one({"email":email}) is not None
+
+def store_new_user(email, hash):
+    db["users"].insert_one({
+        "email": email,
+        "hash": hash
+    })
+
+def get_user(email):
+    return db["users"].find_one({"email": email})
     

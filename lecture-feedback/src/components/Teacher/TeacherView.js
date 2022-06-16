@@ -20,7 +20,7 @@ import TeacherFeedbackBar from "./TeacherFeedbackBar"
 import { getString, Reaction } from "../Reactions"
 import { useParams } from "react-router-dom"
 
-export const TeacherView = () => {
+export const TeacherView = ({isAuth, setAuth}) => {
   const [studentCounter, setStudentCounter] = useState(0)
   const [chartView, setChartView] = useState(0)
 
@@ -54,7 +54,7 @@ export const TeacherView = () => {
   return (
     <ChakraProvider>
       <SocketContext.Provider value={socket}>
-        <TeacherHeader state={chartView} setState={setChartView} />
+        <TeacherHeader isAuth={isAuth} setAuth={setAuth} state={chartView} setState={setChartView} />
         <Heading textAlign="center">Reaction Analysis</Heading>
         <Heading textAlign="center"> Code: {code} </Heading>
         <Grid templateColumns="repeat(2, 1fr)">

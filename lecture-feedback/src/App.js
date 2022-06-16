@@ -7,19 +7,23 @@ import { StudentView } from "./components/Student/StudentView"
 import { TeacherView } from "./components/Teacher/TeacherView"
 import { SnapshotView } from "./components/Teacher/SnapshotView"
 import { TeacherMenu } from "./components/Teacher/TeacherMenu"
+import { TeacherLogin } from "./components/Teacher/TeacherLogin"
+import { TeacherSignup } from "./components/Teacher/TeacherSignup"
 
 function App() {
-  const [state, setState] = useState("")
+  const [isAuth, setAuth] = useState(false);
 
   return (
     <Router>
       <Fragment>
         <Routes>
           <Route path="" element={<HomeView />} />
-          <Route path="student/meeting/:code" element={<StudentView />} />
-          <Route path="teacher/meeting/:code" element={<TeacherView />} />
-          <Route path="teacher/snapshots" element={<SnapshotView />} />
-          <Route path="teacher/menu" element={< TeacherMenu/>} />
+          <Route path="student/meeting/:code" element={<StudentView/>} />
+          <Route path="teacher/meeting/:code" element={<TeacherView isAuth={isAuth} setAuth={setAuth} />} />
+          <Route path="teacher/snapshots" element={<SnapshotView isAuth={isAuth} setAuth={setAuth} />} />
+          <Route path="teacher/login" element={<TeacherLogin isAuth={isAuth} setAuth={setAuth}/>} />
+          <Route path="teacher/signup" element={<TeacherSignup isAuth={isAuth} setAuth={setAuth} />} />
+          <Route path="teacher/menu" element={< TeacherMenu isAuth={isAuth} setAuth={setAuth}/>} />
         </Routes>
       </Fragment>
     </Router>

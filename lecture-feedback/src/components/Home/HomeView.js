@@ -55,7 +55,7 @@ export const HomeView = () => {
        </Box> : null}
           <NavButton
             name="Teacher"
-            dst="teacher/menu"
+            dst="teacher/login"
             size="lg"
           />
         </VStack>

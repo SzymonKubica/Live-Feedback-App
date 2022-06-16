@@ -1,11 +1,13 @@
+import functools
 from reaction import Reaction, getString
-from flask import Flask, request, session
+from flask import Flask, jsonify, request, session
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import database
 from flask_session import Session
+import bcrypt
 
 load_dotenv()
 
@@ -37,6 +39,15 @@ def not_found(e):
 @cross_origin()
 def index():
     return app.send_static_file("index.html")
+
+# Decorator to ensurer a user is logged in
+def login_required(func):
+    @functools.wraps(func)
+    def secure_function(*args, **kwargs):
+        if "logged_in_email" not in session:
+            return jsonify({"error":"unauthorised"}), 401
+        return func(*args, **kwargs)
+    return secure_function
 
 @app.route("/api/create-snapshot")
 @cross_origin()
@@ -135,6 +146,7 @@ def handle_reaction(reaction, room):
     update_all_reactions(room)
 
 @socketio.on("update line graph")
+@login_required
 def handle_message():
     room = sid_to_room[request.sid]
     emit("update line graph", get_graph_data(room), broadcast=True)
@@ -197,6 +209,7 @@ def update_all_reactions(room):
     emit("update line graph", to=room)
 
 @app.route("/api/reaction-count", methods=['POST'])
+@login_required
 @cross_origin()
 def get_reaction_count():
         # also add room later on
@@ -205,6 +218,7 @@ def get_reaction_count():
         return {"count":database.count_active(reaction, room, students_sid)}
 
 @app.route("/api/student-count", methods=['POST'])
+@login_required
 @cross_origin()
 def get_student_count():
         room = request.json["room"]
@@ -216,6 +230,7 @@ def get_student_count():
         return {"count":count}
 
 @app.route("/api/all_reactions", methods=['POST'])
+@login_required
 @cross_origin()
 def get_all_reactions():
         room = request.json["room"]
@@ -226,12 +241,14 @@ def get_all_reactions():
         return output
 
 @app.route("/api/line_graph_data", methods=['POST'])
+@login_required
 @cross_origin()
 def send_graph_data():
     room = request.json["room"]
     return get_graph_data(room)
 
 @socketio.on("create snapshot")
+@login_required
 def handle_message():
     room = sid_to_room[request.sid]
     database.create_new_snapshot(room, students_sid)
@@ -249,6 +266,7 @@ def add_comment(comment, reaction, room):
     return {"success":True}
 
 @app.route("/api/get-comments", methods=['POST'])
+@login_required
 @cross_origin()
 def get_comments():
         room = request.json["room"]
@@ -259,6 +277,7 @@ def get_comments():
 
 # code stuff
 @app.route("/api/new-code")
+@login_required
 @cross_origin()
 def get_new_code():
     code = database.get_new_code()
@@ -266,11 +285,74 @@ def get_new_code():
     return {"code":code}
 
 @app.route("/api/is-code-active", methods=['POST'])
+@login_required
 @cross_origin()
 def is_code_active():
     code = request.json['code']
     return {"valid":database.is_active_code(code)}
+
+# login stuff
+@app.route("/api/create-user", methods=['POST'])
+@cross_origin()
+def create_user():
+    email = request.json['email']
+    password = request.json['password'].encode('utf8')
+
+    # if exists complain
+    if database.user_exists(email):
+        return jsonify({"error": "user already exists"}), 409
+
+    hash = bcrypt.hashpw(password, bcrypt.gensalt())
+    database.store_new_user(email, hash)
+    return jsonify({"success": True}), 200
+
+@app.route("/api/login", methods=['POST'])
+@cross_origin()
+def login():
+    email = request.json['email']
+    password = request.json['password'].encode('utf8')
+
+    if not database.user_exists(email):
+        return jsonify({"error": "invalid details"}), 403
+
+    user = database.get_user(email)
+
+    if bcrypt.checkpw(password, user["hash"]):
+        session["logged_in_email"] = email
+        return jsonify({"success": True}), 200 
+    else:
+        return jsonify({"error": "invalid details"}), 403
+
+@app.route("/api/authenticated", methods=['POST'])
+@cross_origin()
+def check_authenticated():
+    if session.get("logged_in_email") is None:
+        return {"authenticated": False}
+    else:
+        return {"authenticated": True}
     
+    # email = request.json['email']
+    # password = request.json['password'].encode('utf8')
+
+    # if not database.user_exists(email):
+    #     return jsonify({"error": "invalid details"}), 403
+
+    # user = database.get_user(email)
+
+    # if bcrypt.checkpw(password, user["hash"]):
+    #     session["logged_in_email"] = email
+    #     return jsonify({"success": True}), 200 
+    # else:
+    #     return jsonify({"error": "invalid details"}), 403
+
+@app.route("/api/logout", methods=['POST'])
+@cross_origin()
+def logout():
+    if session.get("logged_in_email") is None:
+        return jsonify({"error": "not logged in"}), 400
+    else:
+        session.pop("logged_in_email")
+        return jsonify({"success": True}), 200
 
 
 if __name__ == "__main__":
