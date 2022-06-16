@@ -5,10 +5,10 @@ from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from flask_session import Session
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
-import line_graph
 
 # Our modules
 import database
+import line_graph
 from reaction import Reaction, getString
 
 load_dotenv()
