@@ -14,7 +14,7 @@ import {
 import { SocketContext } from "../../context/socket"
 import { Button, Stack } from "@chakra-ui/react"
 
-const TeacherGraph3 = props => {
+const TeacherGraph3 = ({ room }) => {
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -34,11 +34,6 @@ const TeacherGraph3 = props => {
 
   const [data, setData] = useState(getSettings(initialDatasets))
 
-  const [options, setOptions] = useState({
-    responsive: true,
-  })
-
-  const socket = React.useContext(SocketContext)
   function getLabels() {
     let labels = []
     let i
@@ -85,32 +80,31 @@ const TeacherGraph3 = props => {
   const REFRESH_TIME = 10000
 
   useEffect(() => {
-    socket.emit("update line graph")
-    const interval = setInterval(() => {
-      socket.emit("update line graph", props.room)
-    }, REFRESH_TIME)
-
-    socket.on("update line graph", data => {
-      setData(getSettings(data))
-    })
-
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ room: props.room }),
+      body: JSON.stringify({ room: room }),
     }
 
-    fetch("/api/line_graph_data", requestOptions)
-      .then(res => res.json())
-      .then(data => {
-        setData(getSettings(data))
-        console.log(getSettings(data))
-      })
-      .then(console.log("Fetched from api"))
+    function fetch_graph_data() {
+      fetch("/api/line_graph_data", requestOptions)
+        .then(res => res.json())
+        .then(data => {
+          setData(getSettings(data))
+        })
+        .then(console.log("Fetched from api"))
+    }
 
-    // Disconnect when unmounts
-    return () => socket.off("update all")
+    fetch_graph_data()
+
+    const interval = setInterval(() => {
+      fetch_graph_data()
+    }, REFRESH_TIME)
   }, [])
+
+  const [options, setOptions] = useState({
+    responsive: true,
+  })
 
   return (
     <Stack>
