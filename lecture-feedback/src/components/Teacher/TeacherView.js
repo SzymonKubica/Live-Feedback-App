@@ -9,6 +9,8 @@ import {
   GridItem,
   Flex,
   Spacer,
+  Container,
+  Center,
 } from "@chakra-ui/react"
 
 import { socket, SocketContext } from "../../context/socket"
@@ -17,14 +19,14 @@ import CommentLog from "./CommentLog"
 import TeacherGraph2 from "./TeacherGraph2"
 import TeacherGraph3 from "./TeacherGraph3"
 import TeacherFeedbackBar from "./TeacherFeedbackBar"
-import { getString, Reaction } from "../Reactions"
-import { useParams } from "react-router-dom"
+import { useParams } from "react-router-dom";
+import TeacherBars from "./TeacherBars"
 
 export const TeacherView = () => {
   const [studentCounter, setStudentCounter] = useState(0)
   const [chartView, setChartView] = useState(0)
 
-  let { code } = useParams()
+  let { code } = useParams();
 
   useEffect(() => {
     socket.on("update students connected", data => {
@@ -55,52 +57,24 @@ export const TeacherView = () => {
     <ChakraProvider>
       <SocketContext.Provider value={socket}>
         <TeacherHeader state={chartView} setState={setChartView} />
-        <Heading textAlign="center">Reaction Analysis</Heading>
-        <Heading textAlign="center"> Code: {code} </Heading>
-        <Grid templateColumns="repeat(2, 1fr)">
-          <GridItem>
-            {chartView == 0 ? (
-              <TeacherGraph2 room={code} />
-            ) : chartView == 1 ? (
-              <Stack marginStart={10} marginTop={10} width="90%" spacing="10%">
-                <Box width="100%">
-                  <Stack spacing={20}>
-                    <TeacherFeedbackBar
-                      studentCount={studentCounter}
-                      title="Good"
-                      color="green"
-                      reaction={getString(Reaction.GOOD)}
-                      room={code}
-                    />
-                    <TeacherFeedbackBar
-                      studentCount={studentCounter}
-                      title="Confused"
-                      color="red"
-                      reaction={getString(Reaction.CONFUSED)}
-                      room={code}
-                    />
-                    <TeacherFeedbackBar
-                      studentCount={studentCounter}
-                      title="Too Fast"
-                      color="orange"
-                      reaction={getString(Reaction.TOO_FAST)}
-                      room={code}
-                    />
-                    <TeacherFeedbackBar
-                      studentCount={studentCounter}
-                      title="Chilling"
-                      color="twitter"
-                      reaction={getString(Reaction.CHILLING)}
-                      room={code}
-                    />
-                  </Stack>
-                </Box>
-              </Stack>
-            ) : (
-              <TeacherGraph3 room={code} />
-            )}
+        <Heading textAlign='center'>Reaction Analysis</Heading>
+        <Heading textAlign='center'> Code: {code} </Heading>
+        <Grid templateColumns="repeat(3, 1fr)" height='calc(78vh)'>
+          <GridItem rowSpan={2} colSpan={2}>
+            <Center>
+              <Container height='100%' width='100%'>
+
+                {chartView == 0 ? (
+                  <TeacherGraph2 room={code} />
+                ) : chartView == 1 ? (
+                  <TeacherBars studentCounter={studentCounter} code={code} />
+                ) : (
+                  <TeacherGraph3 />
+                )}
+              </Container>
+            </Center>
           </GridItem>
-          <GridItem>
+          <GridItem rowSpan={2}>
             {/* TODO: add get code button */}
             <CommentLog room={code} />
           </GridItem>
