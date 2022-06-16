@@ -21,7 +21,7 @@ import TeacherGraph2 from "./TeacherGraph2"
 import TeacherGraph3 from "./TeacherGraph3"
 import { useParams } from "react-router-dom"
 import TeacherFeedbackBars from "./TeacherFeedbackBars"
-import { getString, Reaction } from "../Reactions"
+import { getColour, getString, Reaction } from "../Reactions"
 
 export const TeacherView = () => {
   const [studentCounter, setStudentCounter] = useState(0)
@@ -37,16 +37,16 @@ export const TeacherView = () => {
       {
         data: [0, 0, 0, 0],
         backgroundColor: [
-          "rgba(0, 255, 0, 0.5)",
-          "rgba(255, 0, 0, 0.5)",
-          "rgba(255, 255, 0, 0.5)",
-          "rgba(0, 0, 255, 0.5)",
+          getColour(Reaction.GOOD),
+          getColour(Reaction.CONFUSED),
+          getColour(Reaction.TOO_FAST),
+          getColour(Reaction.CHILLING),
         ],
         borderColor: [
-          "rgba(0, 255, 0, 1)",
-          "rgba(255, 0, 0, 1)",
-          "rgba(255, 255, 0, 1)",
-          "rgba(0, 0, 255, 1)",
+          'rgb(255,255,255)',
+          'rgb(255,255,255)',
+          'rgb(255,255,255)',
+          'rgb(255,255,255)',
         ],
         borderWidth: 1,
       },
