@@ -18,7 +18,7 @@ import TeacherHeader from "./TeacherHeader"
 import CommentLog from "./CommentLog"
 import TeacherGraph2 from "./TeacherGraph2"
 import TeacherGraph3 from "./TeacherGraph3"
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router-dom"
 import TeacherFeedbackBars from "./TeacherFeedbackBars"
 import { getString, Reaction } from "../Reactions"
 
@@ -26,11 +26,12 @@ export const TeacherView = () => {
   const [studentCounter, setStudentCounter] = useState(0)
   const [chartView, setChartView] = useState(0)
 
-  let { code } = useParams();
+  let { code } = useParams()
 
   useEffect(() => {
     socket.on("update students connected", data => {
       setStudentCounter(data.count)
+      console.log("updating connected students")
     })
     socket.emit("join", { room: code, type: "teacher" })
 
@@ -57,17 +58,16 @@ export const TeacherView = () => {
     <ChakraProvider>
       <SocketContext.Provider value={socket}>
         <TeacherHeader state={chartView} setState={setChartView} />
-        <Heading textAlign='center'>Reaction Analysis</Heading>
-        <Heading textAlign='center'> Code: {code} </Heading>
-        <Grid templateColumns="repeat(3, 1fr)" height='calc(78vh)'>
+        <Heading textAlign="center">Reaction Analysis</Heading>
+        <Heading textAlign="center"> Code: {code} </Heading>
+        <Grid templateColumns="repeat(3, 1fr)" height="calc(78vh)">
           <GridItem rowSpan={2} colSpan={2}>
             <Center>
-              <Container height='100%' width='100%'>
-
+              <Container height="100%" width="100%">
                 {chartView == 0 ? (
                   <TeacherGraph2 room={code} />
                 ) : chartView == 1 ? (
-              <TeacherFeedbackBars room={code} />
+                  <TeacherFeedbackBars room={code} />
                 ) : (
                   <TeacherGraph3 />
                 )}

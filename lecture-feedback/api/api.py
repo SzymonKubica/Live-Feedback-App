@@ -37,7 +37,6 @@ line_graph.initialise_graph_data(data_points=21)
 def not_found(e):
     return app.send_static_file("index.html")
 
-
 @app.route("/")
 @cross_origin()
 def index():
@@ -49,7 +48,6 @@ def reset_buttons(room):
 def in_room(room):
     return room in socketio.server.rooms(request.sid)
 
-
 @socketio.on("connect")
 def test_connect():
     print("connected")
@@ -60,7 +58,6 @@ def test_disconnect():
     if request.sid in students_sid:
         room = sid_to_room[request.sid]
         student_room_counts[room] -= 1
-        emit("update students connected", {"count":student_room_counts[room]}, to=room)
         students_sid.remove(request.sid)
         sid_to_room.pop(request.sid)
         update(room)
