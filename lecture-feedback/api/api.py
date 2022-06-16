@@ -280,7 +280,7 @@ def get_comments():
 @login_required
 @cross_origin()
 def get_new_code():
-    code = database.get_new_code()
+    code = database.get_new_code(session["logged_in_email"])
     database.fetch_snapshot(str(code))   
     return {"code":code}
 
@@ -330,20 +330,7 @@ def check_authenticated():
         return {"authenticated": False}
     else:
         return {"authenticated": True}
-    
-    # email = request.json['email']
-    # password = request.json['password'].encode('utf8')
 
-    # if not database.user_exists(email):
-    #     return jsonify({"error": "invalid details"}), 403
-
-    # user = database.get_user(email)
-
-    # if bcrypt.checkpw(password, user["hash"]):
-    #     session["logged_in_email"] = email
-    #     return jsonify({"success": True}), 200 
-    # else:
-    #     return jsonify({"error": "invalid details"}), 403
 
 @app.route("/api/logout", methods=['POST'])
 @cross_origin()
@@ -353,6 +340,13 @@ def logout():
     else:
         session.pop("logged_in_email")
         return jsonify({"success": True}), 200
+
+@app.route("/api/owner", methods=['POST'])
+@login_required
+@cross_origin()
+def check_owner():
+    room = request.json["room"]
+    return {"owner":database.room_owner(room, session["logged_in_email"])}
 
 
 if __name__ == "__main__":
