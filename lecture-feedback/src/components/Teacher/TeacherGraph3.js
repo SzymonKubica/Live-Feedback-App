@@ -13,8 +13,9 @@ import {
 } from "chart.js"
 import { SocketContext } from "../../context/socket"
 import { Button, Stack } from "@chakra-ui/react"
+import Reaction, { getColour } from "../Reactions"
 
-const TeacherGraph3 = props => {
+const TeacherGraph3 = ({ room }) => {
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -34,11 +35,6 @@ const TeacherGraph3 = props => {
 
   const [data, setData] = useState(getSettings(initialDatasets))
 
-  const [options, setOptions] = useState({
-    responsive: true,
-  })
-
-  const socket = React.useContext(SocketContext)
   function getLabels() {
     let labels = []
     let i
@@ -56,27 +52,27 @@ const TeacherGraph3 = props => {
         {
           label: "Good",
           data: props.good,
-          backgroundColor: "rgba(0, 255, 0, 0.5)",
-          borderColor: "rgb(0, 255, 0)",
+          backgroundColor: getColour(Reaction.GOOD),
+          borderColor: getColour(Reaction.GOOD),
           // hidden: true,
         },
         {
           label: "Confused",
           data: props.confused,
-          backgroundColor: "rgba(255, 0, 0, 0.5)",
-          borderColor: "rgb(255, 0, 0)",
+          backgroundColor: getColour(Reaction.CONFUSED),
+          borderColor: getColour(Reaction.CONFUSED),
         },
         {
           label: "Too Fast",
           data: props.tooFast,
-          backgroundColor: "rgba(255, 255, 0, 0.5)",
-          borderColor: "rgb(255, 255, 0)",
+          backgroundColor: getColour(Reaction.TOO_FAST),
+          borderColor: getColour(Reaction.TOO_FAST),
         },
         {
           label: "Chilling",
           data: props.chilling,
-          backgroundColor: "rgba(0, 0, 255, 0.5)",
-          borderColor: "rgb(0, 0, 255)",
+          backgroundColor: getColour(Reaction.CHILLING),
+          borderColor: getColour(Reaction.CHILLING),
         },
       ],
     }
@@ -85,32 +81,31 @@ const TeacherGraph3 = props => {
   const REFRESH_TIME = 10000
 
   useEffect(() => {
-    socket.emit("update line graph")
-    const interval = setInterval(() => {
-      socket.emit("update line graph", props.room)
-    }, REFRESH_TIME)
-
-    socket.on("update line graph", data => {
-      setData(getSettings(data))
-    })
-
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ room: props.room }),
+      body: JSON.stringify({ room: room }),
     }
 
-    fetch("/api/line_graph_data", requestOptions)
-      .then(res => res.json())
-      .then(data => {
-        setData(getSettings(data))
-        console.log(getSettings(data))
-      })
-      .then(console.log("Fetched from api"))
+    function fetch_graph_data() {
+      fetch("/api/line_graph_data", requestOptions)
+        .then(res => res.json())
+        .then(data => {
+          setData(getSettings(data))
+        })
+        .then(console.log("Fetched from api"))
+    }
 
-    // Disconnect when unmounts
-    return () => socket.off("update all")
+    fetch_graph_data()
+
+    const interval = setInterval(() => {
+      fetch_graph_data()
+    }, REFRESH_TIME)
   }, [])
+
+  const [options, setOptions] = useState({
+    responsive: true,
+  })
 
   return (
     <Stack>

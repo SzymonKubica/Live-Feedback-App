@@ -14,13 +14,13 @@ export const getString = reaction => {
 export function getColour(reaction) {
   switch(reaction) {
     case Reaction.GOOD:
-      return "green"
+      return "rgb(56, 161, 105)"
     case Reaction.CONFUSED:
-      return "red"
+      return "rgb(229, 62, 62)"
     case Reaction.TOO_FAST:
-      return "orange"
+      return "rgb(221, 107, 32)"
     case Reaction.CHILLING:
-      return "#1da1f2" // twitter
+      return "rgb(29, 161, 242)" // twitter
     }
 }
 
