@@ -18,9 +18,9 @@ import TeacherHeader from "./TeacherHeader"
 import CommentLog from "./CommentLog"
 import TeacherGraph2 from "./TeacherGraph2"
 import TeacherGraph3 from "./TeacherGraph3"
-import TeacherFeedbackBar from "./TeacherFeedbackBar"
 import { useParams } from "react-router-dom";
-import TeacherBars from "./TeacherBars"
+import TeacherFeedbackBars from "./TeacherFeedbackBars"
+import { getString, Reaction } from "../Reactions"
 
 export const TeacherView = () => {
   const [studentCounter, setStudentCounter] = useState(0)
@@ -67,7 +67,7 @@ export const TeacherView = () => {
                 {chartView == 0 ? (
                   <TeacherGraph2 room={code} />
                 ) : chartView == 1 ? (
-                  <TeacherBars studentCounter={studentCounter} code={code} />
+              <TeacherFeedbackBars room={code} />
                 ) : (
                   <TeacherGraph3 />
                 )}
