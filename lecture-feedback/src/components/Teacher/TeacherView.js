@@ -115,11 +115,11 @@ export const TeacherView = () => {
         <TeacherHeader state={chartView} setState={setChartView} />
         <Heading textAlign="center">Reaction Analysis</Heading>
         <Heading textAlign="center"> Code: {code} </Heading>
-        <Grid templateColumns="repeat(3, 1fr)" height="calc(78vh)">
+        <Grid templateColumns="repeat(3, 1fr)" height="calc(76vh)">
           <GridItem rowSpan={2} colSpan={2}>
             <Container maxW="100%" id="graphsDiv">
               {chartView == 0 ? (
-                <Container maxW={Math.min(0.66 * width, 0.78 * height)}>
+                <Container maxW={Math.min(0.66 * width, 0.76 * height)}>
                   <TeacherGraph2 room={code} data={circleGraphData} />
                 </Container>
               ) : chartView == 1 ? (
@@ -129,7 +129,7 @@ export const TeacherView = () => {
                   room={code}
                 />
               ) : (
-                <Container maxW={width * 0.66} maxH={height * 0.78}>
+                <Container maxW={width * 0.66} maxH={height * 0.76}>
                   <TeacherGraph3 room={code} />
                 </Container>
               )}
