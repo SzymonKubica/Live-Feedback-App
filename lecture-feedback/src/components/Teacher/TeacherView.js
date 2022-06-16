@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react"
 
 import { socket, SocketContext } from "../../context/socket"
+import { useViewport } from "../../hooks/useViewport"
 import TeacherHeader from "./TeacherHeader"
 import CommentLog from "./CommentLog"
 import TeacherGraph2 from "./TeacherGraph2"
@@ -25,6 +26,7 @@ import TeacherBars from "./TeacherBars"
 export const TeacherView = () => {
   const [studentCounter, setStudentCounter] = useState(0)
   const [chartView, setChartView] = useState(0)
+  const { width, height } = useViewport()
 
   let { code } = useParams();
 
@@ -63,13 +65,16 @@ export const TeacherView = () => {
           <GridItem rowSpan={2} colSpan={2}>
             <Container maxW='100%' id="graphsDiv">
               {chartView == 0 ? (
-                <Container maxW='2xl'>
+                <Container maxW={Math.min(0.66 * width, 0.78 *height)}>
                     <TeacherGraph2 room={code} />
                 </Container>
               ) : chartView == 1 ? (
                 <TeacherBars studentCounter={studentCounter} code={code} />
               ) : (
+                <Container maxW={width*0.66} maxH={height*0.78}>
+                
                 <TeacherGraph3 />
+                </Container>
               )}
             </Container>
           </GridItem>
