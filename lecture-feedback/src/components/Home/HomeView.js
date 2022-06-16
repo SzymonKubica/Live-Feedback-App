@@ -17,7 +17,7 @@ export const HomeView = () => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({"code": parseInt(code)}) 
+      body: JSON.stringify({"code": code}) 
     }
     
     const response = await fetch("/api/is-code-active", requestOptions)
