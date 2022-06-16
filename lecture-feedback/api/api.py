@@ -84,8 +84,9 @@ def test_disconnect():
         students_sid.remove(request.sid)
         sid_to_room.pop(request.sid)
         update_all_reactions(room)
-
-    print("disconnected")
+        print("student disconnected")
+    else:
+        print("teacher disconnected")
 
 @socketio.on("join")
 def on_join(data):
@@ -121,7 +122,8 @@ def on_leave(data):
         update_all_reactions(room)
 
     leave_room(room)
-    session.pop("room") # since they have now left the meeting
+    if request.sid in students_sid:
+        session.pop("room") # since they have now left the meeting
     print("left room")
 
 @socketio.on("add reaction")
@@ -145,10 +147,16 @@ def get_graph_data(room):
     else:
         totals = database.get_totals_for(datetime.now(), room)
         for reaction in Reaction:
-            graph_data[getString(reaction)] = graph_data[getString(reaction)][1:] + [totals[reaction]]
+            if totals == None:
+                new_entry = [0]
+            else: 
+                new_entry = [totals[reaction]]
+
+            graph_data[getString(reaction)] = graph_data[getString(reaction)][1:] + new_entry
 
     return graph_data
 
+REFRESH_INTERVAL = 10 # seconds
 def fetch_graph_data(room):
     request_time = datetime.now()
     data = {}
@@ -157,16 +165,21 @@ def fetch_graph_data(room):
         data[reaction] = []
 
     for i in range (21):
-        totals = database.get_totals_for(request_time - timedelta(seconds = 30 * i), room)
+        totals = database.get_totals_for(request_time - timedelta(seconds = REFRESH_INTERVAL * i), room)
         for reaction in Reaction:
-            data[getString(reaction)] = [totals[reaction]] + data[getString(reaction)]
+            if totals == None:
+               new_entry = [0]
+            else:
+               new_entry = [totals[reaction]]
+
+            data[getString(reaction)] = new_entry + data[getString(reaction)]
     return data
 
 @socketio.on("remove reaction")
 def handle_reaction(reaction, room):
     sid = request.sid
     database.remove_insight(reaction, room, sid)
-    database.save_totals() ## need to rewrite this also
+    database.save_totals(room, sid) ## need to rewrite this also
     update_reaction_count(reaction, room)
     update_all_reactions(room)
     
@@ -181,6 +194,7 @@ def update_all_reactions(room):
     for reaction in Reaction:
         output[reaction] = database.count_active(reaction, room, students_sid)
     emit("update all", output, to=room)
+    emit("update line graph", to=room)
 
 @app.route("/api/reaction-count", methods=['POST'])
 @cross_origin()
@@ -214,7 +228,8 @@ def get_all_reactions():
 @app.route("/api/line_graph_data", methods=['POST'])
 @cross_origin()
 def send_graph_data():
-    return get_graph_data()
+    room = request.json["room"]
+    return get_graph_data(room)
 
 @socketio.on("create snapshot")
 def handle_message():

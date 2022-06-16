@@ -32,12 +32,12 @@ export const TeacherView = () => {
     socket.on("update students connected", data => {
       setStudentCounter(data.count)
     })
-    socket.emit("join", { "room": code, "type": "teacher" })
+    socket.emit("join", { room: code, type: "teacher" })
 
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ "room": code })
+      body: JSON.stringify({ room: code }),
     }
 
     fetch("/api/student-count", requestOptions)
@@ -46,12 +46,10 @@ export const TeacherView = () => {
         setStudentCounter(data.count)
       })
 
-
-
     // Disconnect when unmounts
     return () => {
       socket.off("update students connected")
-      socket.emit("leave", { "room": code })
+      socket.emit("leave", { room: code })
     }
   }, [])
 
