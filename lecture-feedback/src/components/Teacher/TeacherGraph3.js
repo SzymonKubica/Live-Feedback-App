@@ -13,6 +13,7 @@ import {
 } from "chart.js"
 import { SocketContext } from "../../context/socket"
 import { Button, Stack } from "@chakra-ui/react"
+import Reaction, { getColour } from "../Reactions"
 
 const TeacherGraph3 = ({ room }) => {
   ChartJS.register(
@@ -51,27 +52,27 @@ const TeacherGraph3 = ({ room }) => {
         {
           label: "Good",
           data: props.good,
-          backgroundColor: "rgba(0, 255, 0, 0.5)",
-          borderColor: "rgb(0, 255, 0)",
+          backgroundColor: getColour(Reaction.GOOD),
+          borderColor: getColour(Reaction.GOOD),
           // hidden: true,
         },
         {
           label: "Confused",
           data: props.confused,
-          backgroundColor: "rgba(255, 0, 0, 0.5)",
-          borderColor: "rgb(255, 0, 0)",
+          backgroundColor: getColour(Reaction.CONFUSED),
+          borderColor: getColour(Reaction.CONFUSED),
         },
         {
           label: "Too Fast",
           data: props.tooFast,
-          backgroundColor: "rgba(255, 255, 0, 0.5)",
-          borderColor: "rgb(255, 255, 0)",
+          backgroundColor: getColour(Reaction.TOO_FAST),
+          borderColor: getColour(Reaction.TOO_FAST),
         },
         {
           label: "Chilling",
           data: props.chilling,
-          backgroundColor: "rgba(0, 0, 255, 0.5)",
-          borderColor: "rgb(0, 0, 255)",
+          backgroundColor: getColour(Reaction.CHILLING),
+          borderColor: getColour(Reaction.CHILLING),
         },
       ],
     }
