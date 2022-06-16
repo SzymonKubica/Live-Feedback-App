@@ -61,18 +61,17 @@ export const TeacherView = () => {
         <Heading textAlign='center'> Code: {code} </Heading>
         <Grid templateColumns="repeat(3, 1fr)" height='calc(78vh)'>
           <GridItem rowSpan={2} colSpan={2}>
-            <Center>
-              <Container height='100%' width='100%'>
-
-                {chartView == 0 ? (
-                  <TeacherGraph2 room={code} />
-                ) : chartView == 1 ? (
-                  <TeacherBars studentCounter={studentCounter} code={code} />
-                ) : (
-                  <TeacherGraph3 />
-                )}
-              </Container>
-            </Center>
+            <Container maxW='100%' id="graphsDiv">
+              {chartView == 0 ? (
+                <Container maxW='2xl'>
+                    <TeacherGraph2 room={code} />
+                </Container>
+              ) : chartView == 1 ? (
+                <TeacherBars studentCounter={studentCounter} code={code} />
+              ) : (
+                <TeacherGraph3 />
+              )}
+            </Container>
           </GridItem>
           <GridItem rowSpan={2}>
             {/* TODO: add get code button */}
