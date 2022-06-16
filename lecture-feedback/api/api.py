@@ -1,3 +1,4 @@
+import re
 from flask import Flask, request, session
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
@@ -41,17 +42,6 @@ def not_found(e):
 @cross_origin()
 def index():
     return app.send_static_file("index.html")
-
-@app.route("/api/create-snapshot")
-@cross_origin()
-def create_snapshot():
-    room = sid_to_room[request.sid]
-    database.create_new_snapshot(room, students_sid)
-    update(room)
-    reset_buttons(room)
-    print("created snapshot")
-    return None
-
 
 def reset_buttons(room):
     emit("reset buttons", to=room)
@@ -110,9 +100,12 @@ def on_leave(data):
         students_sid.remove(request.sid)
         sid_to_room.pop(request.sid)
         update(room)
+        leave_room(room)
+        session.pop(room)
 
-    leave_room(room)
-    session.pop("room") # since they have now left the meeting
+    # TODO: figure out what to do for lecturers
+    #leave_room(room)
+    #session.pop(room) # since they have now left the meeting
     print("left room")
 
 @socketio.on("add reaction")
@@ -120,12 +113,6 @@ def handle_reaction(reaction, room):
     sid = request.sid
     database.add_insight(reaction, room, sid)
     update(room)
-
-@socketio.on("update line graph")
-def handle_message():
-    room = sid_to_room[request.sid]
-    line_graph.update_graph_data(room, students_sid)
-    emit("update line graph", line_graph.room_to_graph_data[room], broadcast=True)
 
 @socketio.on("remove reaction")
 def handle_reaction(reaction, room):
@@ -145,6 +132,11 @@ def count_active_reactions_in(room):
         output[reaction] = database.count_active(reaction, room, students_sid)
     return output
 
+@socketio.on("update line graph")
+def handle_message():
+    room = sid_to_room[request.sid]
+    line_graph.update_graph_data(room, students_sid)
+    emit("update line graph", line_graph.room_to_graph_data[room], broadcast=True)
 
 @socketio.on("create snapshot")
 def handle_message():
@@ -152,12 +144,24 @@ def handle_message():
     database.create_new_snapshot(room, students_sid)
     update(room)
     reset_buttons(room)
+    print("snapshot created for room: " + str(room))
 
+@app.route("/api/create-snapshot")
+@cross_origin()
+def create_snapshot():
+    room = sid_to_room[request.sid]
+    database.create_new_snapshot(room, students_sid)
+    update(room)
+    reset_buttons(room)
+    print("created snapshot")
+    return None
 
 @app.route("/api/snapshots")
 @cross_origin()
 def get_snapshots():
-    snapshots = database.find_snapshots()
+    print("Request received to show snapshots")
+    room = sid_to_room[request.sid]
+    snapshots = database.find_snapshots(room)
     return {"snapshots":snapshots}
 
 @app.route("/api/reaction-count", methods=['POST'])
@@ -188,9 +192,9 @@ def get_all_reactions():
 @cross_origin()
 def send_graph_data():
     room = request.json["room"]
-    print("json received: " + str(room))
+    print("Line graph data requested for room: " + str(room))
     line_graph.update_graph_data(room, students_sid)
-    return line_graph.room_to_graph_data(room)
+    return line_graph.room_to_graph_data[room]
 
 @socketio.on("leave comment")
 def add_comment(comment, reaction, room):
