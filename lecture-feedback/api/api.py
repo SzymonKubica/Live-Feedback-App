@@ -125,7 +125,7 @@ def handle_reaction(reaction, room):
 @login_required
 def handle_message():
     room = sid_to_room[request.sid]
-    emit("update line graph", line_graph.room_to_graph_data[room], broadcast=True)
+    emit("update line graph", line_graph.room_to_graph_data[room], to=room)
 
 
 
