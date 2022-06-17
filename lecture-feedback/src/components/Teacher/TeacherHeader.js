@@ -29,7 +29,7 @@ const TeacherHeader = props => {
       >
         Reset
       </Button>
-      <NavButton name="Snapshots" dst="snapshots" />
+      {/* <NavButton name="Snapshots" dst="snapshots" /> */}
       <LogoutButton isAuth={props.isAuth} setAuth={props.setAuth} />
       <ColorModeSwitcher marginStart="5px" marginTop="15px" />
     </Flex>
