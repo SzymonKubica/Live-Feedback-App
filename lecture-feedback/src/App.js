@@ -45,8 +45,8 @@ function App() {
     .then(data => {
         if (data["authenticated"]) {
             setAuth(true)
-            setLoading(false)
         }
+        setLoading(false)
     })
     }, [])
 
