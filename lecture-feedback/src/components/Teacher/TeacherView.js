@@ -75,44 +75,10 @@ export const TeacherView = ({isAuth, setAuth}) => {
           navigate("/")
         }
     })
+    .then(() => {
+      socket.emit("join", { room: code, type: "teacher" })
 
-    // established teacher can view so continue as normal
-
-    socket.emit("join", { room: code, type: "teacher" })
-
-    socket.on("update", data => {
-      setData(data)
-      setCircleGraphData(prevState => ({
-        labels: prevState.labels,
-        datasets: [
-          {
-            ...prevState.datasets[0],
-            data: [data.good, data.confused, data.tooFast, data.chilling],
-          },
-        ],
-      }))
-    })
-
-    socket.on("update students connected", data => {
-      setStudentCounter(data.count)
-      console.log("updating connected students")
-    })
-
-    requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ room: code }),
-    }
-
-    fetch("/api/student-count", requestOptions)
-      .then(res => res.json())
-      .then(data => {
-        setStudentCounter(data.count)
-      })
-
-    fetch("/api/all_reactions", requestOptions)
-      .then(res => res.json())
-      .then(data => {
+      socket.on("update", data => {
         setData(data)
         setCircleGraphData(prevState => ({
           labels: prevState.labels,
@@ -124,7 +90,46 @@ export const TeacherView = ({isAuth, setAuth}) => {
           ],
         }))
       })
-      .then(console.log("Fetched from api"))
+
+      socket.on("update students connected", data => {
+        setStudentCounter(data.count)
+        console.log("updating connected students")
+      })
+
+      requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ room: code }),
+      }
+  
+      fetch("/api/student-count", requestOptions)
+        .then(res => res.json())
+        .then(data => {
+          setStudentCounter(data.count)
+        })
+
+      fetch("/api/all_reactions", requestOptions)
+        .then(res => res.json())
+        .then(data => {
+          setData(data)
+          setCircleGraphData(prevState => ({
+            labels: prevState.labels,
+            datasets: [
+              {
+                ...prevState.datasets[0],
+                data: [data.good, data.confused, data.tooFast, data.chilling],
+              },
+            ],
+          }))
+        })
+    })
+
+    // established teacher can view so continue as normal
+
+
+
+
+
 
     // Disconnect when unmounts
     return () => {
