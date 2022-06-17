@@ -4,7 +4,7 @@ import NavButton from "../NavButton"
 import Header from "../Header"
 import { useNavigate } from "react-router-dom";
 
-export const TeacherMenu= () => {
+export const TeacherMenu= ({isAuth, setAuth}) => {
 
   const [meetingCode, setMeetingCode] = useState("")
   let navigate = useNavigate();
@@ -21,9 +21,9 @@ export const TeacherMenu= () => {
   return (
     <ChakraProvider theme={theme}>
     <Stack>
-      <Header />
+      <Header isAuth={isAuth} setAuth={setAuth} />
       <VStack spacing="20px" marginTop="10px">
-        <Heading>Teacher Menu</Heading>
+        <Heading >Teacher Menu</Heading>
         <Button onClick={generateMeetingCode} colorScheme='blue' size='lg'>Start Presentation</Button>
         <NavButton colorScheme='blue' size='lg' dst="student" name = "Past Presentation Analysis"></NavButton>
       </VStack>

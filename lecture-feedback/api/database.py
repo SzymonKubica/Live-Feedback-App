@@ -147,29 +147,49 @@ def get_current_comments(room, active_students):
     return get_comments_between(current_room_snapshot[room], datetime.now(), room, active_students)
 
 
-def get_new_code():
-    def gen_code(): return random.randrange(10**(6-1),10**6)
+def get_new_code(email):
+    def gen_code(): return str(random.randrange(10**(6-1),10**6))
     
     code = gen_code()
     
-    while add_active_code(code):
+    while add_active_code(code, email):
         code = gen_code()
 
     return code
 
 # Adds code to database as active, if it already exists, returns false
 # probably not thread safe
-def add_active_code(code: int):
+def add_active_code(code: int, email):
     is_new_code = 0 == db["active_codes"].count_documents({
             "code": code
         })
 
 
     if is_new_code:
-        db["active_codes"].insert_one({"code": code})
+        db["active_codes"].insert_one(
+            {
+                "code": code,
+                "email": email
+            })
 
     return not is_new_code
 
 def is_active_code(code: int):
     return db["active_codes"].find_one({"code":code}) is not None
+
+def user_exists(email) -> bool:
+    return db["users"].find_one({"email":email}) is not None
+
+def store_new_user(email, hash):
+    db["users"].insert_one({
+        "email": email,
+        "hash": hash
+    })
+
+def get_user(email):
+    return db["users"].find_one({"email": email})
+
+def room_owner(code, email) -> bool:
+    return db["active_codes"].find_one({"code":code, "email":email}) is not None
+
     
