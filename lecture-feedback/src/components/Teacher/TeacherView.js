@@ -124,15 +124,9 @@ export const TeacherView = ({isAuth, setAuth}) => {
         })
     })
 
-    // established teacher can view so continue as normal
-
-
-
-
-
-
     // Disconnect when unmounts
     return () => {
+      socket.off("update")
       socket.off("update students connected")
       socket.emit("leave", { room: code })
     }
