@@ -252,7 +252,6 @@ def get_new_code():
     return {"code":code}
 
 @app.route("/api/is-code-active", methods=['POST'])
-@login_required
 @cross_origin()
 def is_code_active():
     code = request.json['code']
