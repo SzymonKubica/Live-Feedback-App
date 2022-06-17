@@ -9,26 +9,53 @@ import {
   GridItem,
   Flex,
   Spacer,
+  Container,
+  Center,
 } from "@chakra-ui/react"
 
 import { socket, SocketContext } from "../../context/socket"
+import { useViewport } from "../../hooks/useViewport"
 import TeacherHeader from "./TeacherHeader"
 import CommentLog from "./CommentLog"
 import TeacherGraph2 from "./TeacherGraph2"
 import TeacherGraph3 from "./TeacherGraph3"
-import TeacherFeedbackBar from "./TeacherFeedbackBar"
-import { getString, Reaction } from "../Reactions"
 import { useParams } from "react-router-dom"
 import { useNavigate } from "react-router-dom";
+import TeacherFeedbackBars from "./TeacherFeedbackBars"
+import { getColour, Reaction } from "../Reactions"
 
 export const TeacherView = ({isAuth, setAuth}) => {
   const [studentCounter, setStudentCounter] = useState(0)
   const [chartView, setChartView] = useState(0)
   const [visible, setVisible] = useState(false)
+  const { width, height } = useViewport()
 
   let { code } = useParams()
   let navigate = useNavigate();
 
+
+  const [data, setData] = useState({})
+  const [circleGraphData, setCircleGraphData] = useState({
+    labels: ["Good", "Confused", "Too Fast", "Chilling"],
+    datasets: [
+      {
+        data: [0, 0, 0, 0],
+        backgroundColor: [
+          getColour(Reaction.GOOD),
+          getColour(Reaction.CONFUSED),
+          getColour(Reaction.TOO_FAST),
+          getColour(Reaction.CHILLING),
+        ],
+        borderColor: [
+          'rgb(255,255,255)',
+          'rgb(255,255,255)',
+          'rgb(255,255,255)',
+          'rgb(255,255,255)',
+        ],
+        borderWidth: 1,
+      },
+    ],
+  })
 
   useEffect(() => {
     // check if teacher is the owner
@@ -51,10 +78,25 @@ export const TeacherView = ({isAuth, setAuth}) => {
 
     // established teacher can view so continue as normal
 
+    socket.emit("join", { room: code, type: "teacher" })
+
+    socket.on("update", data => {
+      setData(data)
+      setCircleGraphData(prevState => ({
+        labels: prevState.labels,
+        datasets: [
+          {
+            ...prevState.datasets[0],
+            data: [data.good, data.confused, data.tooFast, data.chilling],
+          },
+        ],
+      }))
+    })
+
     socket.on("update students connected", data => {
       setStudentCounter(data.count)
+      console.log("updating connected students")
     })
-    socket.emit("join", { room: code, type: "teacher" })
 
     requestOptions = {
       method: "POST",
@@ -68,6 +110,22 @@ export const TeacherView = ({isAuth, setAuth}) => {
         setStudentCounter(data.count)
       })
 
+    fetch("/api/all_reactions", requestOptions)
+      .then(res => res.json())
+      .then(data => {
+        setData(data)
+        setCircleGraphData(prevState => ({
+          labels: prevState.labels,
+          datasets: [
+            {
+              ...prevState.datasets[0],
+              data: [data.good, data.confused, data.tooFast, data.chilling],
+            },
+          ],
+        }))
+      })
+      .then(console.log("Fetched from api"))
+
     // Disconnect when unmounts
     return () => {
       socket.off("update students connected")
@@ -78,66 +136,43 @@ export const TeacherView = ({isAuth, setAuth}) => {
   return (
     <ChakraProvider>
       <Box>
-        {visible ? 
+        { visible ?
         <SocketContext.Provider value={socket}>
           <TeacherHeader isAuth={isAuth} setAuth={setAuth} state={chartView} setState={setChartView} />
           <Heading textAlign="center">Reaction Analysis</Heading>
           <Heading textAlign="center"> Code: {code} </Heading>
-          <Grid templateColumns="repeat(2, 1fr)">
-            <GridItem>
-              {chartView == 0 ? (
-                <TeacherGraph2 room={code} />
-              ) : chartView == 1 ? (
-                <Stack marginStart={10} marginTop={10} width="90%" spacing="10%">
-                  <Box width="100%">
-                    <Stack spacing={20}>
-                      <TeacherFeedbackBar
-                        studentCount={studentCounter}
-                        title="Good"
-                        color="green"
-                        reaction={getString(Reaction.GOOD)}
-                        room={code}
-                      />
-                      <TeacherFeedbackBar
-                        studentCount={studentCounter}
-                        title="Confused"
-                        color="red"
-                        reaction={getString(Reaction.CONFUSED)}
-                        room={code}
-                      />
-                      <TeacherFeedbackBar
-                        studentCount={studentCounter}
-                        title="Too Fast"
-                        color="orange"
-                        reaction={getString(Reaction.TOO_FAST)}
-                        room={code}
-                      />
-                      <TeacherFeedbackBar
-                        studentCount={studentCounter}
-                        title="Chilling"
-                        color="twitter"
-                        reaction={getString(Reaction.CHILLING)}
-                        room={code}
-                      />
-                    </Stack>
-                  </Box>
-                </Stack>
-              ) : (
-                <TeacherGraph3 room={code} />
-              )}
+          <Grid templateColumns="repeat(3, 1fr)" height="calc(76vh)">
+            <GridItem rowSpan={2} colSpan={2}>
+              <Container maxW="100%" id="graphsDiv">
+                {chartView == 0 ? (
+                  <Container maxW={Math.min(0.66 * width, 0.76 * height)}>
+                    <TeacherGraph2 room={code} data={circleGraphData} />
+                  </Container>
+                ) : chartView == 1 ? (
+                  <TeacherFeedbackBars
+                    studentCounter={studentCounter}
+                    data={data}
+                    room={code}
+                  />
+                ) : (
+                  <Container maxW={width * 0.66} maxH={height * 0.76}>
+                    <TeacherGraph3 room={code} />
+                  </Container>
+                )}
+              </Container>
             </GridItem>
-            <GridItem>
+            <GridItem rowSpan={2}>
               {/* TODO: add get code button */}
               <CommentLog room={code} />
             </GridItem>
           </Grid>
 
-          <Flex>
-            <Spacer />
-            <Heading>{studentCounter} students</Heading>
-          </Flex>
-        </SocketContext.Provider>
-        : null}
+            <Flex>
+              <Spacer />
+              <Heading>{studentCounter} students</Heading>
+            </Flex>
+          </SocketContext.Provider>
+          : null}
       </Box>
     </ChakraProvider>
   )
