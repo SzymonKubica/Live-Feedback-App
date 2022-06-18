@@ -1,7 +1,5 @@
-from sqlite3 import DatabaseError
 from reaction import getString, Reaction
 import database
-from datetime import datetime
 
 room_to_graph_data = {} # map from room number to the graph data
 DATA_POINTS = 21
@@ -17,10 +15,10 @@ def populate_graph():
             data[getString(reaction)] += [0]
     return data
 
-def update_graph_data(room, active_students):
+def update_graph_data(room):
     if room in room_to_graph_data:
         for reaction in Reaction:
-            count = database.count_active(reaction, room, active_students)
+            count = database.count_active(reaction, room)
             entries = room_to_graph_data[room][getString(reaction)]
             list = entries[1:] + [count]
             room_to_graph_data[room][getString(reaction)] = list

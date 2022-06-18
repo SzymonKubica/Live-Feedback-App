@@ -11,6 +11,7 @@ import bcrypt
 import database
 import line_graph
 from reaction import Reaction, getString
+import analysis_graph
 
 load_dotenv()
 
@@ -69,6 +70,7 @@ def test_disconnect():
         room = sid_to_room[request.sid]
         student_room_counts[room] -= 1
         students_sid.remove(request.sid)
+        database.remove_pending_reaction(room, request.sid)
         sid_to_room.pop(request.sid)
         update(room)
         print("student disconnected")
@@ -106,6 +108,7 @@ def on_leave(data):
         student_room_counts[room] -= 1
         students_sid.remove(request.sid)
         sid_to_room.pop(request.sid)
+        database.remove_pending_reaction(request.sid, room)
         update(room)
         leave_room(room)
         session.pop(room)
@@ -144,7 +147,7 @@ def update(room):
 def count_active_reactions_in(room):
     output = {}
     for reaction in Reaction:
-        output[reaction] = database.count_active(reaction, room, students_sid)
+        output[reaction] = database.count_active(reaction, room)
     return output
 
 @socketio.on("update line graph")
@@ -177,6 +180,7 @@ def get_snapshots():
     print("Request received to show snapshots")
     room = sid_to_room[request.sid]
     snapshots = database.find_snapshots(room)
+    database.get_reset_snaphosts(room)
     return {"snapshots":snapshots}
 
 @app.route("/api/reaction-count", methods=['POST'])
@@ -185,7 +189,7 @@ def get_snapshots():
 def get_reaction_count():
         reaction = request.json["reaction"]
         room = request.json["room"]
-        return {"count":database.count_active(reaction, room, students_sid)}
+        return {"count":database.count_active(reaction, room)}
 
 @app.route("/api/student-count", methods=['POST'])
 @login_required
@@ -212,9 +216,17 @@ def get_all_reactions():
 def send_graph_data():
     room = request.json["room"]
     print("Line graph data requested for room: " + str(room))
-    line_graph.update_graph_data(room, students_sid)
-    line_graph.update_graph_data(room, students_sid)
+    line_graph.update_graph_data(room)
+    analysis_graph.get_analytics_data_for(room)
     return line_graph.room_to_graph_data[room]
+
+@app.route("/api/analytics_graph_data", methods=['POST'])
+@login_required
+@cross_origin()
+def send_analytics_data():
+    room = request.json["room"]
+    print("Analytics graph data requested for room: " + str(room))
+    return analysis_graph.get_analytics_data_for(room)
 
 @socketio.on("create snapshot")
 @login_required

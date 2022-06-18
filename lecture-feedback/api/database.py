@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta
 import json
+import operator
 import os
 import pymongo
 from bson import json_util
 from pymongo import MongoClient
 import certifi
-from reaction import Reaction
+from reaction import Reaction, getString
 import random
 
 # snapshot = None
@@ -45,6 +46,33 @@ def add_insight(type, room, sid):
 def remove_insight(type, room, sid):
     add_entry(db, type, generate_insight("remove", room, sid))
 
+
+def parse_datetime(date_string):
+    return datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%S.%fZ")
+def remove_pending_reaction(room, sid):
+    reactions = []
+    time_to_reaction = {}
+    for reaction in Reaction:
+        last_entry = find_latest_reaction_in(room, sid, reaction)
+        if last_entry != None:
+            reactions.append(last_entry)
+            time_to_reaction[last_entry["time"]["$date"]] = reaction
+        
+    
+    if reactions != []:
+        reactions = sorted(reactions, key = lambda i: parse_datetime(i["time"]["$date"]) , reverse=True)
+        latest_interaction = reactions[0]
+        if(latest_interaction["type"] == "add"):
+            remove_insight(getString(time_to_reaction[latest_interaction["time"]["$date"]]), room, sid)
+
+def find_latest_reaction_in(room, sid, reaction):
+        last_entry = parse_mongo_json((db[getString(reaction)].find_one({
+            "room": room,
+            "sid": sid
+        }, sort=[("time", pymongo.DESCENDING)])))
+        return last_entry
+
+
 # Add an insight to a table in the database
 def add_entry(db, table, content):
     tb = db[table]
@@ -60,16 +88,16 @@ def generate_insight(type, room, sid):
     }
 
 # Count insights of given type
-def count_active(table, room, active_students):
-    return count_active_between(table, current_room_snapshot[room], datetime.now(), room, active_students)
+def count_active(table, room):
+    return count_active_between(table, current_room_snapshot[room], datetime.now(), room)
 
-def count_active_between(table, start, end, room,active_students):
-    add_count = count_entries(table, start, end, "add", room, active_students)
-    remove_count = count_entries(table, start, end, "remove", room, active_students)
+def count_active_between(table, start, end, room):
+    add_count = count_entries(table, start, end, "add", room)
+    remove_count = count_entries(table, start, end, "remove", room)
     return add_count - remove_count
 
 # Note only counts if the student is currently connected (with associated sid)
-def count_entries(table, start, end, type, room, active_students):
+def count_entries(table, start, end, type, room):
     return db[table].count_documents({
         "time": {
             "$gte": start,
@@ -77,16 +105,15 @@ def count_entries(table, start, end, type, room, active_students):
         },
         "type":type,
         "room": room,
-        "sid": {
-            "$in": list(active_students)
-        }
-
     })
 
 def find_snapshots(room):
     return parse_mongo_json(list(db['snapshots'].find({
         "room": room
         })))
+
+def get_reset_snaphosts(room):
+    print(find_snapshots(room))
 
 def parse_mongo_json(data):
     return json.loads(json_util.dumps(data))
@@ -102,17 +129,17 @@ def create_new_snapshot(room, active_students):
     db["snapshots"].insert_one({
         "start":currnet_snapshot, #for now
         "end": next_snapshot,
-        "summarised_data": get_summarised(currnet_snapshot, next_snapshot, room, active_students),
+        "summarised_data": get_summarised(currnet_snapshot, next_snapshot, room),
         "room": room
     })
 
     current_room_snapshot[room] = next_snapshot
 
-def get_summarised(start, end, room, active_students):
+def get_summarised(start, end, room):
     output = {}
 
     for reaction in Reaction:
-        output[reaction] = count_active_between(reaction, start, end, room, active_students)
+        output[reaction] = count_active_between(reaction, start, end, room)
 
     return output
 

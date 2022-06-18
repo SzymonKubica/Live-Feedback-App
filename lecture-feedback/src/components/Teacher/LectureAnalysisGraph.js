@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react"
 import { Line } from "react-chartjs-2"
 import {
   Chart as ChartJS,
-  ArcElement,
   Tooltip,
   Legend,
   CategoryScale,
@@ -14,7 +13,7 @@ import {
 import { Stack } from "@chakra-ui/react"
 import Reaction, { getColour } from "../Reactions"
 
-const TeacherGraph3 = ({ room }) => {
+const LectureAnalysisGraph = ({ room }) => {
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -34,26 +33,14 @@ const TeacherGraph3 = ({ room }) => {
 
   const [data, setData] = useState(getSettings(initialDatasets))
 
-  function getLabels() {
-    let labels = []
-    let i
-    for (i = 0; i < 21; i++) {
-      labels.push(String(i * -0.5))
-    }
-    labels.reverse()
-    return labels
-  }
-
   function getSettings(props) {
     return {
-      labels: getLabels(),
       datasets: [
         {
           label: "Good",
           data: props.good,
           backgroundColor: getColour(Reaction.GOOD),
           borderColor: getColour(Reaction.GOOD),
-          // hidden: true,
         },
         {
           label: "Confused",
@@ -87,10 +74,11 @@ const TeacherGraph3 = ({ room }) => {
     }
 
     function fetch_graph_data() {
-      fetch("/api/line_graph_data", requestOptions)
+      fetch("/api/analytics_graph_data", requestOptions)
         .then(res => res.json())
         .then(data => {
           setData(getSettings(data))
+          console.log(data)
         })
         .then(console.log("Fetched from api"))
     }
@@ -104,6 +92,12 @@ const TeacherGraph3 = ({ room }) => {
 
   const [options, setOptions] = useState({
     responsive: true,
+    scales: {
+      x: {
+        type: "linear",
+        position: "bottom",
+      },
+    },
   })
 
   return (
@@ -113,4 +107,4 @@ const TeacherGraph3 = ({ room }) => {
   )
 }
 
-export default TeacherGraph3
+export default LectureAnalysisGraph
