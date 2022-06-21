@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef} from "react"
 import { Line } from "react-chartjs-2"
 import {
   Chart as ChartJS,
@@ -64,8 +64,6 @@ const LectureAnalysisGraph = ({ room }) => {
     }
   }
 
-  const REFRESH_TIME = 10000
-
   useEffect(() => {
     const requestOptions = {
       method: "POST",
@@ -73,36 +71,42 @@ const LectureAnalysisGraph = ({ room }) => {
       body: JSON.stringify({ room: room }),
     }
 
-    function fetch_graph_data() {
-      fetch("/api/analytics_graph_data", requestOptions)
-        .then(res => res.json())
-        .then(data => {
-          setData(getSettings(data))
-          console.log(data)
-        })
-        .then(console.log("Fetched from api"))
-    }
+    fetch("/api/analytics_graph_data", requestOptions)
+      .then(res => res.json())
+      .then(data => {
+        setData(getSettings(data))
+        console.log(data)
+      })
+      .then(console.log("Fetched from api"))
 
-    fetch_graph_data()
-
-    const interval = setInterval(() => {
-      fetch_graph_data()
-    }, REFRESH_TIME)
   }, [])
 
   const [options, setOptions] = useState({
     responsive: true,
+    maintainAspectRatio: false,
     scales: {
       x: {
         type: "linear",
         position: "bottom",
       },
     },
+    elements: {
+      point:{
+        pointRadius: 2,
+      }
+    }
   })
 
   return (
     <Stack>
-      <Line updateMode="none" data={data} options={options} />
+        <Line 
+          id="chart"
+          updateMode="none" 
+          data={data} 
+          options={options} 
+          height={60} 
+          
+        />
     </Stack>
   )
 }

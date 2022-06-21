@@ -9,6 +9,7 @@ import { SnapshotView } from "./components/Teacher/SnapshotView"
 import { TeacherMenu } from "./components/Teacher/TeacherMenu"
 import { TeacherLogin } from "./components/Teacher/TeacherLogin"
 import { TeacherSignup } from "./components/Teacher/TeacherSignup"
+import { PanoptoView } from "./components/Teacher/PastAnalysis/PanoptoView"
 import { Box } from "@chakra-ui/react"
 
 function RequireAuth({ children, isAuth, isLoading}) {
@@ -67,6 +68,12 @@ function App() {
           <Route path="teacher/menu" element={
             <RequireAuth isAuth={isAuth} isLoading={isLoading}>
               <TeacherMenu isAuth={isAuth} setAuth={setAuth}/>
+            </RequireAuth>
+          }/>
+
+          <Route path="teacher/panopto" element={
+            <RequireAuth isAuth={isAuth} isLoading={isLoading}>
+              <PanoptoView isAuth={isAuth} setAuth={setAuth}/>
             </RequireAuth>
           }/>
         </Routes>
