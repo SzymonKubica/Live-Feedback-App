@@ -11,6 +11,9 @@ import {
   Spacer,
   Container,
   Center,
+  Button,
+  Modal,
+  useDisclosure
 } from "@chakra-ui/react"
 
 import { socket, SocketContext } from "../../context/socket"
@@ -30,7 +33,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
   const [chartView, setChartView] = useState(0)
   const [visible, setVisible] = useState(false)
   const { width, height } = useViewport()
-
+  
   let { code } = useParams()
   let navigate = useNavigate()
 
@@ -96,6 +99,13 @@ export const TeacherView = ({ isAuth, setAuth }) => {
           console.log("updating connected students")
         })
 
+        socket.on("presentation ended", () => {
+          // do some other stuff to save the video
+          
+          // navigate("/teacher/menu")
+          onOpen()
+        })
+
         requestOptions = {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -128,6 +138,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
     return () => {
       socket.off("update")
       socket.off("update students connected")
+      socket.off("presentation ended")
       socket.emit("leave", { room: code })
     }
   }, [])
@@ -173,6 +184,8 @@ export const TeacherView = ({ isAuth, setAuth }) => {
             </Grid>
 
             <Flex>
+              <Spacer />
+              <Button onClick={handleEndPresentation}>End Presentation</Button>
               <Spacer />
               <Heading>{studentCounter} students</Heading>
             </Flex>

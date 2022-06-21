@@ -186,7 +186,7 @@ def get_new_code(email):
 
 # Adds code to database as active, if it already exists, returns false
 # probably not thread safe
-def add_active_code(code: int, email):
+def add_active_code(code, email):
     is_new_code = 0 == db["active_codes"].count_documents({
             "code": code
         })
@@ -196,13 +196,19 @@ def add_active_code(code: int, email):
         db["active_codes"].insert_one(
             {
                 "code": code,
-                "email": email
+                "email": email,
+                "ended": False
             })
 
     return not is_new_code
 
-def is_active_code(code: int):
-    return db["active_codes"].find_one({"code":code}) is not None
+def end_presentation(code):
+    db["active_codes"].update_one({"code":code}, {"$set": {"ended": True}}, upsert=False)
+
+def is_active_code(code):
+    ## need to update this to take into account ended
+    found = db["active_codes"].find_one({"code":code})
+    return found is not None and not found["ended"]
 
 def user_exists(email) -> bool:
     return db["users"].find_one({"email":email}) is not None

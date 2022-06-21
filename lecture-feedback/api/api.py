@@ -164,6 +164,18 @@ def handle_message():
     reset_buttons(room)
     print("snapshot created for room: " + str(room))
 
+@socketio.on("end presentation")
+def handle_end_presentation():
+    if session["logged_in_email"]:
+        room = sid_to_room[request.sid]
+        database.end_presentation(room)
+        emit("presentation ended", to=room)
+
+    else:
+        # do something maybe?
+        pass
+    pass
+
 @app.route("/api/create-snapshot")
 @cross_origin()
 def create_snapshot():
