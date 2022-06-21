@@ -14,7 +14,7 @@ export const PanoptoView = () => {
 
   const code = "248191"
 
-  const [time, setTime] = useState(0)
+  const [time, setTime] = useState(90)
 
   // const onReady = React.useCallback(() => {
   //   const timeToStart = (7 * 60) + 12.6;
@@ -30,11 +30,7 @@ export const PanoptoView = () => {
     <ChakraProvider theme={theme}>
         <Container maxW={width * 0.66} maxH={height * 0.76}>
         <iframe src={`https://pro.panopto.com/Panopto/Pages/Embed.aspx?tid=ac005dfe-14fb-47f6-9ccc-aebb00a778ee&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${time}&interactivity=all`} height="405" width="720" allowfullscreen allow="autoplay"></iframe>
-        <Button onClick={() => {
-          setTime(time-10)
-          }
-          }>Test</Button>
-        <LectureAnalysisGraph room={code} />
+        <LectureAnalysisGraph room={code} setTime={setTime}/>
         </Container>
     </ChakraProvider>
   )

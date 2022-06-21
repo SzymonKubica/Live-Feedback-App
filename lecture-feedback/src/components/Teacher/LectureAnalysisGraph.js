@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef} from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { Line } from "react-chartjs-2"
 import {
   Chart as ChartJS,
@@ -13,7 +13,7 @@ import {
 import { Stack } from "@chakra-ui/react"
 import Reaction, { getColour } from "../Reactions"
 
-const LectureAnalysisGraph = ({ room }) => {
+const LectureAnalysisGraph = ({ room, setTime }) => {
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -88,25 +88,43 @@ const LectureAnalysisGraph = ({ room }) => {
       x: {
         type: "linear",
         position: "bottom",
+        title: {
+          display: true,
+          text: "Time(seconds)",
+        }
+      },
+      y: {
+        type: "linear",
+        position: "left",
+        title: {
+          display: true,
+          text: "Reactions",
+        }
       },
     },
     elements: {
-      point:{
+      point: {
         pointRadius: 2,
       }
-    }
+    },
+    onClick: function (event, elementsAtEvent) {
+      let valueX = null
+      var scale = this.scales['x'];
+      valueX = scale.getValueForPixel(event.x);
+      setTime(valueX)
+    },
   })
 
   return (
     <Stack>
-        <Line 
-          id="chart"
-          updateMode="none" 
-          data={data} 
-          options={options} 
-          height={60} 
-          
-        />
+      <Line
+        id="chart"
+        updateMode="none"
+        data={data}
+        options={options}
+        height={60}
+
+      />
     </Stack>
   )
 }
