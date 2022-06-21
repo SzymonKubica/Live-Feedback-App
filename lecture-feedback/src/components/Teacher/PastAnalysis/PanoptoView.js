@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react"
 import { ChakraProvider, theme, VStack, Heading, Stack, Button, Center , Input, Box, Container} from "@chakra-ui/react"
-import ReactPlayer from 'react-player'
 import LectureAnalysisGraph from "../LectureAnalysisGraph"
 import { useViewport } from "../../../hooks/useViewport"
 
@@ -30,13 +29,6 @@ export const PanoptoView = () => {
   return (
     <ChakraProvider theme={theme}>
         <Container maxW={width * 0.66} maxH={height * 0.76}>
-        {/* <ReactPlayer 
-          ref={playerRef}
-          url={videoUrl}
-          controls={true}
-          playing={true}
-
-        /> */}
         <iframe src={`https://pro.panopto.com/Panopto/Pages/Embed.aspx?tid=ac005dfe-14fb-47f6-9ccc-aebb00a778ee&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${time}&interactivity=all`} height="405" width="720" allowfullscreen allow="autoplay"></iframe>
         <Button onClick={() => {
           setTime(time-10)
