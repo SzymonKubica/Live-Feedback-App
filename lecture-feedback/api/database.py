@@ -29,7 +29,8 @@ def initialise_database():
 
 
 # Find the most recent snapshot in the database
-def fetch_snapshot(room):
+# time is passed on initial fetch when new code genreated
+def fetch_snapshot(room, time=None):
     # global snapshot
     global current_room_snapshot
     snapshot = db["snapshots"].find_one(
@@ -38,7 +39,9 @@ def fetch_snapshot(room):
         }
         ,sort=[("end", pymongo.DESCENDING)])
     if snapshot is None:
-        current_room_snapshot[room] = datetime.min #should be start time of meeting
+        current_room_snapshot[room] = datetime.min #safety coz code trash
+    elif time is not None:
+        current_room_snapshot[room] = time 
     else:
         current_room_snapshot[room] = snapshot['end']
 
@@ -173,24 +176,36 @@ def get_comments_between(start, end, room, active_students):
     for comment in comments:
         parsed_comments.append({"comment":comment["comment"], "reaction":comment["reaction"]})
     return parsed_comments
+    
+
+def get_all_comments(room):
+    comments = db["comments"].find({
+        "room": room
+    })
+
+    parsed_comments = []
+    for comment in comments:
+        parsed_comments.append({"comment":comment["comment"], "reaction":comment["reaction"], "time":comment["time"]})
+    return parsed_comments
+    
 
 def get_current_comments(room, active_students):
     return get_comments_between(current_room_snapshot[room], datetime.now(), room, active_students)
 
 
-def get_new_code(email):
+def get_new_code(email, time):
     def gen_code(): return str(random.randrange(10**(6-1),10**6))
     
     code = gen_code()
     
-    while add_active_code(code, email):
+    while add_active_code(code, email, time):
         code = gen_code()
 
     return code
 
 # Adds code to database as active, if it already exists, returns false
 # probably not thread safe
-def add_active_code(code, email):
+def add_active_code(code, email, time):
     is_new_code = 0 == db["active_codes"].count_documents({
             "code": code
         })
@@ -201,6 +216,7 @@ def add_active_code(code, email):
             {
                 "code": code,
                 "email": email,
+                "start_time": time,
                 "ended": False
             })
 
@@ -208,6 +224,9 @@ def add_active_code(code, email):
 
 def end_presentation(code):
     db["active_codes"].update_one({"code":code}, {"$set": {"ended": True}}, upsert=False)
+
+def get_start_time(code):
+    return db["active_codes"].find_one({"code":code})["start_time"]
 
 def is_active_code(code):
     ## need to update this to take into account ended
