@@ -9,8 +9,8 @@ import { ChonkyIconFA } from 'chonky-icon-fontawesome';
 
 setChonkyDefaults({
   iconComponent: ChonkyIconFA,
-  disableSelection: true,
-  disableDragAndDropProvider: true,
+  disableSelection: false,
+  disableDragAndDropProvider: false,
 });
 
 

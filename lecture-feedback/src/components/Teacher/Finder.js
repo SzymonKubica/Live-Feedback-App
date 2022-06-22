@@ -73,11 +73,102 @@ const useCustomFileMap = (initial, setInitial) => {
 
     }, [currentFolderId]);
 
-    // Function that will be called when user creates a new folder using the toolbar
-    // button. That that we use incremental integer IDs for new folder, but this is
-    // not a good practice in production! Instead, you should use something like UUIDs
-    // or MD5 hashes for file paths.
-    const idCounter = useRef(0);
+    // Called when there is a change made
+    const updateBackend = (newFileMap) => {
+        const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({"directory":{"rootFolderId": rootFolderId, "fileMap": newFileMap}})
+        }
+
+        fetch("/api/set-presentations", requestOptions)
+        .then(res => res.json())
+        .then(data => {
+            console.log(data)
+            console.log(newFileMap)
+        })
+    }
+
+    // Function that will be called when user deletes files either using the toolbar
+    // button or `Delete` key.
+    const deleteFiles = useCallback((files) => {
+        setFileMap((currentFileMap) => {
+            // Create a copy of the file map to make sure we don't mutate it.
+            const newFileMap = { ...currentFileMap };
+
+            files.forEach((file) => {
+                // Delete file from the file map.
+                delete newFileMap[file.id];
+
+                // Update the parent folder to make sure it doesn't try to load the
+                // file we just deleted.
+                if (file.parentId) {
+                    const parent = newFileMap[file.parentId];
+                    const newChildrenIds = parent.childrenIds.filter(
+                        (id) => id !== file.id
+                    );
+                    newFileMap[file.parentId] = {
+                        ...parent,
+                        childrenIds: newChildrenIds,
+                        childrenCount: newChildrenIds.length,
+                    };
+                }
+            });
+            updateBackend(newFileMap)
+            return newFileMap;
+        });
+        
+    }, []);
+
+    // Function that will be called when files are moved from one folder to another
+    // using drag & drop.
+    const moveFiles = useCallback(
+        (
+            files,
+            source,
+            destination
+        ) => {
+            setFileMap((currentFileMap) => {
+                const newFileMap = { ...currentFileMap };
+                const moveFileIds = new Set(files.map((f) => f.id));
+
+                // Delete files from their source folder.
+                const newSourceChildrenIds = source.childrenIds.filter(
+                    (id) => !moveFileIds.has(id)
+                );
+                newFileMap[source.id] = {
+                    ...source,
+                    childrenIds: newSourceChildrenIds,
+                    childrenCount: newSourceChildrenIds.length,
+                };
+
+                // Add the files to their destination folder.
+                const newDestinationChildrenIds = [
+                    ...destination.childrenIds,
+                    ...files.map((f) => f.id),
+                ];
+                newFileMap[destination.id] = {
+                    ...destination,
+                    childrenIds: newDestinationChildrenIds,
+                    childrenCount: newDestinationChildrenIds.length,
+                };
+
+                // Finally, update the parent folder ID on the files from source folder
+                // ID to the destination folder ID.
+                files.forEach((file) => {
+                    newFileMap[file.id] = {
+                        ...file,
+                        parentId: destination.id,
+                    };
+                });
+                updateBackend(newFileMap)
+                return newFileMap;
+            });
+        },
+        []
+    );
+
+
     const createFolder = useCallback((folderName) => {
         setFileMap((currentFileMap) => {
             const newFileMap = { ...currentFileMap };
@@ -100,46 +191,46 @@ const useCustomFileMap = (initial, setInitial) => {
                 ...parent,
                 childrenIds: [...parent.childrenIds, newFolderId],
             };
-
+            updateBackend(newFileMap)
             return newFileMap;
             // return currentFileMap
         });
+        // updateBackend()
     }, []);
 
-    const addVideo = (videoName, code) => {
-        
-        const newFileMap = { ...fileMap };
+    const addVideo = useCallback((videoName, code) => {
+        setFileMap((currentFileMap) => {
+            const newFileMap = { ...currentFileMap };
 
-        // Create the new video
-        const newVideoId = `video-${md5(currentFolderIdRef.current+videoName)}`;
-        newFileMap[newVideoId] = {
-            id: newVideoId,
-            name: videoName,
-            modDate: new Date(),
-            parentId: currentFolderIdRef.current,
-            code: code
-        };
+            // Create the new folder
+            const newVideoId = `video-${md5(currentFolderIdRef.current+videoName)}`;
+            newFileMap[newVideoId] = {
+                id: newVideoId,
+                name: videoName,
+                modDate: new Date(),
+                parentId: currentFolderIdRef.current,
+                code: code
+            };
 
-        // Update parent folder to reference the new video.
-        const parent = newFileMap[currentFolderIdRef.current];
-        newFileMap[currentFolderIdRef.current] = {
-            ...parent,
-            childrenIds: [...parent.childrenIds, newVideoId],
-        };
+            // Update parent folder to reference the new video.
+            const parent = newFileMap[currentFolderIdRef.current];
+            newFileMap[currentFolderIdRef.current] = {
+                ...parent,
+                childrenIds: [...parent.childrenIds, newVideoId],
+            };
+            updateBackend(newFileMap)
+            return newFileMap;
+        });
         
-        setFileMap(newFileMap)
-        
-        return newFileMap;
-    }
+    }, [])
 
     return {
         fileMap,
         currentFolderId,
         rootFolderId,
         setCurrentFolderId,
-        // resetFileMap,
-        // deleteFiles,
-        // moveFiles,
+        deleteFiles,
+        moveFiles,
         addVideo,
         createFolder,
     };
@@ -183,8 +274,8 @@ export const useFolderChain = (
 
 export const useFileActionHandler = (
     setCurrentFolderId,
-    // deleteFiles,
-    // moveFiles,
+    deleteFiles,
+    moveFiles,
     createFolder
 ) => {
     let navigate = useNavigate();
@@ -205,16 +296,21 @@ export const useFileActionHandler = (
 
                 console.log("Tried to open some file which isn't dir")
                 // we have target file too so all good
-
+            } else if (data.id === ChonkyActions.DeleteFiles.id) {
+                deleteFiles(data.state.selectedFilesForAction);
+            } else if (data.id === ChonkyActions.MoveFiles.id) {
+                moveFiles(
+                    data.payload.files,
+                    data.payload.source,
+                    data.payload.destination
+                );
             } else if (data.id === ChonkyActions.CreateFolder.id) {
                 const folderName = prompt('Provide the name for your new folder:');
                 if (folderName) createFolder(folderName);
             }
 
-        },
-        [createFolder, setCurrentFolderId]
-        
-        // [createFolder, deleteFiles, moveFiles, setCurrentFolderId]
+        },        
+        [createFolder, deleteFiles, moveFiles, setCurrentFolderId]
     );
 };
 
@@ -228,9 +324,8 @@ export const PresentationFileFinder = React.memo((props) => {
         currentFolderId,
         rootFolderId,
         setCurrentFolderId,
-        // resetFileMap,
-        // deleteFiles,
-        // moveFiles,
+        deleteFiles,
+        moveFiles,
         addVideo,
         createFolder,
     } = useCustomFileMap(initial, setInitial);
@@ -238,12 +333,12 @@ export const PresentationFileFinder = React.memo((props) => {
     const folderChain = useFolderChain(fileMap, currentFolderId);
     const handleFileAction = useFileActionHandler(
         setCurrentFolderId,
-        // deleteFiles,
-        // moveFiles,
+        deleteFiles,
+        moveFiles,
         createFolder
     );
     const fileActions = useMemo(
-        () => [ChonkyActions.CreateFolder], //[ChonkyActions.CreateFolder, ChonkyActions.DeleteFiles],
+        () => [ChonkyActions.CreateFolder, ChonkyActions.DeleteFiles],
         []
     );
     const thumbnailGenerator = useCallback(
@@ -256,19 +351,7 @@ export const PresentationFileFinder = React.memo((props) => {
         const videoName = prompt('Provide the name for the video');
         if (videoName && videoName.length !== 0) {
             const newMap = addVideo(videoName, props.code)
-            // save it
-            const requestOptions = {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({"directory":{"rootFolderId": rootFolderId, "fileMap": newMap}})
-            }
-    
-            fetch("/api/set-presentations", requestOptions)
-            .then(res => res.json())
-            .then(data => {
-                console.log(data)
-                navigate("/teacher/menu")
-            })
+            navigate("/teacher/menu")
         } 
         
         // only triggered when press ok not cancel
