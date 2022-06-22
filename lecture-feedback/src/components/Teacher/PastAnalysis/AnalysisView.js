@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react"
 import { ChakraProvider, theme, VStack, Heading, Stack, Button, Center , Input, Box, Container} from "@chakra-ui/react"
 import LectureAnalysisGraph from "../LectureAnalysisGraph"
 import { useViewport } from "../../../hooks/useViewport"
-
+import { useParams, useNavigate } from "react-router-dom";
 
 export const AnalysisView = () => {
 
@@ -12,7 +12,7 @@ export const AnalysisView = () => {
 
   const { width, height } = useViewport()
 
-  const code = "248191"
+  let {code} = useParams()
 
   const [time, setTime] = useState(90)
 

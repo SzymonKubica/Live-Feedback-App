@@ -187,6 +187,8 @@ export const useFileActionHandler = (
     // moveFiles,
     createFolder
 ) => {
+    let navigate = useNavigate();
+
     return useCallback(
         (data) => {
             if (data.id === ChonkyActions.OpenFiles.id) {
@@ -196,6 +198,11 @@ export const useFileActionHandler = (
                     setCurrentFolderId(fileToOpen.id);
                     return;
                 }
+                // Must be opening a file (video)
+                // console.log(data.payload.targetFile.code)
+                const roomCode = data.payload.targetFile.code
+                navigate(roomCode)
+
                 console.log("Tried to open some file which isn't dir")
                 // we have target file too so all good
 
@@ -211,7 +218,7 @@ export const useFileActionHandler = (
     );
 };
 
-export const PresentationViewer = React.memo((props) => {
+export const PresentationFileFinder = React.memo((props) => {
     let navigate = useNavigate();
 
     const [initial, setInitial] = useState(true)
@@ -270,7 +277,7 @@ export const PresentationViewer = React.memo((props) => {
 
     return (
             <ChakraProvider theme={theme}>
-                <Box>
+                <Box width={"50%"} height={400}>
                     <FullFileBrowser
                         files={files}
                         folderChain={folderChain}
@@ -279,8 +286,12 @@ export const PresentationViewer = React.memo((props) => {
                         thumbnailGenerator={thumbnailGenerator}
                         {...props}
                     />
-                    <Button onClick={handleSave} >Save</Button>
-                    <Button onClick={handleCancel} >Cancel</Button>
+                    {props.allowSave ?
+                    <Box> 
+                        <Button onClick={handleSave} >Save</Button>
+                        <Button onClick={handleCancel} >Cancel</Button>
+                    </Box>
+                    : null}
                 </Box>
             </ChakraProvider>
             // </div>
