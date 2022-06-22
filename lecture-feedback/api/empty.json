@@ -1,0 +1,12 @@
+{
+    "rootFolderId": "root",
+    "fileMap": {
+        "root": {
+          "id": "root",
+          "name": "Presentations",
+          "isDir": true,
+          "childrenIds": [],
+          "childrenCount": 0
+        }
+      }
+}

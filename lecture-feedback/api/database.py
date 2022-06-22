@@ -8,12 +8,16 @@ from pymongo import MongoClient
 import certifi
 from reaction import Reaction, getString
 import random
+import json
 
 # snapshot = None
 current_room_snapshot = {}
 cluster = None
 client = None
 db = None
+
+with open('empty.json') as f:
+   empty_directory = json.load(f)
 
 def initialise_database():
     global cluster 
@@ -219,10 +223,26 @@ def store_new_user(email, hash):
         "hash": hash
     })
 
+    db["saved_presentations"].insert_one({
+        "directory": empty_directory,
+        "email": email
+    })
+
 def get_user(email):
     return db["users"].find_one({"email": email})
 
 def room_owner(code, email) -> bool:
     return db["active_codes"].find_one({"code":code, "email":email}) is not None
+
+def get_presentation_directory(email):
+    return db["saved_presentations"].find_one({
+        "email": email
+    })["directory"]
+
+def set_presentation_directory(email, new_directory):
+    db["saved_presentations"].update_one(
+        {"email":email}, 
+        {"$set": {"directory": new_directory}}, 
+        upsert=False)
 
     

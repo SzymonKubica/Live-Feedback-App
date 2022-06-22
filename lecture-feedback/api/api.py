@@ -339,5 +339,22 @@ def check_owner():
     return {"owner":database.room_owner(room, session["logged_in_email"])}
 
 
+# Gets the previous structure
+@app.route("/api/get-presentations", methods=['GET'])
+@login_required
+@cross_origin()
+def get_presentations():
+    return database.get_presentation_directory(session["logged_in_email"])
+
+# updated the presentations directory structure
+@app.route("/api/set-presentations", methods=['POST'])
+@login_required
+@cross_origin()
+def set_presentations():
+    directory = request.json["directory"]
+    print(directory)
+    database.set_presentation_directory(session["logged_in_email"], directory)
+    return {"success":True}
+
 if __name__ == "__main__":
     socketio.run()
