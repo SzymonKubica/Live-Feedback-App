@@ -27,7 +27,7 @@ import { useNavigate } from "react-router-dom"
 import TeacherFeedbackBars from "./TeacherFeedbackBars"
 import { getColour, Reaction } from "../Reactions"
 import LectureAnalysisGraph from "./LectureAnalysisGraph"
-import { PresentationViewer } from "./PresentationViewer"
+import { PresentationFileFinder } from "./Finder"
 
 export const TeacherView = ({ isAuth, setAuth }) => {
   const [studentCounter, setStudentCounter] = useState(0)
@@ -154,7 +154,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
   return (
     <ChakraProvider>
       <Box>
-        {showSave ? <PresentationViewer code={code} /> :
+        {showSave ? <PresentationFileFinder allowSave={true} code={code} /> :
         <Box>
         {visible ? (
           <SocketContext.Provider value={socket}>

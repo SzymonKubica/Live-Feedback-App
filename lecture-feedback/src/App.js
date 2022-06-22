@@ -11,7 +11,7 @@ import { TeacherLogin } from "./components/Teacher/TeacherLogin"
 import { TeacherSignup } from "./components/Teacher/TeacherSignup"
 import { PanoptoView } from "./components/Teacher/PastAnalysis/PanoptoView"
 import { Box } from "@chakra-ui/react"
-import { PresentationViewer } from "./components/Teacher/PresentationViewer"
+import { PresentationFileFinder } from "./components/Teacher/Finder"
 import { AnalysisView } from "./components/Teacher/PastAnalysis/AnalysisView"
 
 
@@ -81,6 +81,12 @@ function App() {
           }/>
 
           <Route path="teacher/analysis" element={
+            <RequireAuth isAuth={isAuth} isLoading={isLoading}>
+              <PresentationFileFinder allowSave={false} />
+            </RequireAuth>
+          }/>
+
+          <Route path="teacher/analysis/:code" element={
             <RequireAuth isAuth={isAuth} isLoading={isLoading}>
               <AnalysisView />
             </RequireAuth>
