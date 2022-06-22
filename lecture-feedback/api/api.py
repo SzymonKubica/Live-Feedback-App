@@ -11,6 +11,7 @@ import bcrypt
 import database
 import line_graph
 from reaction import Reaction, getString
+import analysis_graph
 
 load_dotenv()
 
@@ -69,6 +70,7 @@ def test_disconnect():
         room = sid_to_room[request.sid]
         student_room_counts[room] -= 1
         students_sid.remove(request.sid)
+        database.remove_pending_reaction(room, request.sid)
         sid_to_room.pop(request.sid)
         update(room)
         print("student disconnected")
@@ -106,6 +108,7 @@ def on_leave(data):
         student_room_counts[room] -= 1
         students_sid.remove(request.sid)
         sid_to_room.pop(request.sid)
+        database.remove_pending_reaction(request.sid, room)
         update(room)
         leave_room(room)
         session.pop(room)
@@ -144,7 +147,7 @@ def update(room):
 def count_active_reactions_in(room):
     output = {}
     for reaction in Reaction:
-        output[reaction] = database.count_active(reaction, room, students_sid)
+        output[reaction] = database.count_active(reaction, room)
     return output
 
 @socketio.on("update line graph")
@@ -160,6 +163,19 @@ def handle_message():
     update(room)
     reset_buttons(room)
     print("snapshot created for room: " + str(room))
+
+@socketio.on("end presentation")
+def handle_end_presentation():
+    if session["logged_in_email"]:
+        room = sid_to_room[request.sid]
+        database.end_presentation(room)
+        emit("presentation ended", to=room)
+
+    else:
+        # do something maybe?
+        pass
+    pass
+
 
 @app.route("/api/create-snapshot")
 @cross_origin()
@@ -177,6 +193,7 @@ def get_snapshots():
     print("Request received to show snapshots")
     room = sid_to_room[request.sid]
     snapshots = database.find_snapshots(room)
+    database.get_reset_snaphosts(room)
     return {"snapshots":snapshots}
 
 @app.route("/api/reaction-count", methods=['POST'])
@@ -185,7 +202,7 @@ def get_snapshots():
 def get_reaction_count():
         reaction = request.json["reaction"]
         room = request.json["room"]
-        return {"count":database.count_active(reaction, room, students_sid)}
+        return {"count":database.count_active(reaction, room)}
 
 @app.route("/api/student-count", methods=['POST'])
 @login_required
@@ -212,9 +229,17 @@ def get_all_reactions():
 def send_graph_data():
     room = request.json["room"]
     print("Line graph data requested for room: " + str(room))
-    line_graph.update_graph_data(room, students_sid)
-    line_graph.update_graph_data(room, students_sid)
+    line_graph.update_graph_data(room)
+    analysis_graph.get_analytics_data_for(room)
     return line_graph.room_to_graph_data[room]
+
+@app.route("/api/analytics_graph_data", methods=['POST'])
+@login_required
+@cross_origin()
+def send_analytics_data():
+    room = request.json["room"]
+    print("Analytics graph data requested for room: " + str(room))
+    return analysis_graph.get_analytics_data_for(room)
 
 @socketio.on("create snapshot")
 @login_required
@@ -242,13 +267,40 @@ def get_comments():
         print(comments)
         return {"comments": comments}
 
+
+@app.route("/api/get-all-comments", methods=['POST'])
+@login_required
+@cross_origin()
+def get_all_comments():
+    room = request.json["room"]
+    comments = database.get_all_comments(room)
+    return {"comments": comments}
+
+
+@app.route("/api/get-start-time", methods=['POST'])
+@login_required
+@cross_origin()
+def get_start_time():
+    room = request.json["room"]
+    time = database.get_start_time(room)
+    return {"time": time}
+
+@app.route("/api/get-end-time", methods=['POST'])
+@login_required
+@cross_origin()
+def get_end_time():
+    room = request.json["room"]
+    time = database.get_end_time(room)
+    return {"time": time}
+
 # code stuff
 @app.route("/api/new-code")
 @login_required
 @cross_origin()
 def get_new_code():
-    code = database.get_new_code(session["logged_in_email"])
-    database.fetch_snapshot(str(code))   
+    time = datetime.now()
+    code = database.get_new_code(session["logged_in_email"], time)
+    database.fetch_snapshot(str(code), time)   
     return {"code":code}
 
 @app.route("/api/is-code-active", methods=['POST'])
@@ -313,6 +365,44 @@ def logout():
 def check_owner():
     room = request.json["room"]
     return {"owner":database.room_owner(room, session["logged_in_email"])}
+
+
+# Gets the previous structure
+@app.route("/api/get-presentations", methods=['GET'])
+@login_required
+@cross_origin()
+def get_presentations():
+    return database.get_presentation_directory(session["logged_in_email"])
+
+# updated the presentations directory structure
+@app.route("/api/set-presentations", methods=['POST'])
+@login_required
+@cross_origin()
+def set_presentations():
+    directory = request.json["directory"]
+    print(directory)
+    database.set_presentation_directory(session["logged_in_email"], directory)
+    return {"success":True}
+
+# Sets the link for videos
+@app.route("/api/set-video-link", methods=['POST'])
+@login_required
+@cross_origin()
+def set_video_link():
+    room = request.json["room"]
+    link = request.json["link"]
+    print("here")
+    database.set_video_link(room, link)
+    return {"success": True}
+
+# Gets the link for videos
+@app.route("/api/get-video-link", methods=['POST'])
+@login_required
+@cross_origin()
+def get_video_link():
+    room = request.json["room"]
+    link = database.get_video_link(room)
+    return {"link":link}
 
 
 if __name__ == "__main__":

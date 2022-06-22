@@ -9,7 +9,13 @@ import { SnapshotView } from "./components/Teacher/SnapshotView"
 import { TeacherMenu } from "./components/Teacher/TeacherMenu"
 import { TeacherLogin } from "./components/Teacher/TeacherLogin"
 import { TeacherSignup } from "./components/Teacher/TeacherSignup"
-import { Box } from "@chakra-ui/react"
+import { PanoptoView } from "./components/Teacher/PastAnalysis/PanoptoView"
+import { Box, Center} from "@chakra-ui/react"
+import { PresentationFileFinder } from "./components/Teacher/Finder"
+import { AnalysisView } from "./components/Teacher/PastAnalysis/AnalysisView"
+import { ChakraProvider, theme } from "@chakra-ui/react"
+import Header from "./components/Header"
+
 
 function RequireAuth({ children, isAuth, isLoading}) {
   // let auth = useAuth();
@@ -67,6 +73,29 @@ function App() {
           <Route path="teacher/menu" element={
             <RequireAuth isAuth={isAuth} isLoading={isLoading}>
               <TeacherMenu isAuth={isAuth} setAuth={setAuth}/>
+            </RequireAuth>
+          }/>
+
+          <Route path="teacher/panopto" element={
+            <RequireAuth isAuth={isAuth} isLoading={isLoading}>
+              <PanoptoView isAuth={isAuth} setAuth={setAuth}/>
+            </RequireAuth>
+          }/>
+
+          <Route path="teacher/analysis" element={
+            <RequireAuth isAuth={isAuth} isLoading={isLoading}>
+              <ChakraProvider theme={theme}>
+                <Header isAuth={isAuth} setAuth={setAuth} />
+                <Center>
+                  <PresentationFileFinder isAuth={isAuth} setAuth={setAuth} allowSave={false} />
+                </Center>
+              </ChakraProvider>
+            </RequireAuth>
+          }/>
+
+          <Route path="teacher/analysis/:code" element={
+            <RequireAuth isAuth={isAuth} isLoading={isLoading}>
+              <AnalysisView isAuth={isAuth} setAuth={setAuth} />
             </RequireAuth>
           }/>
         </Routes>
