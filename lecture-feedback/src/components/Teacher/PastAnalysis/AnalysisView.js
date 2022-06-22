@@ -13,7 +13,7 @@ export const AnalysisView = () => {
 
   const { width, height } = useViewport()
 
-  const code = "563837"
+  let {code} = useParams()
 
   const [time, setTime] = useState(90)
 
