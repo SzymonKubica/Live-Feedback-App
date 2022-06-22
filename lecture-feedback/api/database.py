@@ -174,7 +174,7 @@ def get_comments_between(start, end, room, active_students):
 
     parsed_comments = []
     for comment in comments:
-        parsed_comments.append({"comment":comment["comment"], "reaction":comment["reaction"]})
+        parsed_comments.append({"comment":comment["comment"], "reaction":comment["reaction"], "time":comment["time"]})
     return parsed_comments
     
 
@@ -217,16 +217,20 @@ def add_active_code(code, email, time):
                 "code": code,
                 "email": email,
                 "start_time": time,
+                "end_time": None,
                 "ended": False
             })
 
     return not is_new_code
 
 def end_presentation(code):
-    db["active_codes"].update_one({"code":code}, {"$set": {"ended": True}}, upsert=False)
+    db["active_codes"].update_one({"code":code}, {"$set": {"ended": True, "end_time": datetime.now()}}, upsert=False)
 
 def get_start_time(code):
     return db["active_codes"].find_one({"code":code})["start_time"]
+
+def get_end_time(code):
+    return db["active_codes"].find_one({"code":code})["end_time"]
 
 def is_active_code(code):
     ## need to update this to take into account ended

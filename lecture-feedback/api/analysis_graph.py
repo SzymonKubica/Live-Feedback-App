@@ -44,8 +44,8 @@ def get_analytics_data_for(room):
 
     # for now the start time is the time of the first reaction.
 
-    min_time = min(times)
-    max_time = max(times)
+    min_time = database.get_start_time(room)
+    max_time = database.get_end_time(room)
     retard_times = times
     curr_time = min_time
 

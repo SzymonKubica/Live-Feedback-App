@@ -51,7 +51,7 @@ const Messages = ({ messages, h, startTime, setTime }) => {
 								</GridItem>
 								<GridItem rowSpan={1} colSpan={2} />
 								<GridItem rowSpan={1} colSpan={1}>
-									<Text color='gray'>{millisToMinutesAndSeconds(mils)}</Text>
+									<Text color='gray'>{startTime === undefined ? item.time.split(" ")[4] : millisToMinutesAndSeconds(mils)}</Text>
 								</GridItem>
 							</Grid>
 						</Box>
