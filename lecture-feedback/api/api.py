@@ -273,9 +273,7 @@ def get_comments():
 @cross_origin()
 def get_all_comments():
     room = request.json["room"]
-    print("All commentws requested for room: " + str(room))
     comments = database.get_all_comments(room)
-    print(comments)
     return {"comments": comments}
 
 
@@ -377,6 +375,26 @@ def set_presentations():
     print(directory)
     database.set_presentation_directory(session["logged_in_email"], directory)
     return {"success":True}
+
+# Sets the link for videos
+@app.route("/api/set-video-link", methods=['POST'])
+@login_required
+@cross_origin()
+def set_video_link():
+    room = request.json["room"]
+    link = request.json["link"]
+    print("here")
+    database.set_video_link(room, link)
+    return {"success": True}
+
+# Gets the link for videos
+@app.route("/api/get-video-link", methods=['POST'])
+@login_required
+@cross_origin()
+def get_video_link():
+    room = request.json["room"]
+    link = database.get_video_link(room)
+    return {"link":link}
 
 
 if __name__ == "__main__":

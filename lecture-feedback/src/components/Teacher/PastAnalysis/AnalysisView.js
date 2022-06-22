@@ -20,6 +20,7 @@ export const AnalysisView = () => {
 
   const [comments, setComments] = useState([{ comment: "hello", reaction: "chilling" }])
   const [startTime, setStartTime] = useState(0)
+  const [link, setLink] = useState("")
 
   const requestOptions = {
     method: "POST",
@@ -39,15 +40,33 @@ export const AnalysisView = () => {
       .then(data => {
         setStartTime(data.time)
       })
+
+    fetch('/api/get-video-link', requestOptions)
+    .then(res => res.json())
+    .then(data => {
+      setLink(data.link)
+    })
   }, [])
 
+  //https://pro.panopto.com/Panopto/Pages/Embed.aspx?tid=ac005dfe-14fb-47f6-9ccc-aebb00a778ee
 
+  const handleAddLink = () => {
+    let link = prompt("Enter Panopto Link")
+    link = link.replace("Viewer","Embed")
+    setTime(0)
+    setLink(link)
 
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ "room": code , "link":link}),
+    }
+    fetch('/api/set-video-link', requestOptions)
+    .then(res => res.json())
+    .then(data => {
+    })
 
-  // const onReady = React.useCallback(() => {
-  //   const timeToStart = (7 * 60) + 12.6;
-  //   playerRef.current.seekTo(timeToStart, 'seconds');
-  // }, [playerRef.current]);
+  }
 
   const test = () => {
     playerRef.current.seekTo(30, "seconds")
@@ -58,7 +77,14 @@ export const AnalysisView = () => {
     <ChakraProvider theme={theme}>
       <Flex>
         <Container maxW={width * 0.66} maxH={height * 0.76}>
-          <iframe src={`https://pro.panopto.com/Panopto/Pages/Embed.aspx?tid=ac005dfe-14fb-47f6-9ccc-aebb00a778ee&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${time}&interactivity=all`} height="405" width="720" allowfullscreen allow="autoplay"></iframe>
+          {link === "" ? 
+          <Box height={height * 0.70} width={width * 0.60}>
+            <Heading>No Video Saved</Heading>
+            <Button onClick={handleAddLink}>Add Panopto Link</Button>
+          </Box>
+          :
+          <iframe src={`${link}&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${time}&interactivity=all`} height={height * 0.70} width={width * 0.60} allowfullscreen allow="autoplay"></iframe>
+          }
           <LectureAnalysisGraph room={code} setTime={setTime} />
         </Container>
         <Flex w="100%" h="100%" justify="center" align="center">

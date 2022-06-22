@@ -264,4 +264,15 @@ def set_presentation_directory(email, new_directory):
         {"$set": {"directory": new_directory}}, 
         upsert=False)
 
-    
+
+def set_video_link(code, link):
+    db["active_codes"].update_one(
+        {"code":code}, 
+        {"$set": {"video_link": link}}, 
+        upsert=False)
+
+def get_video_link(code):
+    req = db["active_codes"].find_one({"code": code})
+    if "video_link" in req:
+        return req["video_link"]
+    return ""
