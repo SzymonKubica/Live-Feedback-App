@@ -13,6 +13,8 @@ import { PanoptoView } from "./components/Teacher/PastAnalysis/PanoptoView"
 import { Box, Center} from "@chakra-ui/react"
 import { PresentationFileFinder } from "./components/Teacher/Finder"
 import { AnalysisView } from "./components/Teacher/PastAnalysis/AnalysisView"
+import { ChakraProvider, theme } from "@chakra-ui/react"
+import Header from "./components/Header"
 
 
 function RequireAuth({ children, isAuth, isLoading}) {
@@ -82,9 +84,12 @@ function App() {
 
           <Route path="teacher/analysis" element={
             <RequireAuth isAuth={isAuth} isLoading={isLoading}>
-              <Center>
-                <PresentationFileFinder isAuth={isAuth} setAuth={setAuth} allowSave={false} />
-              </Center>
+              <ChakraProvider theme={theme}>
+                <Header isAuth={isAuth} setAuth={setAuth} />
+                <Center>
+                  <PresentationFileFinder isAuth={isAuth} setAuth={setAuth} allowSave={false} />
+                </Center>
+              </ChakraProvider>
             </RequireAuth>
           }/>
 
