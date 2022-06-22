@@ -13,11 +13,12 @@ export const AnalysisView = () => {
 
   const { width, height } = useViewport()
 
-  const code = "628678"
+  const code = "563837"
 
   const [time, setTime] = useState(90)
 
   const [comments, setComments] = useState([{ comment: "hello", reaction: "chilling" }])
+  const [startTime, setStartTime] = useState(0)
 
   const requestOptions = {
     method: "POST",
@@ -31,16 +32,13 @@ export const AnalysisView = () => {
       .then(data => {
         setComments(data.comments)
       })
+
+      fetch('/api/get-start-time', requestOptions)
+      .then(res => res.json())
+      .then(data => {
+        setStartTime(data.time)
+      })
   }, [])
-
-  function hello() {
-    fetch('/api/get-all-comments', requestOptions)
-    .then(res => res.json())
-    .then(data => {
-      setComments(data.comments)
-    })
-
-  }
 
 
 
@@ -64,7 +62,7 @@ export const AnalysisView = () => {
         </Container>
         <Flex w="100%" h="100%" justify="center" align="center">
           <Flex w={["100%", "100%", "40%"]} h="90%" flexDir="column">
-            <Messages h="calc(40vh)" messages={comments} />
+            <Messages h="calc(40vh)" messages={comments} startTime={startTime} setTime={setTime}/>
           </Flex>
         </Flex>
       </Flex>
