@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react"
 import { SocketContext } from '../../context/socket'
 
 
-import { Flex } from '@chakra-ui/react'
+import { Flex, Switch } from '@chakra-ui/react'
 
 import Messages from "./Messages"
 
 export default function CommentLog({room}) {
+    const [commentsAllowed, setCommentsAllowed] = useState(false)
     
     const [comments, setComments] = useState([])
     const socket = React.useContext(SocketContext);    
@@ -41,7 +42,11 @@ export default function CommentLog({room}) {
     return (    
     <Flex w="100%" h="100%" justify="center" align="center">
       <Flex w={["100%", "100%", "40%"]} h="90%" flexDir="column">
-        <Messages h="calc(40vh)" messages={comments} />
+      <Switch isChecked = {commentsAllowed} onChange = {e => setCommentsAllowed(!commentsAllowed)}>Comments</Switch>
+      {commentsAllowed ? 
+            <Messages h="calc(40vh)" messages={comments} />
+            : null}
+
       </Flex>
     </Flex>
     )
