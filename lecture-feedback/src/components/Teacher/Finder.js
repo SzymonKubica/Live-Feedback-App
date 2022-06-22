@@ -6,6 +6,7 @@
 
  import {
     ChonkyActions,
+    ChonkyIconName,
     ChonkyFileActionData,
     FileArray,
     FileBrowserProps,
@@ -207,8 +208,10 @@ const useCustomFileMap = (initial, setInitial) => {
             newFileMap[newVideoId] = {
                 id: newVideoId,
                 name: videoName,
+                ext: "",
                 modDate: new Date(),
                 parentId: currentFolderIdRef.current,
+                icon: ChonkyIconName.video,
                 code: code
             };
 
