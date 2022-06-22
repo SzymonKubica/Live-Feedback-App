@@ -15,8 +15,8 @@
 } from 'chonky';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DemoFsMap from './empty.json';
-import { ChakraProvider, theme, VStack, Heading, Stack, Button, Center , Input, Box} from "@chakra-ui/react"
-import { useNavigate} from "react-router-dom";
+import { ChakraProvider, theme, Button, Box} from "@chakra-ui/react"
+import { useNavigate } from "react-router-dom";
 import md5 from "md5"
 
 
@@ -254,24 +254,31 @@ export const PresentationFileFinder = React.memo((props) => {
 
     const handleSave = () => {
         const videoName = prompt('Provide the name for the video');
-        const newMap = addVideo(videoName, props.code)
-        // save it
-        const requestOptions = {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({"directory":{"rootFolderId": rootFolderId, "fileMap": newMap}})
+        if (videoName && videoName.length !== 0) {
+            const newMap = addVideo(videoName, props.code)
+            // save it
+            const requestOptions = {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({"directory":{"rootFolderId": rootFolderId, "fileMap": newMap}})
+            }
+    
+            fetch("/api/set-presentations", requestOptions)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                navigate("/teacher/menu")
+            })
+        } 
+        
+        // only triggered when press ok not cancel
+        if (videoName.length === 0) {
+            alert("invalid video name")
         }
-
-        fetch("/api/set-presentations", requestOptions)
-        .then(res => res.json())
-        .then(data => {
-            console.log(data)
-            navigate("/teacher/menu")
-        })
+        
     }
 
-    const handleCancel = () => {
-        console.log(fileMap)
+    const handleNoSave = () => {
         navigate("/teacher/menu")
     }
 
@@ -289,7 +296,7 @@ export const PresentationFileFinder = React.memo((props) => {
                     {props.allowSave ?
                     <Box> 
                         <Button onClick={handleSave} >Save</Button>
-                        <Button onClick={handleCancel} >Cancel</Button>
+                        <Button onClick={handleNoSave} >Don't Save</Button>
                     </Box>
                     : null}
                 </Box>

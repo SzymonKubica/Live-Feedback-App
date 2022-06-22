@@ -154,8 +154,11 @@ export const TeacherView = ({ isAuth, setAuth }) => {
   return (
     <ChakraProvider>
       <Box>
-        {showSave ? <PresentationFileFinder allowSave={true} code={code} /> :
-        <Box>
+        {showSave ? 
+        <Center>
+          <PresentationFileFinder allowSave={true} code={code} />
+        </Center> 
+        : <Box>
         {visible ? (
           <SocketContext.Provider value={socket}>
             <TeacherHeader
