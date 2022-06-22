@@ -176,6 +176,7 @@ def handle_end_presentation():
         pass
     pass
 
+
 @app.route("/api/create-snapshot")
 @cross_origin()
 def create_snapshot():
@@ -266,13 +267,34 @@ def get_comments():
         print(comments)
         return {"comments": comments}
 
+
+@app.route("/api/get-all-comments", methods=['POST'])
+@login_required
+@cross_origin()
+def get_all_comments():
+    room = request.json["room"]
+    print("All commentws requested for room: " + str(room))
+    comments = database.get_all_comments(room)
+    print(comments)
+    return {"comments": comments}
+
+
+@app.route("/api/get-start-time", methods=['POST'])
+@login_required
+@cross_origin()
+def get_start_time():
+    room = request.json["room"]
+    time = database.get_start_time(room)
+    return {"time": time}
+
 # code stuff
 @app.route("/api/new-code")
 @login_required
 @cross_origin()
 def get_new_code():
-    code = database.get_new_code(session["logged_in_email"])
-    database.fetch_snapshot(str(code))   
+    time = datetime.now()
+    code = database.get_new_code(session["logged_in_email"], time)
+    database.fetch_snapshot(str(code), time)   
     return {"code":code}
 
 @app.route("/api/is-code-active", methods=['POST'])
@@ -355,6 +377,7 @@ def set_presentations():
     print(directory)
     database.set_presentation_directory(session["logged_in_email"], directory)
     return {"success":True}
+
 
 if __name__ == "__main__":
     socketio.run()
