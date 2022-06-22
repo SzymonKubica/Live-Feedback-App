@@ -27,12 +27,14 @@ import { useNavigate } from "react-router-dom"
 import TeacherFeedbackBars from "./TeacherFeedbackBars"
 import { getColour, Reaction } from "../Reactions"
 import LectureAnalysisGraph from "./LectureAnalysisGraph"
+import { PresentationViewer } from "./PresentationViewer"
 
 export const TeacherView = ({ isAuth, setAuth }) => {
   const [studentCounter, setStudentCounter] = useState(0)
   const [chartView, setChartView] = useState(0)
   const [visible, setVisible] = useState(false)
   const { width, height } = useViewport()
+  const [showSave, setShowSave] = useState(false)
   
   let { code } = useParams()
   let navigate = useNavigate()
@@ -102,8 +104,8 @@ export const TeacherView = ({ isAuth, setAuth }) => {
         socket.on("presentation ended", () => {
           // do some other stuff to save the video
           
-          // navigate("/teacher/menu")
-          onOpen()
+          navigate("/teacher/menu")
+          // onOpen()
         })
 
         requestOptions = {
@@ -143,9 +145,17 @@ export const TeacherView = ({ isAuth, setAuth }) => {
     }
   }, [])
 
+  const handleEndPresentation = () => {
+    socket.off("presentation ended") // we only want to close other lectuers tabs, not the current (if they have open)
+    socket.emit("end presentation")
+    setShowSave(true)
+  }
+
   return (
     <ChakraProvider>
       <Box>
+        {showSave ? <PresentationViewer code={code} /> :
+        <Box>
         {visible ? (
           <SocketContext.Provider value={socket}>
             <TeacherHeader
@@ -191,6 +201,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
             </Flex>
           </SocketContext.Provider>
         ) : null}
+        </Box>}
       </Box>
     </ChakraProvider>
   )
