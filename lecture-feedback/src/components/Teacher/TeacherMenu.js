@@ -39,7 +39,7 @@ export const TeacherMenu= () => {
       <VStack spacing="20px" marginTop="10px">
         <Heading>Teacher Menu</Heading>
         <Button onClick={generateMeetingCode} colorScheme='blue' size='lg'>Start Presentation</Button>
-        <NavButton colorScheme='blue' size='lg' dst="student" name = "Past Presentation Analysis"></NavButton>
+        <NavButton colorScheme='blue' size='lg' dst="/teacher/analysis" name = "Past Presentation Analysis"></NavButton>
         {/* TODO: Add unique identifier to NavButton  */}
         <NavButton colorScheme='blue' size='lg' dst="review-feedback" name = "Review Feedback"></NavButton>
         <Switch>Colour Blind Mode</Switch> 
