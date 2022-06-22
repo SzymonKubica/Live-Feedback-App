@@ -277,7 +277,7 @@ export const PresentationFileFinder = React.memo((props) => {
 
     return (
             <ChakraProvider theme={theme}>
-                <Box>
+                <Box width={"50%"} height={400}>
                     <FullFileBrowser
                         files={files}
                         folderChain={folderChain}
