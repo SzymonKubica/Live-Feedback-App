@@ -33,6 +33,7 @@ export const LogoutButton = ({isAuth, setAuth}) => {
         alignSelf="start"
         marginStart="5px"
         marginTop="15px"
+        marginBottom="15px"
         >
         Logout
         </Button>

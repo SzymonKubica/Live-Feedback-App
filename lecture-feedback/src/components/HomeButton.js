@@ -16,6 +16,7 @@ const HomeButton = () => {
         alignSelf="start"
         marginStart="5px"
         marginTop="15px"
+        marginBottom="15px"
       >
         Home
       </Button>

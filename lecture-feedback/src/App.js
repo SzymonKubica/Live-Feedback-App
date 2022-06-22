@@ -83,14 +83,14 @@ function App() {
           <Route path="teacher/analysis" element={
             <RequireAuth isAuth={isAuth} isLoading={isLoading}>
               <Center>
-                <PresentationFileFinder allowSave={false} />
+                <PresentationFileFinder isAuth={isAuth} setAuth={setAuth} allowSave={false} />
               </Center>
             </RequireAuth>
           }/>
 
           <Route path="teacher/analysis/:code" element={
             <RequireAuth isAuth={isAuth} isLoading={isLoading}>
-              <AnalysisView />
+              <AnalysisView isAuth={isAuth} setAuth={setAuth} />
             </RequireAuth>
           }/>
         </Routes>

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react"
-import { ChakraProvider, theme, VStack, Heading, Stack, Button, Center, Input, Box, Container, Flex } from "@chakra-ui/react"
+import { ChakraProvider, theme, VStack, Heading, Stack, Button, Center, Input, Box, Container, Flex, Grid, GridItem, Spacer} from "@chakra-ui/react"
 import LectureAnalysisGraph from "../LectureAnalysisGraph"
 import { useViewport } from "../../../hooks/useViewport"
 import Messages from "../Messages"
 import { useParams, useNavigate } from "react-router-dom";
+import Header from "../../Header"
 
 
-export const AnalysisView = () => {
+export const AnalysisView = ({isAuth, setAuth}) => {
 
 
   const playerRef = React.useRef();
@@ -16,7 +17,7 @@ export const AnalysisView = () => {
 
   let {code} = useParams()
 
-  const [time, setTime] = useState(90)
+  const [time, setTime] = useState(0)
 
   const [comments, setComments] = useState([{ comment: "hello", reaction: "chilling" }])
   const [startTime, setStartTime] = useState(0)
@@ -68,31 +69,35 @@ export const AnalysisView = () => {
 
   }
 
-  const test = () => {
-    playerRef.current.seekTo(30, "seconds")
-  }
-
-
   return (
     <ChakraProvider theme={theme}>
-      <Flex>
-        <Container maxW={width * 0.66} maxH={height * 0.76}>
-          {link === "" ? 
-          <Box height={height * 0.70} width={width * 0.60}>
-            <Heading>No Video Saved</Heading>
-            <Button onClick={handleAddLink}>Add Panopto Link</Button>
-          </Box>
-          :
-          <iframe src={`${link}&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${time}&interactivity=all`} height={height * 0.70} width={width * 0.60} allowfullscreen allow="autoplay"></iframe>
-          }
-          <LectureAnalysisGraph room={code} setTime={setTime} />
-        </Container>
-        <Flex w="100%" h="100%" justify="center" align="center">
-          <Flex w={["100%", "100%", "40%"]} h="90%" flexDir="column">
-            <Messages h="calc(40vh)" messages={comments} startTime={startTime} setTime={setTime}/>
+      {/* <Flex> */}
+        <Header isAuth={isAuth} setAuth={setAuth} />
+        <Grid templateColumns="repeat(3, 1fr)" height="calc(70vh)">
+          <GridItem rowSpan={2} colSpan={2}>
+            <Container maxW={width * 0.55} maxH={height * 0.70}>
+              {link === "" ? 
+              <Box height={height * 0.65} width={width * 0.55}>
+                <Heading>No Video Saved</Heading>
+                <Button onClick={handleAddLink}>Add Panopto Link</Button>
+              </Box>
+              :
+              <iframe src={`${link}&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${time}&interactivity=all`} height={height * 0.65} width={width * 0.55} allowfullscreen allow="autoplay"></iframe>
+              }
+              <LectureAnalysisGraph room={code} setTime={setTime} />
+            </Container>
+          </GridItem>
+          <Spacer />
+
+          <GridItem rowSpan={2}>
+          <Flex w="100%" h="100%" justify="center" align="center">
+            <Flex w={["100%", "100%", "40%"]} h="90%" flexDir="column">
+              <Messages h="calc(40vh)" messages={comments} startTime={startTime} setTime={setTime}/>
+            </Flex>
           </Flex>
-        </Flex>
-      </Flex>
+          </GridItem>
+      </Grid>
+      {/* </Flex> */}
     </ChakraProvider>
   )
 }
