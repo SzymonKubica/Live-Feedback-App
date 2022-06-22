@@ -3,6 +3,7 @@ import { ChakraProvider, theme, VStack, Heading, Stack, Button, Center, Input, B
 import LectureAnalysisGraph from "../LectureAnalysisGraph"
 import { useViewport } from "../../../hooks/useViewport"
 import Messages from "../Messages"
+import { useParams, useNavigate } from "react-router-dom";
 
 
 export const AnalysisView = () => {
