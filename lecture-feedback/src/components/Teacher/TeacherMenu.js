@@ -25,7 +25,7 @@ export const TeacherMenu= ({isAuth, setAuth}) => {
       <VStack spacing="20px" marginTop="10px">
         <Heading >Teacher Menu</Heading>
         <Button onClick={generateMeetingCode} colorScheme='blue' size='lg'>Start Presentation</Button>
-        <NavButton colorScheme='blue' size='lg' dst="student" name = "Past Presentation Analysis"></NavButton>
+        <NavButton colorScheme='blue' size='lg' dst="/teacher/analysis" name = "Past Presentation Analysis"></NavButton>
       </VStack>
     </Stack>
   </ChakraProvider>

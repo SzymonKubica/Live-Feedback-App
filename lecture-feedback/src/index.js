@@ -4,6 +4,15 @@ import * as ReactDOM from "react-dom/client"
 import App from "./App"
 import reportWebVitals from "./reportWebVitals"
 import * as serviceWorker from "./serviceWorker"
+import { setChonkyDefaults } from 'chonky';
+import { ChonkyIconFA } from 'chonky-icon-fontawesome';
+
+setChonkyDefaults({
+  iconComponent: ChonkyIconFA,
+  disableSelection: true,
+  disableDragAndDropProvider: true,
+});
+
 
 const container = document.getElementById("root")
 const root = ReactDOM.createRoot(container)
