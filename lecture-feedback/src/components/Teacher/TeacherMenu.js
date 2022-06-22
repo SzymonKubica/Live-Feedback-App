@@ -3,7 +3,6 @@ import { ChakraProvider, theme, VStack, Heading, Stack, Button, Center , Input, 
 import NavButton from "../NavButton"
 import Header from "../Header"
 import { useNavigate } from "react-router-dom";
-import { Player } from "video-react"
 
 
 export const TeacherMenu= () => {
