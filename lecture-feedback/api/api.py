@@ -285,6 +285,14 @@ def get_start_time():
     time = database.get_start_time(room)
     return {"time": time}
 
+@app.route("/api/get-end-time", methods=['POST'])
+@login_required
+@cross_origin()
+def get_end_time():
+    room = request.json["room"]
+    time = database.get_end_time(room)
+    return {"time": time}
+
 # code stuff
 @app.route("/api/new-code")
 @login_required
