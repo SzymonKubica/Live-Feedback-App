@@ -13,7 +13,7 @@ import {
   Center,
   Button,
   Modal,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react"
 
 import { socket, SocketContext } from "../../context/socket"
@@ -35,7 +35,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
   const [visible, setVisible] = useState(false)
   const { width, height } = useViewport()
   const [showSave, setShowSave] = useState(false)
-  
+
   let { code } = useParams()
   let navigate = useNavigate()
 
@@ -103,7 +103,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
 
         socket.on("presentation ended", () => {
           // do some other stuff to save the video
-          
+
           navigate("/teacher/menu")
           // onOpen()
         })
@@ -154,57 +154,60 @@ export const TeacherView = ({ isAuth, setAuth }) => {
   return (
     <ChakraProvider>
       <Box>
-        {showSave ? 
-        <Center>
-          <PresentationFileFinder allowSave={true} code={code} />
-        </Center> 
-        : <Box>
-        {visible ? (
-          <SocketContext.Provider value={socket}>
-            <TeacherHeader
-              isAuth={isAuth}
-              setAuth={setAuth}
-              state={chartView}
-              setState={setChartView}
-            />
-            <Heading textAlign="center">Reaction Analysis</Heading>
-            <Heading textAlign="center"> Code: {code} </Heading>
-            <Grid templateColumns="repeat(3, 1fr)" height="calc(76vh)">
-              <GridItem rowSpan={2} colSpan={2}>
-                <Container maxW="100%" id="graphsDiv">
-                  {chartView == 0 ? (
-                    <Container maxW={Math.min(0.66 * width, 0.76 * height)}>
-                      <TeacherGraph2 room={code} data={circleGraphData} />
+        {showSave ? (
+          <Center>
+            <PresentationFileFinder allowSave={true} code={code} />
+          </Center>
+        ) : (
+          <Box>
+            {visible ? (
+              <SocketContext.Provider value={socket}>
+                <TeacherHeader
+                  isAuth={isAuth}
+                  setAuth={setAuth}
+                  state={chartView}
+                  setState={setChartView}
+                />
+                <Heading textAlign="center">Reaction Analysis</Heading>
+                <Heading textAlign="center"> Code: {code} </Heading>
+                <Grid templateColumns="repeat(3, 1fr)" height="calc(76vh)">
+                  <GridItem rowSpan={2} colSpan={2}>
+                    <Container maxW="100%" id="graphsDiv">
+                      {chartView == 0 ? (
+                        <Container maxW={Math.min(0.66 * width, 0.76 * height)}>
+                          <TeacherGraph2 room={code} data={circleGraphData} />
+                        </Container>
+                      ) : chartView == 1 ? (
+                        <TeacherFeedbackBars
+                          studentCounter={studentCounter}
+                          data={data}
+                          room={code}
+                        />
+                      ) : (
+                        <Container maxW={width * 0.66} maxH={height * 0.76}>
+                          <TeacherGraph3 room={code} />
+                        </Container>
+                      )}
                     </Container>
-                  ) : chartView == 1 ? (
-                    <TeacherFeedbackBars
-                      studentCounter={studentCounter}
-                      data={data}
-                      room={code}
-                    />
-                  ) : (
-                    <Container maxW={width * 0.66} maxH={height * 0.76}>
-                      <TeacherGraph3 room={code} />
-                      <LectureAnalysisGraph room={code} />
-                    </Container>
-                  )}
-                </Container>
-              </GridItem>
-              <GridItem rowSpan={2}>
-                {/* TODO: add get code button */}
-                <CommentLog room={code} />
-              </GridItem>
-            </Grid>
+                  </GridItem>
+                  <GridItem rowSpan={2}>
+                    {/* TODO: add get code button */}
+                    <CommentLog room={code} />
+                  </GridItem>
+                </Grid>
 
-            <Flex>
-              <Spacer />
-              <Button onClick={handleEndPresentation}>End Presentation</Button>
-              <Spacer />
-              <Heading>{studentCounter} students</Heading>
-            </Flex>
-          </SocketContext.Provider>
-        ) : null}
-        </Box>}
+                <Flex>
+                  <Spacer />
+                  <Button onClick={handleEndPresentation}>
+                    End Presentation
+                  </Button>
+                  <Spacer />
+                  <Heading>{studentCounter} students</Heading>
+                </Flex>
+              </SocketContext.Provider>
+            ) : null}
+          </Box>
+        )}
       </Box>
     </ChakraProvider>
   )

@@ -114,8 +114,8 @@ def on_leave(data):
         session.pop(room)
 
     # TODO: figure out what to do for lecturers
-    #leave_room(room)
-    #session.pop(room) # since they have now left the meeting
+    leave_room(room)
+    session.pop(room) # since they have now left the meeting
     print("left room")
 
 @socketio.on("add reaction")
@@ -230,7 +230,6 @@ def send_graph_data():
     room = request.json["room"]
     print("Line graph data requested for room: " + str(room))
     line_graph.update_graph_data(room)
-    analysis_graph.get_analytics_data_for(room)
     return line_graph.room_to_graph_data[room]
 
 @app.route("/api/analytics_graph_data", methods=['POST'])
