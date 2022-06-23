@@ -31,6 +31,7 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
   }
 
   function setTime(t) {
+    console.log(offset)
     setTime_(t + offset)
   }
 
@@ -87,12 +88,17 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
                 <Button onClick={handleAddLink}>Add Panopto Link</Button>
               </Box>
               :
-              <iframe src={`${link}&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${time}&interactivity=all`} height={height * 0.65} width={width * 0.55} allowfullscreen allow="autoplay"></iframe>
+              <iframe src={`${link}&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${time}&interactivity=all`} height={height * 0.65} width={width * 0.55} allowFullScreen allow="autoplay"></iframe>
             }
             <LectureAnalysisGraph room={code} setTime={setTime} />
-            <HStack>
+            <HStack marginTop={5}>
               <Text >Offset (seconds): </Text>
-              <NumberInput value={offset} width='auto' onChange={({ val }) => setOffset(val)}>
+              <NumberInput defaultValue={offset} width='auto' onChange={(evt) => {
+                console.log("evt: " + evt)
+                console.log("offset before: " + offset)
+                setOffset(evt)
+                console.log("offset after: " + offset)
+              }}>
                 <NumberInputField />
                 <NumberInputStepper>
                   <NumberIncrementStepper />

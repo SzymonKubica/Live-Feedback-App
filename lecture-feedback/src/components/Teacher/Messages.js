@@ -28,13 +28,13 @@ const Messages = ({ messages, h, startTime, setTime }) => {
 
 	return (
 
-		<Flex w="100%" h={h} overflowY="scroll" flexDirection="column" p="3" onClick={console.log("Hello") }>
+		<Flex w="100%" h={h} overflowY="scroll" flexDirection="column" p="3">
 			{messages.map((item, index) => {
 				const mils = Date.parse(item.time) - Date.parse(startTime)
 				const secs = mils / 1000
 
 				return (
-					<Flex key={index} w="100%" onClick={console.log("bitch ass onClick")} >
+					<Flex key={index} w="100%" >
 						<Flex
 							bg={getColour(item.reaction)}
 							color="black"
@@ -52,7 +52,6 @@ const Messages = ({ messages, h, startTime, setTime }) => {
 							maxW="350px"
 							my="1"
 							p="3"
-							onClick={console.log(secs)}
 						>
 							<Grid templateColumns="repeat(3, 1fr)" templateRows="repeat(3, 1fr)" width='100%' height='100%'>
 								<GridItem rowSpan={2} colSpan={3}>
