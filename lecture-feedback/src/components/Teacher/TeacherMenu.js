@@ -41,7 +41,8 @@ export const TeacherMenu= () => {
         <Button onClick={generateMeetingCode} colorScheme='blue' size='lg'>Start Presentation</Button>
         <NavButton colorScheme='blue' size='lg' dst="/teacher/analysis" name = "Past Presentation Analysis"></NavButton>
         {/* TODO: Add unique identifier to NavButton  */}
-        <NavButton colorScheme='blue' size='lg' dst="review-feedback" name = "Review Feedback"></NavButton>
+        <div/>
+        <Heading>Settings</Heading>
         <Switch>Colour Blind Mode</Switch> 
         <Select placeholder = "Select 4th button option" width = "20%">
             <option>Too Slow</option>
@@ -52,6 +53,7 @@ export const TeacherMenu= () => {
             <option>Technical difficulties</option> 
             <option>Other</option> 
         </Select>
+        <Input placeholder='Specify if Other' size = 'md' width = "20%" />
       </VStack>
     </Stack>
   </ChakraProvider>
