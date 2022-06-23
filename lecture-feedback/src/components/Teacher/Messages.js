@@ -11,21 +11,30 @@ const Messages = ({ messages, h, startTime, setTime }) => {
 		return <div ref={elementRef} />;
 	};
 
-	function millisToMinutesAndSeconds(millis) {
-		var minutes = Math.floor(millis / 60000);
-		var seconds = ((millis % 60000) / 1000).toFixed(0);
-		return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+	function pad(s) {
+		return s < 10 ? '0' + s : s
 	}
+
+	function msToTime(s) {
+		var ms = s % 1000;
+		s = (s - ms) / 1000;
+		var secs = s % 60;
+		s = (s - secs) / 60;
+		var mins = s % 60;
+		var hrs = (s - mins) / 60;
+	  
+		return (hrs > 0 ? (pad(hrs) + ':') : '') + pad(mins) + ':' + pad(secs);
+	  }
 
 	return (
 
-		<Flex w="100%" h={h} overflowY="scroll" flexDirection="column" p="3" onClick={console.log("Hello") }>
+		<Flex w="100%" h={h} overflowY="scroll" flexDirection="column" p="3">
 			{messages.map((item, index) => {
 				const mils = Date.parse(item.time) - Date.parse(startTime)
 				const secs = mils / 1000
 
 				return (
-					<Flex key={index} w="100%" onClick={console.log("bitch ass onClick")} >
+					<Flex key={index} w="100%" >
 						<Flex
 							bg={getColour(item.reaction)}
 							color="black"
@@ -43,7 +52,6 @@ const Messages = ({ messages, h, startTime, setTime }) => {
 							maxW="350px"
 							my="1"
 							p="3"
-							onClick={console.log(secs)}
 						>
 							<Grid templateColumns="repeat(3, 1fr)" templateRows="repeat(3, 1fr)" width='100%' height='100%'>
 								<GridItem rowSpan={2} colSpan={3}>
@@ -51,7 +59,7 @@ const Messages = ({ messages, h, startTime, setTime }) => {
 								</GridItem>
 								<GridItem rowSpan={1} colSpan={2} />
 								<GridItem rowSpan={1} colSpan={1}>
-									<Text color='gray'>{startTime === undefined ? item.time.split(" ")[4] : millisToMinutesAndSeconds(mils)}</Text>
+									<Text color='gray'>{startTime === undefined ? item.time.split(" ")[4] : msToTime(mils)}</Text>
 								</GridItem>
 							</Grid>
 						</Box>

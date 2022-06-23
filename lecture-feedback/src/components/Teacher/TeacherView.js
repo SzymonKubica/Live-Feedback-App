@@ -183,11 +183,11 @@ export const TeacherView = ({ isAuth, setAuth }) => {
                 <Grid templateColumns="repeat(3, 1fr)" height="calc(76vh)">
                   <GridItem rowSpan={2} colSpan={2}>
                     <Container maxW="100%" id="graphsDiv">
-                      {chartView == 0 ? (
+                      {chartView === 0 ? (
                         <Container maxW={Math.min(0.66 * width, 0.76 * height)}>
                           <TeacherGraph2 room={code} data={circleGraphData} />
                         </Container>
-                      ) : chartView == 1 ? (
+                      ) : chartView === 1 ? (
                         <TeacherFeedbackBars
                           studentCounter={studentCounter}
                           data={data}

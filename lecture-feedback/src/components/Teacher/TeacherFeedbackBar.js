@@ -10,7 +10,7 @@ const TeacherFeedbackBar = ({ counter, studentCount, title, color }) => {
       <Heading>
         {title}: {counter}
       </Heading>
-      {studentCount == 0 ? (
+      {studentCount === 0 ? (
         <Progress colorScheme={color} size="md" value={100} />
       ) : (
         <Progress

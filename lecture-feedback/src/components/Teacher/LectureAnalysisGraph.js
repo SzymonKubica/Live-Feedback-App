@@ -81,6 +81,10 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
 
   }, [])
 
+  function pad(s) {
+    return s < 10 ? '0' + s : s
+  }
+
   const [options, setOptions] = useState({
     responsive: true,
     maintainAspectRatio: false,
@@ -90,8 +94,18 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
         position: "bottom",
         title: {
           display: true,
-          text: "Time(seconds)",
-        }
+          text: "Time",
+        },
+        ticks: {
+          callback: function sToTime(value, index, ticks) {
+            var secs = value % 60;
+            value = (value - secs) / 60;
+            var mins = value % 60;
+            var hrs = (value - mins) / 60;
+
+            return (hrs > 0 ? (pad(hrs) + ':'): '') + pad(mins) + ':' + pad(secs);
+          }
+        },
       },
       y: {
         type: "linear",
