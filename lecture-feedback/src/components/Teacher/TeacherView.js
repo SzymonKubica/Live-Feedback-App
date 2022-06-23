@@ -29,7 +29,7 @@ import { getColour, Reaction } from "../Reactions"
 import LectureAnalysisGraph from "./LectureAnalysisGraph"
 import { PresentationFileFinder } from "./Finder"
 
-export const TeacherView = ({ isAuth, setAuth }) => {
+export const TeacherView = ({ isAuth, setAuth, customReaction }) => {
   const [studentCounter, setStudentCounter] = useState(0)
   const [chartView, setChartView] = useState(0)
   const [visible, setVisible] = useState(false)
@@ -41,7 +41,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
 
   const [data, setData] = useState({})
   const [circleGraphData, setCircleGraphData] = useState({
-    labels: ["Good", "Confused", "Too Fast", "Chilling"],
+    labels: ["Good", "Confused", "Too Fast", customReaction],
     datasets: [
       {
         data: [0, 0, 0, 0],
@@ -49,7 +49,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
           getColour(Reaction.GOOD),
           getColour(Reaction.CONFUSED),
           getColour(Reaction.TOO_FAST),
-          getColour(Reaction.CHILLING),
+          getColour(Reaction.CUSTOM),
         ],
         borderColor: [
           "rgb(255,255,255)",
@@ -90,7 +90,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
             datasets: [
               {
                 ...prevState.datasets[0],
-                data: [data.good, data.confused, data.tooFast, data.chilling],
+                data: [data.good, data.confused, data.tooFast, data.custom],
               },
             ],
           }))
@@ -129,7 +129,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
               datasets: [
                 {
                   ...prevState.datasets[0],
-                  data: [data.good, data.confused, data.tooFast, data.chilling],
+                  data: [data.good, data.confused, data.tooFast, data.custom],
                 },
               ],
             }))
@@ -175,17 +175,25 @@ export const TeacherView = ({ isAuth, setAuth }) => {
                     <Container maxW="100%" id="graphsDiv">
                       {chartView == 0 ? (
                         <Container maxW={Math.min(0.66 * width, 0.76 * height)}>
-                          <TeacherGraph2 room={code} data={circleGraphData} />
+                          <TeacherGraph2
+                            room={code}
+                            data={circleGraphData}
+                            customReaction={customReaction}
+                          />
                         </Container>
                       ) : chartView == 1 ? (
                         <TeacherFeedbackBars
                           studentCounter={studentCounter}
                           data={data}
                           room={code}
+                          customReaction={customReaction}
                         />
                       ) : (
                         <Container maxW={width * 0.66} maxH={height * 0.76}>
-                          <TeacherGraph3 room={code} />
+                          <TeacherGraph3
+                            room={code}
+                            customReaction={customReaction}
+                          />
                         </Container>
                       )}
                     </Container>

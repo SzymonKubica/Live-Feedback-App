@@ -1,4 +1,5 @@
 import functools
+import re
 from flask import Flask, jsonify, request, session
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
@@ -64,6 +65,7 @@ def test_connect():
     print("connected")
     print(request.sid)
 
+
 @socketio.on("disconnect")
 def test_disconnect():
     if request.sid in students_sid:
@@ -75,8 +77,13 @@ def test_disconnect():
         update(room)
         print("student disconnected")
     else:
-        # TODO: Add some handling for the case when a teacher was disconnected due to some error
         print("teacher disconnected")
+
+@socketio.on("set custom reaction")
+def set_custom_reaction(room, reaction):
+    global room_to_custom_reaction
+    room_to_custom_reaction[room] = reaction
+    
 
 @socketio.on("join")
 def on_join(data):
@@ -176,7 +183,6 @@ def handle_end_presentation():
         pass
     pass
 
-
 @app.route("/api/create-snapshot")
 @cross_origin()
 def create_snapshot():
@@ -195,6 +201,14 @@ def get_snapshots():
     snapshots = database.find_snapshots(room)
     database.get_reset_snaphosts(room)
     return {"snapshots":snapshots}
+
+
+room_to_custom_reaction = {}
+@app.route("/api/get-custom-reaction", methods=['POST'])
+@cross_origin()
+def get_custom_reaction():
+    code = request.json['code']
+    return {"reaction": room_to_custom_reaction[code]}
 
 @app.route("/api/reaction-count", methods=['POST'])
 @login_required

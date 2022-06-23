@@ -13,7 +13,7 @@ import {
 import { Stack } from "@chakra-ui/react"
 import Reaction, { getColour } from "../Reactions"
 
-const LectureAnalysisGraph = ({ room, setTime }) => {
+const LectureAnalysisGraph = ({ room, setTime, customReaction }) => {
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -28,7 +28,7 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
     good: [],
     confused: [],
     tooFast: [],
-    chilling: [],
+    custom: [],
   }
 
   const [data, setData] = useState(getSettings(initialDatasets))
@@ -55,10 +55,10 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
           borderColor: getColour(Reaction.TOO_FAST),
         },
         {
-          label: "Chilling",
-          data: props.chilling,
-          backgroundColor: getColour(Reaction.CHILLING),
-          borderColor: getColour(Reaction.CHILLING),
+          label: { customReaction },
+          data: props.custom,
+          backgroundColor: getColour(Reaction.CUSTOM),
+          borderColor: getColour(Reaction.CUSTOM),
         },
       ],
     }
@@ -78,7 +78,6 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
         console.log(data)
       })
       .then(console.log("Fetched from api"))
-
   }, [])
 
   const [options, setOptions] = useState({
@@ -91,7 +90,7 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
         title: {
           display: true,
           text: "Time(seconds)",
-        }
+        },
       },
       y: {
         type: "linear",
@@ -99,18 +98,18 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
         title: {
           display: true,
           text: "Reactions",
-        }
+        },
       },
     },
     elements: {
       point: {
         pointRadius: 2,
-      }
+      },
     },
     onClick: function (event, elementsAtEvent) {
       let valueX = null
-      var scale = this.scales['x'];
-      valueX = scale.getValueForPixel(event.x);
+      var scale = this.scales["x"]
+      valueX = scale.getValueForPixel(event.x)
       setTime(valueX)
     },
   })
@@ -123,7 +122,6 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
         data={data}
         options={options}
         height={60}
-
       />
     </Stack>
   )

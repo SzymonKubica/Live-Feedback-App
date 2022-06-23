@@ -31,7 +31,7 @@ export const SnapshotView = () => {
                   <Td>{data.snapshots[key].summarised_data.confused}</Td>
                   <Td>{data.snapshots[key].summarised_data.good}</Td>
                   <Td>{data.snapshots[key].summarised_data["too-fast"]}</Td>
-                  <Td>{data.snapshots[key].summarised_data.chilling}</Td>
+                  <Td>{data.snapshots[key].summarised_data.custom}</Td>
                 </Tr>
               )
             })}
@@ -51,7 +51,7 @@ export const SnapshotView = () => {
               <Th>Confused</Th>
               <Th>Good</Th>
               <Th>Too Fast</Th>
-              <Th>Chilling</Th>
+              <Th>Custom</Th>
             </Tr>
           </Thead>
           {tableBody}

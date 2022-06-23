@@ -15,7 +15,7 @@ import { SocketContext } from "../../context/socket"
 import { Button, Stack } from "@chakra-ui/react"
 import Reaction, { getColour } from "../Reactions"
 
-const TeacherGraph3 = ({ room }) => {
+const TeacherGraph3 = ({ room, customReaction }) => {
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -30,7 +30,7 @@ const TeacherGraph3 = ({ room }) => {
     good: [],
     confused: [],
     tooFast: [],
-    chilling: [],
+    custom: [],
   }
 
   const [data, setData] = useState(getSettings(initialDatasets))
@@ -69,10 +69,10 @@ const TeacherGraph3 = ({ room }) => {
           borderColor: getColour(Reaction.TOO_FAST),
         },
         {
-          label: "Chilling",
-          data: props.chilling,
-          backgroundColor: getColour(Reaction.CHILLING),
-          borderColor: getColour(Reaction.CHILLING),
+          label: customReaction,
+          data: props.custom,
+          backgroundColor: getColour(Reaction.CUSTOM),
+          borderColor: getColour(Reaction.CUSTOM),
         },
       ],
     }
