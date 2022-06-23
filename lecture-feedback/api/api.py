@@ -115,7 +115,7 @@ def on_leave(data):
 
     # TODO: figure out what to do for lecturers
     leave_room(room)
-    session.pop(room) # since they have now left the meeting
+    # session.pop(room) # since they have now left the meeting
     print("left room")
 
 @socketio.on("add reaction")
