@@ -29,10 +29,18 @@ export const HomeView = () => {
     
   }
 
-  let handleInputChange = (e) => {
+  const handleInputChange = (e) => {
     let inputValue = e.target.value
     setCode(inputValue)
-}
+  }
+
+  const handleKeypress = (e) => {
+    // If enter is pressed
+    let code = (e.keyCode ? e.keyCode : e.which)
+    if (code === 13) {      
+      handleJoin()   
+    }
+  }
   
   return (
     <ChakraProvider theme={theme}>
@@ -46,7 +54,7 @@ export const HomeView = () => {
             onClick = {() => setJoinVisible(!joinVisible)}>Student</Button>
          {joinVisible ? <Box>
         <Center >
-          <Input placeholder='Enter code to Join' size = 'sm' onChange={handleInputChange}/>
+          <Input placeholder='Enter code to Join' size = 'sm' onChange={handleInputChange} onKeyPress={handleKeypress}/>
         </Center >
           <Button colorScheme='blue' size='sm' onClick={handleJoin}>Join</Button>
           {!validCode ? 
