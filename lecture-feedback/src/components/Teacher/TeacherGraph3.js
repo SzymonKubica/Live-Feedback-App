@@ -26,6 +26,8 @@ const TeacherGraph3 = ({ room }) => {
     Legend
   )
 
+  ChartJS.defaults.font.size=20
+
   const initialDatasets = {
     good: [],
     confused: [],
@@ -39,8 +41,9 @@ const TeacherGraph3 = ({ room }) => {
     let labels = []
     let i
     for (i = 0; i < 21; i++) {
-      labels.push(String(i * -0.5))
+      labels.push(String(i * (-5)))
     }
+
     labels.reverse()
     return labels
   }
@@ -105,6 +108,24 @@ const TeacherGraph3 = ({ room }) => {
 
   const [options, setOptions] = useState({
     responsive: true,
+    scales: {
+      x: {
+        type: "linear",
+        position: "bottom",
+        title: {
+          display: true,
+          text: "Time(seconds ago)",
+        },
+      },
+      y: {
+        type: "linear",
+        position: "left",
+        title: {
+          display: true,
+          text: "Reactions",
+        }
+      },
+    },
   })
 
   return (
