@@ -24,6 +24,9 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
     Legend
   )
 
+  ChartJS.defaults.font.size=15
+
+
   const initialDatasets = {
     good: [],
     confused: [],
@@ -136,7 +139,7 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
         updateMode="none"
         data={data}
         options={options}
-        height={60}
+        height={100}
 
       />
     </Stack>

@@ -208,7 +208,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
 
                 <Flex>
                   <Spacer />
-                  <Button onClick={handleEndPresentation}>
+                  <Button onClick={handleEndPresentation} size='lg'>
                     End Presentation
                   </Button>
                   <Spacer />
