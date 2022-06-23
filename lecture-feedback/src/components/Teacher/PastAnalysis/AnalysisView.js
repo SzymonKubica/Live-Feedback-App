@@ -22,7 +22,6 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
   const [comments, setComments] = useState([{ comment: "hello", reaction: "chilling" }])
   const [startTime, setStartTime] = useState(0)
   const [link, setLink] = useState("")
-  const [offset, setOffset] = useState(0)
 
   const requestOptions = {
     method: "POST",
@@ -83,12 +82,12 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
                 <Button onClick={handleAddLink}>Add Panopto Link</Button>
               </Box>
               :
-              <iframe src={`${link}&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${parseFloat(time) + parseFloat(offset)}&interactivity=all`} height={height * 0.65} width={width * 0.55} allowFullScreen allow="autoplay"></iframe>
+              <iframe src={`${link}&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${parseFloat(time) + parseFloat(document.getElementById("offset_num").value)}&interactivity=all`} height={height * 0.65} width={width * 0.55} allowFullScreen allow="autoplay"></iframe>
             }
             <LectureAnalysisGraph room={code} setTime={setTime} />
             <HStack marginTop={5}>
               <Text >Offset (seconds): </Text>
-              <NumberInput defaultValue={offset} width='auto' onChange={(evt) => {setOffset(evt)}}>
+              <NumberInput defaultValue={0} width='auto' id="offset_num">
                 <NumberInputField />
                 <NumberInputStepper>
                   <NumberIncrementStepper />
