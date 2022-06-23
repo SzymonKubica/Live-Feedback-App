@@ -17,7 +17,7 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
 
   let { code } = useParams()
 
-  const [time, setTime_] = useState(0)
+  const [time, setTime] = useState(0)
 
   const [comments, setComments] = useState([{ comment: "hello", reaction: "chilling" }])
   const [startTime, setStartTime] = useState(0)
@@ -28,11 +28,6 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ "room": code }),
-  }
-
-  function setTime(t) {
-    console.log("set time offset: " + offset)
-    setTime_(t + offset)
   }
 
   useEffect(() => {
@@ -88,17 +83,12 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
                 <Button onClick={handleAddLink}>Add Panopto Link</Button>
               </Box>
               :
-              <iframe src={`${link}&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${time}&interactivity=all`} height={height * 0.65} width={width * 0.55} allowFullScreen allow="autoplay"></iframe>
+              <iframe src={`${link}&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${parseFloat(time) + parseFloat(offset)}&interactivity=all`} height={height * 0.65} width={width * 0.55} allowFullScreen allow="autoplay"></iframe>
             }
             <LectureAnalysisGraph room={code} setTime={setTime} />
             <HStack marginTop={5}>
               <Text >Offset (seconds): </Text>
-              <NumberInput defaultValue={offset} width='auto' onChange={(evt) => {
-                console.log("evt: " + evt)
-                console.log("offset before: " + offset)
-                setOffset(evt)
-                console.log("offset after: " + offset)
-              }}>
+              <NumberInput defaultValue={offset} width='auto' onChange={(evt) => {setOffset(evt)}}>
                 <NumberInputField />
                 <NumberInputStepper>
                   <NumberIncrementStepper />
