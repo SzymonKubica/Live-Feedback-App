@@ -49,6 +49,14 @@ export const TeacherSignup = ({isAuth, setAuth}) => {
             }
         })
     }
+
+    const handleKeypress = (e) => {
+        // If enter is pressed
+        let code = (e.keyCode ? e.keyCode : e.which)
+        if (code === 13) {      
+            handleSignup()   
+        }
+      }
     
     return (
         <Box>
@@ -59,7 +67,7 @@ export const TeacherSignup = ({isAuth, setAuth}) => {
             <Center>
                 <VStack spacing="20px" marginTop="10px">
                     <Input placeholder="email" onChange={(e) => setEmail(e.target.value)}/>
-                    <PasswordInput onChange={(e) => setPassword(e.target.value)}/>
+                    <PasswordInput onChange={(e) => setPassword(e.target.value)} onKeyPress={handleKeypress}/>
                     <Button onClick={handleSignup} colorScheme='blue' size='lg'>Sign Up</Button>
                     <Text fontSize='sm' color = "red" >{message}</Text>
                     <Box>
