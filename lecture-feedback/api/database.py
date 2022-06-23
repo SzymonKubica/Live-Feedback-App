@@ -223,6 +223,18 @@ def add_active_code(code, email, time):
 
     return not is_new_code
 
+def find_active_presentation_for(email):
+
+    qr = db["active_codes"].find_one({
+        "email": email,
+        "ended": False 
+    })
+    
+    if qr is None:
+        return None
+
+    return qr["code"]
+
 def end_presentation(code):
     db["active_codes"].update_one({"code":code}, {"$set": {"ended": True, "end_time": datetime.now()}}, upsert=False)
 

@@ -308,6 +308,19 @@ def is_code_active():
     code = request.json['code']
     return {"valid":database.is_active_code(code)}
 
+# Returns presentation if there is an active one
+@app.route("/api/get-active-code")
+# @login_required
+@cross_origin()
+def get_active_presentation():
+    email = session["logged_in_email"]
+    code = database.find_active_presentation_for(email)
+
+    if code is None:
+        return {"code": "none"}
+    
+    return {"code": code}
+
 # login stuff
 @app.route("/api/create-user", methods=['POST'])
 @cross_origin()
@@ -362,7 +375,7 @@ def logout():
 @login_required
 @cross_origin()
 def check_owner():
-    room = request.json["room"]
+    room = request.json["code"]
     return {"owner":database.room_owner(room, session["logged_in_email"])}
 
 
