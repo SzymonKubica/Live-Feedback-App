@@ -53,6 +53,7 @@ export const TeacherMenu= () => {
             <option>Technical difficulties</option> 
             <option>Other</option> 
         </Select>
+        <Input placeholder='Specify if Other' size = 'md' width = "20%" />
       </VStack>
     </Stack>
   </ChakraProvider>
