@@ -31,7 +31,7 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
   }
 
   function setTime(t) {
-    console.log(offset)
+    console.log("set time offset: " + offset)
     setTime_(t + offset)
   }
 
