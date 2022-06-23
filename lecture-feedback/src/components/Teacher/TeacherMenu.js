@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { ChakraProvider, theme, VStack, Heading, Stack, Button, Center , Input, Box, Switch, Select} from "@chakra-ui/react"
 import NavButton from "../NavButton"
 import Header from "../Header"
@@ -6,39 +6,46 @@ import { useNavigate } from "react-router-dom";
 
 
 export const TeacherMenu= ({isAuth, setAuth}) => {
-  const [uploadVisible, setUploadVisible] = useState(false)
-  const [meetingCode, setMeetingCode] = useState("")
-  const [videoLink, setVideoLink] = useState("")
+  const [visible, setVisible] = useState(false)
+  const [code, setCode] = useState("")
+
   let navigate = useNavigate();
-  const f = null;
 
-  let handleInputChange = (e) => {
-    let inputValue = e.target.value
-    setVideoLink(inputValue)
-}
+  useEffect(() => {
+    fetch("/api/get-active-code")
+    .then(res => res.json())
+    .then(data => {
+        if (data["code"] !== "none") {
+          setCode(data["code"])
+        }
+        setVisible(true)
+    })
+  }, [])
 
-  function generateMeetingCode() {
+  function handleStartPresentation() {
     fetch("/api/new-code")
     .then(res => res.json())
     .then(data => {
       navigate("/teacher/meeting/" + data.code, { replace: true })
-      console.log("was called")
     })
   }
-  function fileHandler(e) {
-    console.log(e.target.files[0])
-    f = e.target.files[0]
-    // for teams need to abstact  start time from file name
-    // for zoom need to abstact start time from folder name
+
+  // Called when there is already an active presentation
+  function handleOpenPresentation() {
+    navigate("/teacher/meeting/" + code, { replace: true })
   }
-  
+
   return (
     <ChakraProvider theme={theme}>
+    {visible ?
     <Stack>
       <Header isAuth={isAuth} setAuth={setAuth}/>
       <VStack spacing="20px" marginTop="10px">
         <Heading>Teacher Menu</Heading>
-        <Button onClick={generateMeetingCode} colorScheme='blue' size='lg'>Start Presentation</Button>
+        { code === "" 
+        ? <Button onClick={handleStartPresentation} colorScheme='blue' size='lg'>Start Presentation</Button>
+        : <Button onClick={handleOpenPresentation} colorScheme='blue' size='lg'>Open Presentation</Button> 
+        }
         <NavButton colorScheme='blue' size='lg' dst="/teacher/analysis" name = "Past Presentation Analysis"></NavButton>
         {/* TODO: Add unique identifier to NavButton  */}
         <div/>
@@ -56,6 +63,7 @@ export const TeacherMenu= ({isAuth, setAuth}) => {
         <Input placeholder='Specify if Other' size = 'md' width = "20%" />
       </VStack>
     </Stack>
+    : null}
   </ChakraProvider>
   )
 }
