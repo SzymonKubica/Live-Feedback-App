@@ -29,7 +29,7 @@ export const StudentView = () => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: code }),
+      body: JSON.stringify({ room: code }),
     }
 
     fetch("/api/is-code-active", requestOptions)

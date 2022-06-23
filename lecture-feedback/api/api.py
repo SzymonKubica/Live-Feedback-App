@@ -82,6 +82,7 @@ def test_disconnect():
 @socketio.on("set custom reaction")
 def set_custom_reaction(room, reaction):
     global room_to_custom_reaction
+    print(reaction)
     room_to_custom_reaction[room] = reaction
     
 
@@ -207,8 +208,9 @@ room_to_custom_reaction = {}
 @app.route("/api/get-custom-reaction", methods=['POST'])
 @cross_origin()
 def get_custom_reaction():
-    code = request.json['code']
-    return {"reaction": room_to_custom_reaction[code]}
+    global room_to_custom_reaction
+    room = request.json['room']
+    return {"reaction": room_to_custom_reaction[room]}
 
 @app.route("/api/reaction-count", methods=['POST'])
 @login_required
@@ -319,7 +321,7 @@ def get_new_code():
 @app.route("/api/is-code-active", methods=['POST'])
 @cross_origin()
 def is_code_active():
-    code = request.json['code']
+    code = request.json['room']
     return {"valid":database.is_active_code(code)}
 
 # login stuff

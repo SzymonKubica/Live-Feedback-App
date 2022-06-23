@@ -45,8 +45,7 @@ function RequireAuth({ children, isAuth, isLoading }) {
 function App() {
   const [isAuth, setAuth] = useState(false)
   const [isLoading, setLoading] = useState(true) //intermediate when trying to fetch
-
-  const [customReaction, setCustomReaction] = useState("Too Slow")
+  var code
   useEffect(() => {
     const requestOptions = {
       method: "POST",
@@ -60,12 +59,6 @@ function App() {
         }
         setLoading(false)
       })
-    fetch("/api/get-custom-reaction", requestOptions)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data)
-        setCustomReaction(data.reaction)
-      })
   }, [])
 
   return (
@@ -78,11 +71,7 @@ function App() {
             path="teacher/meeting/:code"
             element={
               <RequireAuth isAuth={isAuth} isLoading={isLoading}>
-                <TeacherView
-                  isAuth={isAuth}
-                  setAuth={setAuth}
-                  customReaction={customReaction}
-                />
+                <TeacherView isAuth={isAuth} setAuth={setAuth} />
               </RequireAuth>
             }
           />
@@ -102,11 +91,7 @@ function App() {
             path="teacher/menu"
             element={
               <RequireAuth isAuth={isAuth} isLoading={isLoading}>
-                <TeacherMenu
-                  isAuth={isAuth}
-                  setAuth={setAuth}
-                  setCustomReaction={setCustomReaction}
-                />
+                <TeacherMenu isAuth={isAuth} setAuth={setAuth} />
               </RequireAuth>
             }
           />

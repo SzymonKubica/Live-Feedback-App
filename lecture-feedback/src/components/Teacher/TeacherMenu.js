@@ -17,13 +17,13 @@ import Header from "../Header"
 import { useNavigate } from "react-router-dom"
 import { socket, SocketContext } from "../../context/socket"
 
-export const TeacherMenu = ({ setCustomReaction }) => {
+export const TeacherMenu = () => {
   const [uploadVisible, setUploadVisible] = useState(false)
   const [meetingCode, setMeetingCode] = useState("")
   const [videoLink, setVideoLink] = useState("")
-  const customReaction = "Too Slow"
+  const [customReaction, setCustomReaction] = useState("No reaction")
   let navigate = useNavigate()
-  const f = null
+  let f = null
 
   let handleInputChange = e => {
     let inputValue = e.target.value
@@ -35,8 +35,9 @@ export const TeacherMenu = ({ setCustomReaction }) => {
       .then(res => res.json())
       .then(data => {
         navigate("/teacher/meeting/" + data.code, { replace: true })
-        console.log("was called")
+        console.log(data.code)
         socket.emit("set custom reaction", data.code, customReaction)
+        console.log("was called")
       })
   }
   function fileHandler(e) {
@@ -57,7 +58,6 @@ export const TeacherMenu = ({ setCustomReaction }) => {
 
   function handleChange(e) {
     setCustomReaction(e.target.value)
-    customReaction = e.target.value
   }
 
   return (

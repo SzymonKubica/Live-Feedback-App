@@ -4,7 +4,6 @@ import {
   Box,
   ChakraProvider,
   Heading,
-  Stack,
   Grid,
   GridItem,
   Flex,
@@ -12,8 +11,6 @@ import {
   Container,
   Center,
   Button,
-  Modal,
-  useDisclosure,
 } from "@chakra-ui/react"
 
 import { socket, SocketContext } from "../../context/socket"
@@ -26,15 +23,15 @@ import { useParams } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import TeacherFeedbackBars from "./TeacherFeedbackBars"
 import { getColour, Reaction } from "../Reactions"
-import LectureAnalysisGraph from "./LectureAnalysisGraph"
 import { PresentationFileFinder } from "./Finder"
 
-export const TeacherView = ({ isAuth, setAuth, customReaction }) => {
+export const TeacherView = ({ isAuth, setAuth }) => {
   const [studentCounter, setStudentCounter] = useState(0)
   const [chartView, setChartView] = useState(0)
   const [visible, setVisible] = useState(false)
   const { width, height } = useViewport()
   const [showSave, setShowSave] = useState(false)
+  const [customReaction, setCustomReaction] = useState("")
 
   let { code } = useParams()
   let navigate = useNavigate()
@@ -69,7 +66,14 @@ export const TeacherView = ({ isAuth, setAuth, customReaction }) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ room: code }),
     }
-
+    fetch("/api/get-custom-reaction", requestOptions)
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
+        setCustomReaction(data.reaction)
+        console.log(customReaction)
+        console.log(data.reaction)
+      })
     fetch("/api/owner", requestOptions)
       .then(res => res.json())
       .then(data => {
@@ -86,7 +90,7 @@ export const TeacherView = ({ isAuth, setAuth, customReaction }) => {
         socket.on("update", data => {
           setData(data)
           setCircleGraphData(prevState => ({
-            labels: prevState.labels,
+            labels: ["Good", "Confused", "Too Fast", customReaction],
             datasets: [
               {
                 ...prevState.datasets[0],
@@ -125,7 +129,7 @@ export const TeacherView = ({ isAuth, setAuth, customReaction }) => {
           .then(data => {
             setData(data)
             setCircleGraphData(prevState => ({
-              labels: prevState.labels,
+              labels: ["Good", "Confused", "Too Fast", customReaction],
               datasets: [
                 {
                   ...prevState.datasets[0],
@@ -175,11 +179,7 @@ export const TeacherView = ({ isAuth, setAuth, customReaction }) => {
                     <Container maxW="100%" id="graphsDiv">
                       {chartView == 0 ? (
                         <Container maxW={Math.min(0.66 * width, 0.76 * height)}>
-                          <TeacherGraph2
-                            room={code}
-                            data={circleGraphData}
-                            customReaction={customReaction}
-                          />
+                          <TeacherGraph2 room={code} data={circleGraphData} />
                         </Container>
                       ) : chartView == 1 ? (
                         <TeacherFeedbackBars
