@@ -41,7 +41,8 @@ export const TeacherMenu= () => {
         <Button onClick={generateMeetingCode} colorScheme='blue' size='lg'>Start Presentation</Button>
         <NavButton colorScheme='blue' size='lg' dst="student" name = "Past Presentation Analysis"></NavButton>
         {/* TODO: Add unique identifier to NavButton  */}
-        <NavButton colorScheme='blue' size='lg' dst="review-feedback" name = "Review Feedback"></NavButton>
+        <div/>
+        <Heading>Settings</Heading>
         <Switch>Colour Blind Mode</Switch> 
         <Select placeholder = "Select 4th button option" width = "20%">
             <option>Too Slow</option>
