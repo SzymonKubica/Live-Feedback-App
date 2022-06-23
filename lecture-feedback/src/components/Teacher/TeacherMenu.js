@@ -5,7 +5,7 @@ import Header from "../Header"
 import { useNavigate } from "react-router-dom";
 
 
-export const TeacherMenu= () => {
+export const TeacherMenu= ({isAuth, setAuth}) => {
   const [uploadVisible, setUploadVisible] = useState(false)
   const [meetingCode, setMeetingCode] = useState("")
   const [videoLink, setVideoLink] = useState("")
@@ -35,7 +35,7 @@ export const TeacherMenu= () => {
   return (
     <ChakraProvider theme={theme}>
     <Stack>
-      <Header />
+      <Header isAuth={isAuth} setAuth={setAuth}/>
       <VStack spacing="20px" marginTop="10px">
         <Heading>Teacher Menu</Heading>
         <Button onClick={generateMeetingCode} colorScheme='blue' size='lg'>Start Presentation</Button>
