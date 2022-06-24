@@ -65,19 +65,6 @@ export const TeacherMenu= ({isAuth, setAuth}) => {
         <Header isAuth={isAuth} setAuth={setAuth} />
         <VStack spacing="20px" marginTop="10px">
           <Heading>Teacher Menu</Heading>
-          {code === "" 
-          ? <Button onClick={handleStartPresentation} colorScheme='blue' size='lg'>Start Presentation</Button>
-          : <Button onClick={handleOpenPresentation} colorScheme='blue' size='lg'>Open Presentation</Button> 
-          }
-          <NavButton
-            colorScheme="blue"
-            size="lg"
-            dst="/teacher/analysis"
-            name="Past Presentation Analysis"
-          ></NavButton>
-          {/* TODO: Add unique identifier to NavButton  */}
-          <Heading>Settings</Heading>
-          {/* <Switch>Colour Blind Mode</Switch> */}
           <SocketContext.Provider>
             <Box>
             <Select
@@ -95,6 +82,20 @@ export const TeacherMenu= ({isAuth, setAuth}) => {
             }
             </Box>
           </SocketContext.Provider>
+          {code === "" 
+          ? <Button onClick={handleStartPresentation} colorScheme='blue' size='lg'>Start Presentation</Button>
+          : <Button onClick={handleOpenPresentation} colorScheme='blue' size='lg'>Open Presentation</Button> 
+          }
+          <NavButton
+            colorScheme="blue"
+            size="lg"
+            dst="/teacher/analysis"
+            name="Past Presentation Analysis"
+          ></NavButton>
+          {/* TODO: Add unique identifier to NavButton  */}
+          // <Heading>Settings</Heading>
+          {/* <Switch>Colour Blind Mode</Switch> */}
+          
         </VStack>
       </Stack>
       : null }
