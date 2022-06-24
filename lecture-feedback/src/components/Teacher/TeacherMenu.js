@@ -77,7 +77,7 @@ export const TeacherMenu= ({isAuth, setAuth}) => {
           ></NavButton>
           {/* TODO: Add unique identifier to NavButton  */}
           <Heading>Settings</Heading>
-          <Switch>Colour Blind Mode</Switch>
+          {/* <Switch>Colour Blind Mode</Switch> */}
           <SocketContext.Provider>
             <Box>
             <Select
