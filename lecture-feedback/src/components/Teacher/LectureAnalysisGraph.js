@@ -55,7 +55,7 @@ const LectureAnalysisGraph = ({ room, setTime, customReaction }) => {
           borderColor: getColour(Reaction.TOO_FAST),
         },
         {
-          label: { customReaction },
+          label: customReaction ,
           data: props.custom,
           backgroundColor: getColour(Reaction.CUSTOM),
           borderColor: getColour(Reaction.CUSTOM),
@@ -64,6 +64,7 @@ const LectureAnalysisGraph = ({ room, setTime, customReaction }) => {
     }
   }
 
+  // We need to update the data when we actually get reaction from async call
   useEffect(() => {
     const requestOptions = {
       method: "POST",
@@ -75,10 +76,8 @@ const LectureAnalysisGraph = ({ room, setTime, customReaction }) => {
       .then(res => res.json())
       .then(data => {
         setData(getSettings(data))
-        console.log(data)
       })
-      .then(console.log("Fetched from api"))
-  }, [])
+  }, [customReaction])
 
   const [options, setOptions] = useState({
     responsive: true,

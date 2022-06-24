@@ -36,6 +36,7 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
   ])
   const [startTime, setStartTime] = useState(0)
   const [link, setLink] = useState("")
+  const [customReaction, setCustomReaction] = useState("")
 
   const requestOptions = {
     method: "POST",
@@ -61,6 +62,12 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
       .then(data => {
         setLink(data.link)
       })
+
+    fetch("/api/get-custom-reaction", requestOptions)
+    .then(res => res.json())
+    .then(data => {
+      setCustomReaction(data.reaction)
+    })
   }, [])
 
   //https://pro.panopto.com/Panopto/Pages/Embed.aspx?tid=ac005dfe-14fb-47f6-9ccc-aebb00a778ee
@@ -102,7 +109,7 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
                 allow="autoplay"
               ></iframe>
             )}
-            <LectureAnalysisGraph room={code} setTime={setTime} />
+            <LectureAnalysisGraph room={code} setTime={setTime} customReaction={customReaction} />
           </Container>
         </GridItem>
         <Spacer />
