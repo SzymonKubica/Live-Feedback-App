@@ -1,50 +1,41 @@
-import React, { useState } from "react"
-import {
-  ChakraProvider,
-  theme,
-  VStack,
-  Heading,
-  Stack,
-  Button,
-  Center,
-  Input,
-  Box,
-  Switch,
-  Select,
-} from "@chakra-ui/react"
+import React, {useState, useEffect} from 'react'
+import { ChakraProvider, theme, VStack, Heading, Stack, Button, Center , Input, Box, Switch, Select} from "@chakra-ui/react"
 import NavButton from "../NavButton"
 import Header from "../Header"
 import { useNavigate } from "react-router-dom"
 import { socket, SocketContext } from "../../context/socket"
 
-export const TeacherMenu = () => {
-  const [uploadVisible, setUploadVisible] = useState(false)
-  const [meetingCode, setMeetingCode] = useState("")
-  const [videoLink, setVideoLink] = useState("")
+
+export const TeacherMenu= ({isAuth, setAuth}) => {
+  const [visible, setVisible] = useState(false)
+  const [code, setCode] = useState("")
   const [customReaction, setCustomReaction] = useState("No reaction")
-  let navigate = useNavigate()
-  let f = null
 
-  let handleInputChange = e => {
-    let inputValue = e.target.value
-    setVideoLink(inputValue)
-  }
+  let navigate = useNavigate();
 
-  function generateMeetingCode() {
+  useEffect(() => {
+    fetch("/api/get-active-code")
+    .then(res => res.json())
+    .then(data => {
+        if (data["code"] !== "none") {
+          setCode(data["code"])
+        }
+        setVisible(true)
+    })
+  }, [])
+
+  function handleStartPresentation() {
     fetch("/api/new-code")
       .then(res => res.json())
       .then(data => {
         navigate("/teacher/meeting/" + data.code, { replace: true })
-        console.log(data.code)
         socket.emit("set custom reaction", data.code, customReaction)
-        console.log("was called")
       })
   }
-  function fileHandler(e) {
-    console.log(e.target.files[0])
-    f = e.target.files[0]
-    // for teams need to abstact  start time from file name
-    // for zoom need to abstact start time from folder name
+
+  // Called when there is already an active presentation
+  function handleOpenPresentation() {
+    navigate("/teacher/meeting/" + code, { replace: true })
   }
   const options = [
     "Too Slow",
@@ -62,13 +53,15 @@ export const TeacherMenu = () => {
 
   return (
     <ChakraProvider theme={theme}>
+      {visible ?
       <Stack>
-        <Header />
+        <Header isAuth={isAuth} setAuth={setAuth} />
         <VStack spacing="20px" marginTop="10px">
           <Heading>Teacher Menu</Heading>
-          <Button onClick={generateMeetingCode} colorScheme="blue" size="lg">
-            Start Presentation
-          </Button>
+          {code === "" 
+          ? <Button onClick={handleStartPresentation} colorScheme='blue' size='lg'>Start Presentation</Button>
+          : <Button onClick={handleOpenPresentation} colorScheme='blue' size='lg'>Open Presentation</Button> 
+          }
           <NavButton
             colorScheme="blue"
             size="lg"
@@ -96,6 +89,7 @@ export const TeacherMenu = () => {
           </SocketContext.Provider>
         </VStack>
       </Stack>
+      : null }
     </ChakraProvider>
   )
 }

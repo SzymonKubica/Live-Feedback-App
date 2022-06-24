@@ -1,20 +1,5 @@
 import React, { useEffect, useState } from "react"
-import {
-  ChakraProvider,
-  theme,
-  VStack,
-  Heading,
-  Stack,
-  Button,
-  Center,
-  Input,
-  Box,
-  Container,
-  Flex,
-  Grid,
-  GridItem,
-  Spacer,
-} from "@chakra-ui/react"
+import { ChakraProvider, theme, VStack, Heading, Stack, Button, Center, Input, Box, Container, Flex, Grid, GridItem, Spacer, Textarea, HStack, Text, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper } from "@chakra-ui/react"
 import LectureAnalysisGraph from "../LectureAnalysisGraph"
 import { useViewport } from "../../../hooks/useViewport"
 import Messages from "../Messages"
@@ -51,13 +36,13 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
         setComments(data.comments)
       })
 
-    fetch("/api/get-start-time", requestOptions)
+    fetch('/api/get-start-time', requestOptions)
       .then(res => res.json())
       .then(data => {
         setStartTime(data.time)
       })
 
-    fetch("/api/get-video-link", requestOptions)
+    fetch('/api/get-video-link', requestOptions)
       .then(res => res.json())
       .then(data => {
         setLink(data.link)
@@ -81,11 +66,13 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ room: code, link: link }),
+      body: JSON.stringify({ "room": code, "link": link }),
     }
-    fetch("/api/set-video-link", requestOptions)
+    fetch('/api/set-video-link', requestOptions)
       .then(res => res.json())
-      .then(data => {})
+      .then(data => {
+      })
+
   }
 
   return (
@@ -94,22 +81,26 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
       <Header isAuth={isAuth} setAuth={setAuth} />
       <Grid templateColumns="repeat(3, 1fr)" height="calc(70vh)">
         <GridItem rowSpan={2} colSpan={2}>
-          <Container maxW={width * 0.55} maxH={height * 0.7}>
-            {link === "" ? (
+          <Container maxW={width * 0.55} maxH={height * 0.70}>
+            {link === "" ?
               <Box height={height * 0.65} width={width * 0.55}>
                 <Heading>No Video Saved</Heading>
                 <Button onClick={handleAddLink}>Add Panopto Link</Button>
               </Box>
-            ) : (
-              <iframe
-                src={`${link}&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${time}&interactivity=all`}
-                height={height * 0.65}
-                width={width * 0.55}
-                allowfullscreen
-                allow="autoplay"
-              ></iframe>
-            )}
-            <LectureAnalysisGraph room={code} setTime={setTime} customReaction={customReaction} />
+              :
+              <iframe src={`${link}&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${parseFloat(time) + parseFloat(document.getElementById("offset_num").value)}&interactivity=all`} height={height * 0.65} width={width * 0.55} allowFullScreen allow="autoplay"></iframe>
+            }
+            <LectureAnalysisGraph room={code} setTime={setTime} />
+            <HStack marginTop={5}>
+              <Text >Offset (seconds): </Text>
+              <NumberInput defaultValue={0} width='auto' id="offset_num">
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+            </HStack>
           </Container>
         </GridItem>
         <Spacer />

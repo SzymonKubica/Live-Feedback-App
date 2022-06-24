@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react"
 import {
   Box,
   ChakraProvider,
+  theme,
   Heading,
   Grid,
   GridItem,
@@ -61,69 +62,44 @@ export const TeacherView = ({ isAuth, setAuth }) => {
 
   useEffect(() => {
     // check if teacher is the owner
+    
     let requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ room: code }),
     }
-    fetch("/api/get-custom-reaction", requestOptions)
+    // first check its even active
+    fetch("/api/is-code-active", requestOptions)
+    .then(res => res.json())
+    .then(data => {
+        if (!data["valid"]) {
+          navigate("/")
+        }})
+    .then(() => {
+      fetch("/api/get-custom-reaction", requestOptions)
       .then(res => res.json())
       .then(data => {
         const custReaction = data.reaction
         setCustomReaction(prev => {
-          fetch("/api/owner", requestOptions)
-            .then(res => res.json())
-            .then(data => {
-              if (data["owner"]) {
-                setVisible(true)
-              } else {
-                // maybe navigate back to teacher view?
-                navigate("/")
-              }
-            })
-            .then(() => {
-              socket.emit("join", { room: code, type: "teacher" })
-      
-              socket.on("update", data => {
-                setData(data)
-                setCircleGraphData(prevState => ({
-                  labels: ["Good", "Confused", "Too Fast", custReaction],
-                  datasets: [
-                    {
-                      ...prevState.datasets[0],
-                      data: [data.good, data.confused, data.tooFast, data.custom],
-                    },
-                  ],
-                }))
+            let requestOptions = {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ "code": code }),
+            }
+            fetch("/api/owner", requestOptions)
+              .then(res => res.json())
+              .then(data => {
+                if (data["owner"]) {
+                  setVisible(true)
+                } else {
+                  // maybe navigate back to teacher view?
+                  navigate("/")
+                }
               })
-      
-              socket.on("update students connected", data => {
-                setStudentCounter(data.count)
-                console.log("updating connected students")
-              })
-      
-              socket.on("presentation ended", () => {
-                // do some other stuff to save the video
-      
-                navigate("/teacher/menu")
-                // onOpen()
-              })
-      
-              requestOptions = {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ room: code }),
-              }
-      
-              fetch("/api/student-count", requestOptions)
-                .then(res => res.json())
-                .then(data => {
-                  setStudentCounter(data.count)
-                })
-      
-              fetch("/api/all_reactions", requestOptions)
-                .then(res => res.json())
-                .then(data => {
+              .then(() => {
+                socket.emit("join", { room: code, type: "teacher" })
+        
+                socket.on("update", data => {
                   setData(data)
                   setCircleGraphData(prevState => ({
                     labels: ["Good", "Confused", "Too Fast", custReaction],
@@ -135,10 +111,54 @@ export const TeacherView = ({ isAuth, setAuth }) => {
                     ],
                   }))
                 })
-            })
-            return custReaction
+        
+                socket.on("update students connected", data => {
+                  setStudentCounter(data.count)
+                  console.log("updating connected students")
+                })
+        
+                socket.on("presentation ended", () => {
+                  // do some other stuff to save the video
+        
+                  navigate("/teacher/menu")
+                  // onOpen()
+                })
+        
+                requestOptions = {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ room: code }),
+                }
+        
+                fetch("/api/student-count", requestOptions)
+                  .then(res => res.json())
+                  .then(data => {
+                    setStudentCounter(data.count)
+                  })
+        
+                fetch("/api/all_reactions", requestOptions)
+                  .then(res => res.json())
+                  .then(data => {
+                    setData(data)
+                    setCircleGraphData(prevState => ({
+                      labels: ["Good", "Confused", "Too Fast", custReaction],
+                      datasets: [
+                        {
+                          ...prevState.datasets[0],
+                          data: [data.good, data.confused, data.tooFast, data.custom],
+                        },
+                      ],
+                    }))
+                  })
+              })
+              return custReaction
+          })
         })
-      })
+
+    })
+
+    
+    
 
     // Disconnect when unmounts
     return () => {
@@ -149,6 +169,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
     }
   }, [])
 
+
   const handleEndPresentation = () => {
     socket.off("presentation ended") // we only want to close other lectuers tabs, not the current (if they have open)
     socket.emit("end presentation")
@@ -156,7 +177,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
   }
 
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <Box>
         {showSave ? (
           <Center>
@@ -177,11 +198,11 @@ export const TeacherView = ({ isAuth, setAuth }) => {
                 <Grid templateColumns="repeat(3, 1fr)" height="calc(76vh)">
                   <GridItem rowSpan={2} colSpan={2}>
                     <Container maxW="100%" id="graphsDiv">
-                      {chartView == 0 ? (
+                      {chartView === 0 ? (
                         <Container maxW={Math.min(0.66 * width, 0.76 * height)}>
                           <TeacherGraph2 room={code} data={circleGraphData} />
                         </Container>
-                      ) : chartView == 1 ? (
+                      ) : chartView === 1 ? (
                         <TeacherFeedbackBars
                           studentCounter={studentCounter}
                           data={data}
@@ -206,7 +227,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
 
                 <Flex>
                   <Spacer />
-                  <Button onClick={handleEndPresentation}>
+                  <Button onClick={handleEndPresentation} size='lg'>
                     End Presentation
                   </Button>
                   <Spacer />

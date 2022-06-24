@@ -36,7 +36,7 @@ export default function CommentSection({visible, setVisible, selectedReaction, r
     <Center >
          {/* only show when visible */}
         {visible ? <Box>
-            <Textarea placeholder='Add an optional comment' size = 'lg' onChange={handleInputChange}/>
+            <Textarea placeholder='Add an optional comment' size = 'lg' onChange={handleInputChange} maxLength={41}/>
             <Button onClick={handleSend} colorScheme='blue' size='sm'>Send</Button>
         </Box> : null}
     </Center>

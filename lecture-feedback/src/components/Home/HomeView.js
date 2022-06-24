@@ -38,11 +38,19 @@ export const HomeView = () => {
     }
   }
 
-  let handleInputChange = e => {
+  const handleInputChange = (e) => {
     let inputValue = e.target.value
     setCode(inputValue)
   }
 
+  const handleKeypress = (e) => {
+    // If enter is pressed
+    let code = (e.keyCode ? e.keyCode : e.which)
+    if (code === 13) {      
+      handleJoin()   
+    }
+  }
+  
   return (
     <ChakraProvider theme={theme}>
       <Stack>
