@@ -10,6 +10,8 @@ export default function CommentSection({visible, setVisible, selectedReaction, r
     const [comment, setComment] = useState("")
     const socket = React.useContext(SocketContext);
     const [selection, setSelection] = useState("") 
+
+    const [time, setTime] = useState(() => new Date())
     
     
     // Only allow comment when there is a new reaction (not allowed to be empty)
@@ -18,6 +20,7 @@ export default function CommentSection({visible, setVisible, selectedReaction, r
         setVisible(true)
       } else {
         setVisible(false)
+        setSelection("")
       }
     }, [selectedReaction])
     
@@ -42,13 +45,35 @@ export default function CommentSection({visible, setVisible, selectedReaction, r
         setSelection("")
         setVisible(false)
     }
+
+    // Measure metric time for sendig message
+    useEffect(() => {
+      let end = new Date()
+      if (visible) {
+        setTime(() => new Date())
+      } else {
+        if (selectedReaction !== NilReaction) {
+          const t = Math.abs(time - end.getTime())/1000
+          const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({"data":{"type":"comment_new", "time":t}})
+          }
+
+          fetch("/api/set-metric", requestOptions)
+        }
+      }
+
+    }, [visible])
+    
   
     return (
     <Center >
          {/* only show when visible */}
         {visible ? <Box>
             {/* <CommentInput /> */}
-            <Select placeholder = "Quick Comment" width = "100%" onChange={handleInputChangeDrop}>
+            <Select width = "100%" onChange={handleInputChangeDrop}>
+              <option value="" disabled selected>Quick Select Comment (Optional)</option>
               <option>Can you repeat this</option>
               <option>Another example</option>
               <option>Good example</option>

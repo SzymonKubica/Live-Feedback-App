@@ -416,6 +416,12 @@ def get_video_link():
     link = database.get_video_link(room)
     return {"link":link}
 
+@app.route("/api/set-metric", methods=['POST'])
+@cross_origin()
+def set_metric():
+    data = request.json["data"]
+    database.set_metric(data)
+    return {"success": True}
 
 if __name__ == "__main__":
     socketio.run()

@@ -292,3 +292,6 @@ def get_video_link(code):
     if "video_link" in req:
         return req["video_link"]
     return ""
+
+def set_metric(data):
+    db["metric"].insert_one(data)
