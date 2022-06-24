@@ -53,6 +53,8 @@ export const TeacherMenu= ({isAuth, setAuth}) => {
     setCustomReaction(e.target.value)
     if (e.target.value === "Other"){
       setOtherSelected(true)
+    } else {
+      setOtherSelected(false)
     }
   }
 
