@@ -69,75 +69,75 @@ export const TeacherView = ({ isAuth, setAuth }) => {
     fetch("/api/get-custom-reaction", requestOptions)
       .then(res => res.json())
       .then(data => {
-        console.log(data)
-        setCustomReaction(data.reaction)
-        console.log(customReaction)
-        console.log(data.reaction)
-      })
-    fetch("/api/owner", requestOptions)
-      .then(res => res.json())
-      .then(data => {
-        if (data["owner"]) {
-          setVisible(true)
-        } else {
-          // maybe navigate back to teacher view?
-          navigate("/")
-        }
-      })
-      .then(() => {
-        socket.emit("join", { room: code, type: "teacher" })
-
-        socket.on("update", data => {
-          setData(data)
-          setCircleGraphData(prevState => ({
-            labels: ["Good", "Confused", "Too Fast", customReaction],
-            datasets: [
-              {
-                ...prevState.datasets[0],
-                data: [data.good, data.confused, data.tooFast, data.custom],
-              },
-            ],
-          }))
+        const custReaction = data.reaction
+        setCustomReaction(prev => {
+          fetch("/api/owner", requestOptions)
+            .then(res => res.json())
+            .then(data => {
+              if (data["owner"]) {
+                setVisible(true)
+              } else {
+                // maybe navigate back to teacher view?
+                navigate("/")
+              }
+            })
+            .then(() => {
+              socket.emit("join", { room: code, type: "teacher" })
+      
+              socket.on("update", data => {
+                setData(data)
+                setCircleGraphData(prevState => ({
+                  labels: ["Good", "Confused", "Too Fast", custReaction],
+                  datasets: [
+                    {
+                      ...prevState.datasets[0],
+                      data: [data.good, data.confused, data.tooFast, data.custom],
+                    },
+                  ],
+                }))
+              })
+      
+              socket.on("update students connected", data => {
+                setStudentCounter(data.count)
+                console.log("updating connected students")
+              })
+      
+              socket.on("presentation ended", () => {
+                // do some other stuff to save the video
+      
+                navigate("/teacher/menu")
+                // onOpen()
+              })
+      
+              requestOptions = {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ room: code }),
+              }
+      
+              fetch("/api/student-count", requestOptions)
+                .then(res => res.json())
+                .then(data => {
+                  setStudentCounter(data.count)
+                })
+      
+              fetch("/api/all_reactions", requestOptions)
+                .then(res => res.json())
+                .then(data => {
+                  setData(data)
+                  setCircleGraphData(prevState => ({
+                    labels: ["Good", "Confused", "Too Fast", custReaction],
+                    datasets: [
+                      {
+                        ...prevState.datasets[0],
+                        data: [data.good, data.confused, data.tooFast, data.custom],
+                      },
+                    ],
+                  }))
+                })
+            })
+            return custReaction
         })
-
-        socket.on("update students connected", data => {
-          setStudentCounter(data.count)
-          console.log("updating connected students")
-        })
-
-        socket.on("presentation ended", () => {
-          // do some other stuff to save the video
-
-          navigate("/teacher/menu")
-          // onOpen()
-        })
-
-        requestOptions = {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ room: code }),
-        }
-
-        fetch("/api/student-count", requestOptions)
-          .then(res => res.json())
-          .then(data => {
-            setStudentCounter(data.count)
-          })
-
-        fetch("/api/all_reactions", requestOptions)
-          .then(res => res.json())
-          .then(data => {
-            setData(data)
-            setCircleGraphData(prevState => ({
-              labels: ["Good", "Confused", "Too Fast", customReaction],
-              datasets: [
-                {
-                  ...prevState.datasets[0],
-                  data: [data.good, data.confused, data.tooFast, data.custom],
-                },
-              ],
-            }))
-          })
       })
 
     // Disconnect when unmounts
