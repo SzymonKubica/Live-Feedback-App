@@ -13,7 +13,7 @@ const StudentFeedbackGrid = ({
   customReaction,
 }) => {
   return (
-    <Center width="100%" height="calc(70vh)">
+    <Center width="100%" height="calc(60vh)">
       <SimpleGrid marginBlock="5%" width="90%" height="90%" columns="2">
         <StudentFeedbackButton
           title="Good"

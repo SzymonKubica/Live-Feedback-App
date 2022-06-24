@@ -293,6 +293,8 @@ def get_video_link(code):
         return req["video_link"]
     return ""
 
+def set_metric(data):
+    db["metric"].insert_one(data)
 def set_custom_reaction(room, reaction):
     custom_reaction = reaction ## make sure not none and map it or something
     db["active_codes"].update_one(
