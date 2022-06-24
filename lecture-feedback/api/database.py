@@ -301,4 +301,8 @@ def set_custom_reaction(room, reaction):
         upsert=False)
 
 def get_custom_reaction(room):
-    return db["active_codes"].find_one({"code":room})["custom_reaction"]
+    try:
+        reaction = db["active_codes"].find_one({"code":room})["custom_reaction"]
+    except:
+        reaction = "Chilling"
+    return reaction
