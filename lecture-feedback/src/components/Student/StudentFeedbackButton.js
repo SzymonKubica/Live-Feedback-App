@@ -1,6 +1,6 @@
 import React from "react"
 
-import { Button } from "@chakra-ui/react"
+import { Button, Text } from "@chakra-ui/react"
 import { SocketContext } from '../../context/socket'
 import { getString, NilReaction } from "../Reactions"
 
@@ -23,7 +23,7 @@ const StudentFeedbackButton = ({
   room
 }) => {
 
-  const socket = React.useContext(SocketContext);  
+  const socket = React.useContext(SocketContext);
 
   function handleButton() {
     if (reaction === selectedReaction) {
@@ -48,6 +48,7 @@ const StudentFeedbackButton = ({
       onClick={handleButton}
       height="100%"
       _hover='0'
+      fontSize={20}
     >
       {title}
     </Button>

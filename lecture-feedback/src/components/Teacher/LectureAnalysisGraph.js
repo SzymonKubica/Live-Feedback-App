@@ -13,7 +13,7 @@ import {
 import { Stack } from "@chakra-ui/react"
 import Reaction, { getColour } from "../Reactions"
 
-const LectureAnalysisGraph = ({ room, setTime }) => {
+const LectureAnalysisGraph = ({ room, setTime, customReaction }) => {
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -24,11 +24,14 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
     Legend
   )
 
+  ChartJS.defaults.font.size=15
+
+
   const initialDatasets = {
     good: [],
     confused: [],
     tooFast: [],
-    chilling: [],
+    custom: [],
   }
 
   const [data, setData] = useState(getSettings(initialDatasets))
@@ -55,15 +58,16 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
           borderColor: getColour(Reaction.TOO_FAST),
         },
         {
-          label: "Chilling",
-          data: props.chilling,
-          backgroundColor: getColour(Reaction.CHILLING),
-          borderColor: getColour(Reaction.CHILLING),
+          label: customReaction ,
+          data: props.custom,
+          backgroundColor: getColour(Reaction.CUSTOM),
+          borderColor: getColour(Reaction.CUSTOM),
         },
       ],
     }
   }
 
+  // We need to update the data when we actually get reaction from async call
   useEffect(() => {
     const requestOptions = {
       method: "POST",
@@ -75,11 +79,12 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
       .then(res => res.json())
       .then(data => {
         setData(getSettings(data))
-        console.log(data)
       })
-      .then(console.log("Fetched from api"))
+  }, [customReaction])
 
-  }, [])
+  function pad(s) {
+    return s < 10 ? '0' + s : s
+  }
 
   const [options, setOptions] = useState({
     responsive: true,
@@ -90,8 +95,18 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
         position: "bottom",
         title: {
           display: true,
-          text: "Time(seconds)",
-        }
+          text: "Time",
+        },
+        ticks: {
+          callback: function sToTime(value, index, ticks) {
+            var secs = value % 60;
+            value = (value - secs) / 60;
+            var mins = value % 60;
+            var hrs = (value - mins) / 60;
+
+            return (hrs > 0 ? (pad(hrs) + ':'): '') + pad(mins) + ':' + pad(secs);
+          }
+        },
       },
       y: {
         type: "linear",
@@ -99,18 +114,18 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
         title: {
           display: true,
           text: "Reactions",
-        }
+        },
       },
     },
     elements: {
       point: {
         pointRadius: 2,
-      }
+      },
     },
     onClick: function (event, elementsAtEvent) {
       let valueX = null
-      var scale = this.scales['x'];
-      valueX = scale.getValueForPixel(event.x);
+      var scale = this.scales["x"]
+      valueX = scale.getValueForPixel(event.x)
       setTime(valueX)
     },
   })
@@ -122,8 +137,7 @@ const LectureAnalysisGraph = ({ room, setTime }) => {
         updateMode="none"
         data={data}
         options={options}
-        height={60}
-
+        height={100}
       />
     </Stack>
   )

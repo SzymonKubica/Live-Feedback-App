@@ -6,8 +6,12 @@ import StudentFeedbackButton from "./StudentFeedbackButton"
 import { Reaction } from "../Reactions"
 import CommentSection from "./CommentSection"
 
-
-const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction, room}) => {
+const StudentFeedbackGrid = ({
+  selectedReaction,
+  setSelectedReaction,
+  room,
+  customReaction,
+}) => {
   return (
     <Center width="100%" height="calc(60vh)">
       <SimpleGrid marginBlock="5%" width="90%" height="90%" columns="2">
@@ -36,9 +40,9 @@ const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction, room}) => 
           room={room}
         />
         <StudentFeedbackButton
-          title="Chilling"
+          title={customReaction}
           color="twitter"
-          reaction={Reaction.CHILLING}
+          reaction={Reaction.CUSTOM}
           selectedReaction={selectedReaction}
           setSelectedReaction={setSelectedReaction}
           room={room}

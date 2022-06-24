@@ -15,7 +15,7 @@ import { SocketContext } from "../../context/socket"
 import { Button, Stack } from "@chakra-ui/react"
 import Reaction, { getColour } from "../Reactions"
 
-const TeacherGraph3 = ({ room }) => {
+const TeacherGraph3 = ({ room, customReaction }) => {
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -26,11 +26,13 @@ const TeacherGraph3 = ({ room }) => {
     Legend
   )
 
+  ChartJS.defaults.font.size=20
+
   const initialDatasets = {
     good: [],
     confused: [],
     tooFast: [],
-    chilling: [],
+    custom: [],
   }
 
   const [data, setData] = useState(getSettings(initialDatasets))
@@ -39,8 +41,9 @@ const TeacherGraph3 = ({ room }) => {
     let labels = []
     let i
     for (i = 0; i < 21; i++) {
-      labels.push(String(i * -0.5))
+      labels.push(String(i * (-5)))
     }
+
     labels.reverse()
     return labels
   }
@@ -69,10 +72,10 @@ const TeacherGraph3 = ({ room }) => {
           borderColor: getColour(Reaction.TOO_FAST),
         },
         {
-          label: "Chilling",
-          data: props.chilling,
-          backgroundColor: getColour(Reaction.CHILLING),
-          borderColor: getColour(Reaction.CHILLING),
+          label: customReaction,
+          data: props.custom,
+          backgroundColor: getColour(Reaction.CUSTOM),
+          borderColor: getColour(Reaction.CUSTOM),
         },
       ],
     }
@@ -105,6 +108,24 @@ const TeacherGraph3 = ({ room }) => {
 
   const [options, setOptions] = useState({
     responsive: true,
+    scales: {
+      x: {
+        type: "linear",
+        position: "bottom",
+        title: {
+          display: true,
+          text: "Time(seconds ago)",
+        },
+      },
+      y: {
+        type: "linear",
+        position: "left",
+        title: {
+          display: true,
+          text: "Reactions",
+        }
+      },
+    },
   })
 
   return (

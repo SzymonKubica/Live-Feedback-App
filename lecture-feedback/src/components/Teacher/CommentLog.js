@@ -42,7 +42,7 @@ export default function CommentLog({room}) {
     return (    
     <Flex w="100%" h="100%" justify="center" align="center">
       <Flex w={["100%", "100%", "40%"]} h="90%" flexDir="column">
-      <Switch isChecked = {commentsAllowed} onChange = {e => setCommentsAllowed(!commentsAllowed)}>Comments</Switch>
+      <Switch fontSize={20} isChecked = {commentsAllowed} onChange = {e => setCommentsAllowed(!commentsAllowed)}>Comments</Switch>
       {commentsAllowed ? 
             <Messages h="calc(40vh)" messages={comments} />
             : null}
