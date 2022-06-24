@@ -74,12 +74,7 @@ export const TeacherMenu= ({isAuth, setAuth}) => {
             name="Past Presentation Analysis"
           ></NavButton>
           {/* TODO: Add unique identifier to NavButton  */}
-          <NavButton
-            colorScheme="blue"
-            size="lg"
-            dst="review-feedback"
-            name="Review Feedback"
-          ></NavButton>
+          <Heading>Settings</Heading>
           <Switch>Colour Blind Mode</Switch>
           <SocketContext.Provider>
             <Box>
