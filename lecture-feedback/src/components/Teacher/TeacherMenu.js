@@ -9,7 +9,9 @@ import { socket, SocketContext } from "../../context/socket"
 export const TeacherMenu= ({isAuth, setAuth}) => {
   const [visible, setVisible] = useState(false)
   const [code, setCode] = useState("")
-  const [customReaction, setCustomReaction] = useState("No reaction")
+  const [customReaction, setCustomReaction] = useState("Too Slow")
+  const [otherSelected, setOtherSelected] = useState(false)
+
 
   let navigate = useNavigate();
 
@@ -49,6 +51,9 @@ export const TeacherMenu= ({isAuth, setAuth}) => {
 
   function handleChange(e) {
     setCustomReaction(e.target.value)
+    if (e.target.value === "Other"){
+      setOtherSelected(true)
+    }
   }
 
   return (
@@ -77,15 +82,21 @@ export const TeacherMenu= ({isAuth, setAuth}) => {
           ></NavButton>
           <Switch>Colour Blind Mode</Switch>
           <SocketContext.Provider>
+            <Box>
             <Select
               placeholder="Select 4th button option"
-              width="20%"
+              width="100%"
               onChange={handleChange}
             >
               {options.map(option => (
                 <option value={option}> {option} </option>
               ))}
             </Select>
+            { otherSelected
+              ? <Input placeholder='Enter Custom Reaction' onChange={(e) => setCustomReaction(e.target.value)}></Input>
+              : null
+            }
+            </Box>
           </SocketContext.Provider>
         </VStack>
       </Stack>
