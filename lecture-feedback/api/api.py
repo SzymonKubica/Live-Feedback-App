@@ -81,9 +81,7 @@ def test_disconnect():
 
 @socketio.on("set custom reaction")
 def set_custom_reaction(room, reaction):
-    global room_to_custom_reaction
-    print(reaction)
-    room_to_custom_reaction[room] = reaction
+    database.set_custom_reaction(room, reaction)
     
 
 @socketio.on("join")
@@ -204,13 +202,11 @@ def get_snapshots():
     return {"snapshots":snapshots}
 
 
-room_to_custom_reaction = {}
 @app.route("/api/get-custom-reaction", methods=['POST'])
 @cross_origin()
 def get_custom_reaction():
-    global room_to_custom_reaction
     room = request.json['room']
-    return {"reaction": room_to_custom_reaction[room]}
+    return {"reaction": database.get_custom_reaction(room)}
 
 @app.route("/api/reaction-count", methods=['POST'])
 @login_required
