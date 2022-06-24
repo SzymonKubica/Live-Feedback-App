@@ -292,3 +292,17 @@ def get_video_link(code):
     if "video_link" in req:
         return req["video_link"]
     return ""
+
+def set_custom_reaction(room, reaction):
+    custom_reaction = reaction ## make sure not none and map it or something
+    db["active_codes"].update_one(
+        {"code":room}, 
+        {"$set": {"custom_reaction": custom_reaction}}, 
+        upsert=False)
+
+def get_custom_reaction(room):
+    try:
+        reaction = db["active_codes"].find_one({"code":room})["custom_reaction"]
+    except:
+        reaction = "Chilling"
+    return reaction

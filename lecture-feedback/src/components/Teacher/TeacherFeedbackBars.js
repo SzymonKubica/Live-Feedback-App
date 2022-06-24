@@ -29,9 +29,9 @@ const TeacherFeedbackBars = props => {
             color="orange"
           />
           <TeacherFeedbackBar
-            counter={props.data.chilling}
+            counter={props.data.custom}
             studentCount={props.studentCounter}
-            title="Chilling"
+            title={props.customReaction}
             color="twitter"
           />
         </Stack>

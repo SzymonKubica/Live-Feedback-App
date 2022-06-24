@@ -3,14 +3,11 @@ import { ChakraProvider, theme, VStack, Heading, Stack, Button, Center, Input, B
 import LectureAnalysisGraph from "../LectureAnalysisGraph"
 import { useViewport } from "../../../hooks/useViewport"
 import Messages from "../Messages"
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"
 import Header from "../../Header"
 
-
 export const AnalysisView = ({ isAuth, setAuth }) => {
-
-
-  const playerRef = React.useRef();
+  const playerRef = React.useRef()
   const videoUrl = "https://www.youtube.com/watch?v=IyD3ID3PlL4"
 
   const { width, height } = useViewport()
@@ -19,18 +16,21 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
 
   const [time, setTime] = useState(0)
 
-  const [comments, setComments] = useState([{ comment: "hello", reaction: "chilling" }])
+  const [comments, setComments] = useState([
+    { comment: "hello", reaction: "custom" },
+  ])
   const [startTime, setStartTime] = useState(0)
   const [link, setLink] = useState("")
+  const [customReaction, setCustomReaction] = useState("")
 
   const requestOptions = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ "room": code }),
+    body: JSON.stringify({ room: code }),
   }
 
   useEffect(() => {
-    fetch('/api/get-all-comments', requestOptions)
+    fetch("/api/get-all-comments", requestOptions)
       .then(res => res.json())
       .then(data => {
         setComments(data.comments)
@@ -47,6 +47,12 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
       .then(data => {
         setLink(data.link)
       })
+
+    fetch("/api/get-custom-reaction", requestOptions)
+    .then(res => res.json())
+    .then(data => {
+      setCustomReaction(data.reaction)
+    })
   }, [])
 
   //https://pro.panopto.com/Panopto/Pages/Embed.aspx?tid=ac005dfe-14fb-47f6-9ccc-aebb00a778ee
@@ -102,7 +108,12 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
         <GridItem rowSpan={2}>
           <Flex w="100%" h="100%" justify="center" align="center">
             <Flex w={["100%", "100%", "40%"]} h="90%" flexDir="column">
-              <Messages h="calc(40vh)" messages={comments} startTime={startTime} setTime={setTime} />
+              <Messages
+                h="calc(40vh)"
+                messages={comments}
+                startTime={startTime}
+                setTime={setTime}
+              />
             </Flex>
           </Flex>
         </GridItem>

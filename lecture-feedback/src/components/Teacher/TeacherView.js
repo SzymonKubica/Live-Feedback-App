@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react"
 import {
   Box,
   ChakraProvider,
+  theme,
   Heading,
-  Stack,
   Grid,
   GridItem,
   Flex,
@@ -12,8 +12,6 @@ import {
   Container,
   Center,
   Button,
-  Modal,
-  useDisclosure,
 } from "@chakra-ui/react"
 
 import { socket, SocketContext } from "../../context/socket"
@@ -26,7 +24,6 @@ import { useParams } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import TeacherFeedbackBars from "./TeacherFeedbackBars"
 import { getColour, Reaction } from "../Reactions"
-import LectureAnalysisGraph from "./LectureAnalysisGraph"
 import { PresentationFileFinder } from "./Finder"
 
 export const TeacherView = ({ isAuth, setAuth }) => {
@@ -35,13 +32,14 @@ export const TeacherView = ({ isAuth, setAuth }) => {
   const [visible, setVisible] = useState(false)
   const { width, height } = useViewport()
   const [showSave, setShowSave] = useState(false)
+  const [customReaction, setCustomReaction] = useState("")
 
   let { code } = useParams()
   let navigate = useNavigate()
 
   const [data, setData] = useState({})
   const [circleGraphData, setCircleGraphData] = useState({
-    labels: ["Good", "Confused", "Too Fast", "Chilling"],
+    labels: ["Good", "Confused", "Too Fast", customReaction],
     datasets: [
       {
         data: [0, 0, 0, 0],
@@ -49,7 +47,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
           getColour(Reaction.GOOD),
           getColour(Reaction.CONFUSED),
           getColour(Reaction.TOO_FAST),
-          getColour(Reaction.CHILLING),
+          getColour(Reaction.CUSTOM),
         ],
         borderColor: [
           "rgb(255,255,255)",
@@ -64,87 +62,103 @@ export const TeacherView = ({ isAuth, setAuth }) => {
 
   useEffect(() => {
     // check if teacher is the owner
+    
     let requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ "code": code }),
+      body: JSON.stringify({ room: code }),
     }
-
     // first check its even active
     fetch("/api/is-code-active", requestOptions)
     .then(res => res.json())
     .then(data => {
         if (!data["valid"]) {
           navigate("/")
-        }
-        
-        // now make sure owner
-        fetch("/api/owner", requestOptions)
-          .then(res => res.json())
-          .then(data => {
-            if (data["owner"]) {
-              setVisible(true)
-            } else {
-              // maybe navigate back to teacher view?
-              navigate("/")
-            }
-          })
-          .then(() => {
-            socket.emit("join", { room: code, type: "teacher" })
-    
-            socket.on("update", data => {
-              setData(data)
-              setCircleGraphData(prevState => ({
-                labels: prevState.labels,
-                datasets: [
-                  {
-                    ...prevState.datasets[0],
-                    data: [data.good, data.confused, data.tooFast, data.chilling],
-                  },
-                ],
-              }))
-            })
-    
-            socket.on("update students connected", data => {
-              setStudentCounter(data.count)
-              console.log("updating connected students")
-            })
-    
-            socket.on("presentation ended", () => {
-              // do some other stuff to save the video
-    
-              navigate("/teacher/menu")
-              // onOpen()
-            })
-    
-            requestOptions = {
+        }})
+    .then(() => {
+      fetch("/api/get-custom-reaction", requestOptions)
+      .then(res => res.json())
+      .then(data => {
+        const custReaction = data.reaction
+        setCustomReaction(prev => {
+            let requestOptions = {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ room: code }),
+              body: JSON.stringify({ "code": code }),
             }
-    
-            fetch("/api/student-count", requestOptions)
+            fetch("/api/owner", requestOptions)
               .then(res => res.json())
               .then(data => {
-                setStudentCounter(data.count)
+                if (data["owner"]) {
+                  setVisible(true)
+                } else {
+                  // maybe navigate back to teacher view?
+                  navigate("/")
+                }
               })
-    
-            fetch("/api/all_reactions", requestOptions)
-              .then(res => res.json())
-              .then(data => {
-                setData(data)
-                setCircleGraphData(prevState => ({
-                  labels: prevState.labels,
-                  datasets: [
-                    {
-                      ...prevState.datasets[0],
-                      data: [data.good, data.confused, data.tooFast, data.chilling],
-                    },
-                  ],
-                }))
+              .then(() => {
+                socket.emit("join", { room: code, type: "teacher" })
+        
+                socket.on("update", data => {
+                  setData(data)
+                  setCircleGraphData(prevState => ({
+                    labels: ["Good", "Confused", "Too Fast", custReaction],
+                    datasets: [
+                      {
+                        ...prevState.datasets[0],
+                        data: [data.good, data.confused, data.tooFast, data.custom],
+                      },
+                    ],
+                  }))
+                })
+        
+                socket.on("update students connected", data => {
+                  setStudentCounter(data.count)
+                  console.log("updating connected students")
+                })
+        
+                socket.on("presentation ended", () => {
+                  // do some other stuff to save the video
+        
+                  navigate("/teacher/menu")
+                  // onOpen()
+                })
+        
+                requestOptions = {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ room: code }),
+                }
+        
+                fetch("/api/student-count", requestOptions)
+                  .then(res => res.json())
+                  .then(data => {
+                    setStudentCounter(data.count)
+                  })
+        
+                fetch("/api/all_reactions", requestOptions)
+                  .then(res => res.json())
+                  .then(data => {
+                    setData(data)
+                    setCircleGraphData(prevState => ({
+                      labels: ["Good", "Confused", "Too Fast", custReaction],
+                      datasets: [
+                        {
+                          ...prevState.datasets[0],
+                          data: [data.good, data.confused, data.tooFast, data.custom],
+                        },
+                      ],
+                    }))
+                  })
               })
+              return custReaction
           })
+        })
+
     })
+
+    
+    
 
     // Disconnect when unmounts
     return () => {
@@ -155,6 +169,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
     }
   }, [])
 
+
   const handleEndPresentation = () => {
     socket.off("presentation ended") // we only want to close other lectuers tabs, not the current (if they have open)
     socket.emit("end presentation")
@@ -162,7 +177,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
   }
 
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <Box>
         {showSave ? (
           <Center>
@@ -192,10 +207,14 @@ export const TeacherView = ({ isAuth, setAuth }) => {
                           studentCounter={studentCounter}
                           data={data}
                           room={code}
+                          customReaction={customReaction}
                         />
                       ) : (
                         <Container maxW={width * 0.66} maxH={height * 0.76}>
-                          <TeacherGraph3 room={code} />
+                          <TeacherGraph3
+                            room={code}
+                            customReaction={customReaction}
+                          />
                         </Container>
                       )}
                     </Container>

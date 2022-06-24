@@ -6,7 +6,7 @@ class Reaction(str, Enum):
     GOOD="good"
     CONFUSED="confused"
     TOO_FAST="tooFast"
-    CHILLING="chilling"
+    CUSTOM="custom"
 
 
 def getString(reaction):
@@ -16,5 +16,5 @@ def getString(reaction):
         return "confused"
     if (reaction is Reaction.TOO_FAST):
         return "tooFast"
-    if (reaction is Reaction.CHILLING):
-        return "chilling"
+    if (reaction is Reaction.CUSTOM):
+        return "custom"
