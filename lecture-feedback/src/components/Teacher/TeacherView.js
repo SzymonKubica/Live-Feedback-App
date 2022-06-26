@@ -107,6 +107,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
                 })
 
                 socket.on("connect", () => {
+                  console.log("connected")
                   if (disconnectAlertVisible) {
                     setDisconnectAlertVisible(false)
                     window.location.reload();
