@@ -9,7 +9,7 @@ import { socket, SocketContext } from "../../context/socket"
 export const TeacherMenu = ({ isAuth, setAuth }) => {
   const [visible, setVisible] = useState(false)
   const [code, setCode] = useState("")
-  const [customReaction, setCustomReaction] = useState("Too Slow")
+  const [customReaction, setCustomReaction] = useState("")
   const [otherSelected, setOtherSelected] = useState(false)
   const [invalid, setInvalid] = useState(false)
 
@@ -43,11 +43,6 @@ export const TeacherMenu = ({ isAuth, setAuth }) => {
 
   // Called when there is already an active presentation
   function handleOpenPresentation() {
-    if (customReaction === "") {
-      setInvalid(true)
-      return
-    }
-
     navigate("/teacher/meeting/" + code, { replace: true })
   }
   const options = [
@@ -79,27 +74,27 @@ export const TeacherMenu = ({ isAuth, setAuth }) => {
             <Heading>Teacher Menu</Heading>
             <SocketContext.Provider>
             </SocketContext.Provider>
-            {code === ""
-              ? <Button onClick={handleStartPresentation} colorScheme='blue' size='lg'>Start Presentation</Button>
-              : <Button onClick={handleOpenPresentation} colorScheme='blue' size='lg'>Open Presentation</Button>
+            {code !== ""
+              ? <Button onClick={handleOpenPresentation} colorScheme='blue' size='lg'>Open Presentation</Button>
+              : <VStack spacing={3}>
+                <Button onClick={handleStartPresentation} colorScheme='blue' size='lg'>Start Presentation</Button>
+                <Select
+                  isInvalid={invalid}
+                  placeholder="Select 4th button option"
+                  width="100%"
+                  onChange={handleChange}
+                  onClick={() => setInvalid(false)}
+                >
+                  {options.map(option => (
+                    <option value={option}> {option} </option>
+                  ))}
+                </Select>
+                {otherSelected
+                  ? <Input placeholder='Enter Custom Reaction' onChange={(e) => setCustomReaction(e.target.value)}></Input>
+                  : null
+                }
+              </VStack>
             }
-            <Box>
-              <Select
-                isInvalid={invalid}
-                placeholder="Select 4th button option"
-                width="100%"
-                onChange={handleChange}
-                onClick={() => setInvalid(false)}
-              >
-                {options.map(option => (
-                  <option value={option}> {option} </option>
-                ))}
-              </Select>
-              {otherSelected
-                ? <Input placeholder='Enter Custom Reaction' onChange={(e) => setCustomReaction(e.target.value)}></Input>
-                : null
-              }
-            </Box>
             <NavButton
               colorScheme="blue"
               size="lg"
