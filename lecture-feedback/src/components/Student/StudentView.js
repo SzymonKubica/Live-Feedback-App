@@ -49,7 +49,7 @@ export const StudentView = () => {
 
         // Must have reconnected so resend reaction
         if (selectedReaction != NilReaction) {
-          socket.emit("add reaction" + getString(selectedReaction), room)
+          socket.emit("add reaction" + getString(selectedReaction), code)
         }
 
         // For when you disconnect due to an error and reconnect
