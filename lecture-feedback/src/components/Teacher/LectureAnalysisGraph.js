@@ -131,13 +131,13 @@ const LectureAnalysisGraph = ({ room, setTime, customReaction }) => {
   })
 
   return (
-    <Stack>
+    <Stack marginTop={5}>
       <Line
         id="chart"
         updateMode="none"
         data={data}
         options={options}
-        height={100}
+        height={50}
       />
     </Stack>
   )
