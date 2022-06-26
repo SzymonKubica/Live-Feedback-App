@@ -49,10 +49,10 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
       })
 
     fetch("/api/get-custom-reaction", requestOptions)
-    .then(res => res.json())
-    .then(data => {
-      setCustomReaction(data.reaction)
-    })
+      .then(res => res.json())
+      .then(data => {
+        setCustomReaction(data.reaction)
+      })
   }, [])
 
   //https://pro.panopto.com/Panopto/Pages/Embed.aspx?tid=ac005dfe-14fb-47f6-9ccc-aebb00a778ee
@@ -79,35 +79,24 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
     <ChakraProvider theme={theme}>
       {/* <Flex> */}
       <Header isAuth={isAuth} setAuth={setAuth} />
-      <Grid templateColumns="repeat(3, 1fr)" height="calc(70vh)">
+      <Grid templateColumns="repeat(3, 1fr)" templateRows="repeat(3, 1fr)" height="calc(85vh)">
         <GridItem rowSpan={2} colSpan={2}>
           <Container maxW={width * 0.55} maxH={height * 0.70}>
             {link === "" ?
-              <Box height={height * 0.65} width={width * 0.55}>
+              <Box height={height * 0.35} width={width * 0.55}>
                 <Heading>No Video Saved</Heading>
                 <Button onClick={handleAddLink}>Add Panopto Link</Button>
               </Box>
               :
-              <iframe src={`${link}&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${parseFloat(time) + parseFloat(document.getElementById("offset_num").value)}&interactivity=all`} height={height * 0.65} width={width * 0.55} allowFullScreen allow="autoplay"></iframe>
+              <iframe src={`${link}&autoplay=true&offerviewer=true&showtitle=true&showbrand=true&captions=false&start=${parseFloat(time) + parseFloat(document.getElementById("offset_num").value)}&interactivity=all`} height={height * 0.35} width={width * 0.55} allowFullScreen allow="autoplay"></iframe>
             }
-            <LectureAnalysisGraph room={code} customReaction={customReaction} setTime={setTime} />
-            <HStack marginTop={5}>
-              <Text >Offset (seconds): </Text>
-              <NumberInput defaultValue={0} width='auto' id="offset_num">
-                <NumberInputField />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-            </HStack>
           </Container>
         </GridItem>
-        <Spacer />
 
-        <GridItem rowSpan={2}>
+
+        <GridItem rowSpan={2} colSpan={1}>
           <Flex w="100%" h="100%" justify="center" align="center">
-            <Flex w={["100%", "100%", "40%"]} h="90%" flexDir="column">
+            <Flex w='100%' h="90%" flexDir="column">
               <Messages
                 h="calc(40vh)"
                 messages={comments}
@@ -116,6 +105,23 @@ export const AnalysisView = ({ isAuth, setAuth }) => {
               />
             </Flex>
           </Flex>
+        </GridItem>
+
+        <GridItem rowSpan={1} colSpan={3}>
+          <Container maxW={width}>
+
+          <LectureAnalysisGraph room={code} customReaction={customReaction} setTime={setTime} />
+          <HStack marginTop={5}>
+            <Text >Offset (seconds): </Text>
+            <NumberInput defaultValue={0} width='auto' id="offset_num">
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </HStack>
+          </Container>
         </GridItem>
       </Grid>
       {/* </Flex> */}
