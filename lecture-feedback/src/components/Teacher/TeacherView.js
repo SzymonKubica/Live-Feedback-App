@@ -107,11 +107,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
                 })
 
                 socket.on("connect", () => {
-                  console.log("connected")
-                  if (disconnectAlertVisible) {
-                    setDisconnectAlertVisible(false)
-                    window.location.reload();
-                  }
+                  setDisconnectAlertVisible(false)
                 })
         
                 socket.on("update", data => {
@@ -182,7 +178,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
       socket.off("presentation ended")
       socket.emit("leave", { room: code })
     }
-  }, [])
+  }, [disconnectAlertVisible])
 
 
   const handleEndPresentation = () => {
