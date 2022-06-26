@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef} from "react"
 
 import { ChakraProvider, Stack, theme, Heading, Box } from "@chakra-ui/react"
 
@@ -13,6 +13,9 @@ import { getString, NilReaction } from "../Reactions"
 
 export const StudentView = () => {
   const [selectedReaction, setSelectedReaction] = useState(NilReaction)
+  const selectedReactionRef = useRef()
+  selectedReactionRef.current = NilReaction
+
   const [visibleComment, setVisibleComment] = useState(false)
   const [customReaction, setCustomReaction] = useState("Too Slow")
   const [alertVisible, setAlertVisible] = useState(false)
@@ -20,6 +23,11 @@ export const StudentView = () => {
   let { code } = useParams()
   let navigate = useNavigate()
 
+  // keep reference up to date to use in below useEffect on reconnection
+  useEffect(() => {
+    selectedReactionRef.current = selectedReaction
+  }, [selectedReaction])
+  
   // reset the button when lecturer creates a snapshot
   useEffect(() => {
     const requestOptions = {
@@ -48,8 +56,8 @@ export const StudentView = () => {
         })
 
         // Must have reconnected so resend reaction
-        if (selectedReaction != NilReaction) {
-          socket.emit("add reaction" + getString(selectedReaction), code)
+        if (selectedReactionRef.current !== NilReaction) {
+          socket.emit("add reaction" + getString(selectedReactionRef.current), code)
         }
 
         // For when you disconnect due to an error and reconnect
