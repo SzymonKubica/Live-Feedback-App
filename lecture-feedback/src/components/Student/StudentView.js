@@ -13,9 +13,7 @@ import { getString, NilReaction } from "../Reactions"
 
 export const StudentView = () => {
   const [selectedReaction, setSelectedReaction] = useState(NilReaction)
-  const selectedReactionRef = useRef()
-  selectedReactionRef.current = NilReaction
-
+  const [resubmitReaction, setResubmitReaction] = useState(false)
   const [visibleComment, setVisibleComment] = useState(false)
   const [customReaction, setCustomReaction] = useState("Too Slow")
   const [alertVisible, setAlertVisible] = useState(false)
@@ -25,9 +23,14 @@ export const StudentView = () => {
 
   // keep reference up to date to use in below useEffect on reconnection
   useEffect(() => {
-    selectedReactionRef.current = selectedReaction
-    console.log("called update")
-  }, [selectedReaction])
+    console.log(selectedReaction)
+    console.log(resubmitReaction)
+    if (selectedReaction !== NilReaction && resubmitReaction) {
+      console.log("here")
+      socket.emit("add reaction" + getString(selectedReactionRef.current), code)
+      setResubmitReaction(false)
+    }
+  }, [selectedReaction, resubmitReaction])
   
   // reset the button when lecturer creates a snapshot
   useEffect(() => {
@@ -56,14 +59,6 @@ export const StudentView = () => {
           setVisibleComment(false)
         })
 
-        console.log(selectedReaction)
-        console.log(selectedReactionRef.current)
-        // Must have reconnected so resend reaction
-        if (selectedReactionRef.current !== NilReaction) {
-          console.log("here")
-          socket.emit("add reaction" + getString(selectedReactionRef.current), code)
-        }
-
         // For when you disconnect due to an error and reconnect
         socket.on("disconnect", () => {
           setDisconnectAlertVisible(true)
@@ -71,6 +66,7 @@ export const StudentView = () => {
 
         socket.on("connect", () => {
           setDisconnectAlertVisible(false)
+          setResubmitReaction(true)
         })
 
       })
