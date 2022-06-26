@@ -6,7 +6,7 @@ import { socket, SocketContext } from "../../context/socket"
 import Header from "../Header"
 import StudentFeedbackGrid from "./StudentFeedbackGrid"
 import CommentSection from "./CommentSection"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useLocation, useNavigate } from "react-router-dom"
 import CustomAlert from "../CustomAlert"
 
 const NilReaction = "nil"
@@ -16,8 +16,14 @@ export const StudentView = () => {
   const [visibleComment, setVisibleComment] = useState(false)
   const [customReaction, setCustomReaction] = useState("Too Slow")
   const [alertVisible, setAlertVisible] = useState(false)
+  const [disconnectAlertVisible, setDisconnectAlertVisible] = useState(false)
   let { code } = useParams()
   let navigate = useNavigate()
+  const location = useLocation()
+
+  // Selected is set when disconnect and refresh is done
+  const queryParams = new URLSearchParams(location.search)
+  const selected = queryParams.get("selected")
 
   // reset the button when lecturer creates a snapshot
   useEffect(() => {
@@ -43,6 +49,25 @@ export const StudentView = () => {
         })
 
         socket.emit("join", { room: code, type: "student" })
+
+        // in case of disconnection and reconnection
+        if (selected != null) {
+          setSelectedReaction(selected)
+        }
+
+        // For when you disconnect due to an error and reconnect
+        socket.on("disconnect", () => {
+          setDisconnectAlertVisible(true)
+        })
+
+        socket.on("connect", () => {
+          if (disconnectAlertVisible) {
+            setDisconnectAlertVisible(false)
+            // window.location.reload();
+            window.location.search = `&selected=${selectedReaction}`;
+          }
+        })
+
       })
     fetch("/api/get-custom-reaction", requestOptions)
       .then(res => res.json())
@@ -68,6 +93,13 @@ export const StudentView = () => {
       <SocketContext.Provider value={socket}>
         <Stack width="100%">
           <Header />
+          {disconnectAlertVisible ? 
+                  <CustomAlert
+                    title="Connection lost, trying to reconnect ..."
+                    description="Check your connection and refresh."
+                    onClose={() => setDisconnectAlertVisible(false)}
+                  />
+          : null }
           {alertVisible ? (
             <Box height="50">
               <CustomAlert
