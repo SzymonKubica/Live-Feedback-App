@@ -82,7 +82,7 @@ export default function CommentSection({visible, setVisible, selectedReaction, r
          {/* only show when visible */}
         {visible ? <Box>
             {/* <CommentInput /> */}
-            <Select width = "100%" onChange={handleInputChangeDrop} isInvalid={invalid} onClick={() => setInvalid(false)}>
+            <Select width = "100%" onChange={handleInputChangeDrop} isInvalid={invalid} onClick={() => {setInvalid(false); setInvalidCommend(false)}}>
               <option value="" disabled selected>Quick Select Comment (Optional)</option>
               <option>Can you repeat this</option>
               <option>Another example</option>
