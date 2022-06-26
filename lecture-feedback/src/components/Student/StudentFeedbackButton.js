@@ -1,7 +1,7 @@
 import React from "react"
 
 import { Button, Text } from "@chakra-ui/react"
-import { SocketContext } from '../../context/socket'
+import { SocketContext } from "../../context/socket"
 import { getString, NilReaction } from "../Reactions"
 
 const defaultColor = 500
@@ -20,10 +20,10 @@ const StudentFeedbackButton = ({
   reaction,
   selectedReaction,
   setSelectedReaction,
-  room
+  setAlertVisible,
+  room,
 }) => {
-
-  const socket = React.useContext(SocketContext);
+  const socket = React.useContext(SocketContext)
 
   function handleButton() {
     if (reaction === selectedReaction) {
@@ -40,6 +40,8 @@ const StudentFeedbackButton = ({
       socket.emit("add reaction", getString(reaction), room)
       setSelectedReaction(reaction)
     }
+    // After the teacher resets reactions each button press clears the "update reaction" prompt.
+    setAlertVisible(false)
   }
   return (
     <Button
@@ -47,7 +49,7 @@ const StudentFeedbackButton = ({
       bg={`${color}.${getColourGradient(reaction, selectedReaction)}`}
       onClick={handleButton}
       height="100%"
-      _hover='0'
+      _hover="0"
       fontSize={20}
     >
       {title}

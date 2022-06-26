@@ -4,8 +4,13 @@ import {
   ChakraProvider,
   Stack,
   theme,
-  Textarea,
   Heading,
+  Box,
+  Alert,
+  AlertTitle,
+  AlertIcon,
+  AlertDescription,
+  CloseButton,
 } from "@chakra-ui/react"
 
 import { socket, SocketContext } from "../../context/socket"
@@ -19,8 +24,8 @@ const NilReaction = "nil"
 export const StudentView = () => {
   const [selectedReaction, setSelectedReaction] = useState(NilReaction)
   const [visibleComment, setVisibleComment] = useState(false)
-  const [visible, setVisible] = useState(false) // for the actual view
   const [customReaction, setCustomReaction] = useState("Too Slow")
+  const [alertVisible, setAlertVisible] = useState(false)
   let { code } = useParams()
   let navigate = useNavigate()
 
@@ -42,6 +47,8 @@ export const StudentView = () => {
       .then(() => {
         socket.on("reset buttons", () => {
           setSelectedReaction(NilReaction)
+          setAlertVisible(true)
+
           setVisibleComment(false)
         })
 
@@ -62,18 +69,36 @@ export const StudentView = () => {
     //
   }, [])
 
+  function onClose() {
+    setAlertVisible(false)
+  }
+
   return (
     <ChakraProvider theme={theme}>
       <SocketContext.Provider value={socket}>
         <Stack width="100%">
           <Header />
-          <Heading textAlign="center">Live Reactions</Heading>
+          {alertVisible ? (
+            <Box>
+              <Alert status="info">
+                <AlertIcon />
+                <AlertTitle> Reactions were reset!</AlertTitle>
+                <AlertDescription>
+                  Please update your feedback.
+                </AlertDescription>
+                <CloseButton onClick={onClose} />
+              </Alert>
+            </Box>
+          ) : (
+            <Heading textAlign="center">Live Reactions</Heading>
+          )}
 
           <StudentFeedbackGrid
             selectedReaction={selectedReaction}
             setSelectedReaction={setSelectedReaction}
             customReaction={customReaction}
             room={code}
+            setAlertVisible={setAlertVisible}
           />
           <CommentSection
             visible={visibleComment}

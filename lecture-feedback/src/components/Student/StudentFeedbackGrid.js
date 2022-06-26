@@ -11,6 +11,7 @@ const StudentFeedbackGrid = ({
   setSelectedReaction,
   room,
   customReaction,
+  setAlertVisible,
 }) => {
   return (
     <Center width="100%" height="calc(60vh)">
@@ -21,6 +22,7 @@ const StudentFeedbackGrid = ({
           reaction={Reaction.GOOD}
           selectedReaction={selectedReaction}
           setSelectedReaction={setSelectedReaction}
+          setAlertVisible={setAlertVisible}
           room={room}
         />
         <StudentFeedbackButton
@@ -29,6 +31,7 @@ const StudentFeedbackGrid = ({
           reaction={Reaction.CONFUSED}
           selectedReaction={selectedReaction}
           setSelectedReaction={setSelectedReaction}
+          setAlertVisible={setAlertVisible}
           room={room}
         />
         <StudentFeedbackButton
@@ -37,6 +40,7 @@ const StudentFeedbackGrid = ({
           reaction={Reaction.TOO_FAST}
           selectedReaction={selectedReaction}
           setSelectedReaction={setSelectedReaction}
+          setAlertVisible={setAlertVisible}
           room={room}
         />
         <StudentFeedbackButton
@@ -45,6 +49,7 @@ const StudentFeedbackGrid = ({
           reaction={Reaction.CUSTOM}
           selectedReaction={selectedReaction}
           setSelectedReaction={setSelectedReaction}
+          setAlertVisible={setAlertVisible}
           room={room}
         />
       </SimpleGrid>
