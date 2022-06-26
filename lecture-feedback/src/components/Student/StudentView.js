@@ -1,26 +1,21 @@
 import React, { useState, useEffect } from "react"
 
-import {
-  ChakraProvider,
-  Stack,
-  theme,
-  Textarea,
-  Heading,
-} from "@chakra-ui/react"
+import { ChakraProvider, Stack, theme, Heading, Box } from "@chakra-ui/react"
 
 import { socket, SocketContext } from "../../context/socket"
 import Header from "../Header"
 import StudentFeedbackGrid from "./StudentFeedbackGrid"
 import CommentSection from "./CommentSection"
 import { useParams, useNavigate } from "react-router-dom"
+import CustomAlert from "./CustomAlert"
 
 const NilReaction = "nil"
 
 export const StudentView = () => {
   const [selectedReaction, setSelectedReaction] = useState(NilReaction)
   const [visibleComment, setVisibleComment] = useState(false)
-  const [visible, setVisible] = useState(false) // for the actual view
   const [customReaction, setCustomReaction] = useState("Too Slow")
+  const [alertVisible, setAlertVisible] = useState(false)
   let { code } = useParams()
   let navigate = useNavigate()
 
@@ -42,6 +37,8 @@ export const StudentView = () => {
       .then(() => {
         socket.on("reset buttons", () => {
           setSelectedReaction(NilReaction)
+          setAlertVisible(true)
+
           setVisibleComment(false)
         })
 
@@ -62,18 +59,35 @@ export const StudentView = () => {
     //
   }, [])
 
+  function onClose() {
+    setAlertVisible(false)
+  }
+
   return (
     <ChakraProvider theme={theme}>
       <SocketContext.Provider value={socket}>
         <Stack width="100%">
           <Header />
-          <Heading textAlign="center">Live Reactions</Heading>
+          {alertVisible ? (
+            <Box height="50">
+              <CustomAlert
+                title="Reactions were reset!"
+                description="Please update your feedback."
+                onClose={onClose}
+              />
+            </Box>
+          ) : (
+            <Heading textAlign="center" height="50">
+              Live Reactions
+            </Heading>
+          )}
 
           <StudentFeedbackGrid
             selectedReaction={selectedReaction}
             setSelectedReaction={setSelectedReaction}
             customReaction={customReaction}
             room={code}
+            setAlertVisible={setAlertVisible}
           />
           <CommentSection
             visible={visibleComment}
