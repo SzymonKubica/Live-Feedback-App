@@ -10,6 +10,8 @@ export default function CommentSection({visible, setVisible, selectedReaction, r
     const [comment, setComment] = useState("")
     const socket = React.useContext(SocketContext);
     const [selection, setSelection] = useState("") 
+    const [invalid, setInvalid] = useState(false)
+    const [invalidCommend, setInvalidCommend] = useState(false)
 
     const [time, setTime] = useState(() => new Date())
     
@@ -38,7 +40,15 @@ export default function CommentSection({visible, setVisible, selectedReaction, r
 
     function handleSend(){
         if (selection === "Other") {
-          socket.emit("leave comment", comment, selectedReaction, room)
+          setComment(comment.trim())
+          if (comment.trim() === "") {
+            setInvalidCommend(true)
+            return
+          }
+          socket.emit("leave comment", comment.trim(), selectedReaction, room)
+        } else if (selection === "") {
+          setInvalid(true)
+          return
         } else {
           socket.emit("leave comment", selection, selectedReaction, room)
         }
@@ -72,7 +82,7 @@ export default function CommentSection({visible, setVisible, selectedReaction, r
          {/* only show when visible */}
         {visible ? <Box>
             {/* <CommentInput /> */}
-            <Select width = "100%" onChange={handleInputChangeDrop}>
+            <Select width = "100%" onChange={handleInputChangeDrop} isInvalid={invalid} onClick={() => setInvalid(false)}>
               <option value="" disabled selected>Quick Select Comment (Optional)</option>
               <option>Can you repeat this</option>
               <option>Another example</option>
@@ -81,7 +91,7 @@ export default function CommentSection({visible, setVisible, selectedReaction, r
               <option>Other</option> 
             </Select>
             { selection === "Other" ?
-            <Textarea placeholder='Add an optional comment' size = 'lg' onChange={handleInputChange} maxLength={41}/>
+            <Textarea value={comment} onClick={() => setInvalidCommend(false)} isInvalid={invalidCommend} placeholder='Add an optional comment' size = 'lg' onChange={handleInputChange} maxLength={41}/>
             : null}
             <Button onClick={handleSend} colorScheme='blue' size='sm'>Send</Button>
         </Box> : null}
