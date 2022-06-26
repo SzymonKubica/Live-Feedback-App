@@ -7,7 +7,7 @@ import Header from "../Header"
 import StudentFeedbackGrid from "./StudentFeedbackGrid"
 import CommentSection from "./CommentSection"
 import { useParams, useNavigate } from "react-router-dom"
-import CustomAlert from "./CustomAlert"
+import CustomAlert from "../CustomAlert"
 
 const NilReaction = "nil"
 
