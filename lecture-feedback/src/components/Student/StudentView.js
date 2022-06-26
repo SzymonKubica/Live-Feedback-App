@@ -26,6 +26,7 @@ export const StudentView = () => {
   // keep reference up to date to use in below useEffect on reconnection
   useEffect(() => {
     selectedReactionRef.current = selectedReaction
+    console.log("called update")
   }, [selectedReaction])
   
   // reset the button when lecturer creates a snapshot
@@ -55,8 +56,11 @@ export const StudentView = () => {
           setVisibleComment(false)
         })
 
+        console.log(selectedReaction)
+        console.log(selectedReactionRef.current)
         // Must have reconnected so resend reaction
         if (selectedReactionRef.current !== NilReaction) {
+          console.log("here")
           socket.emit("add reaction" + getString(selectedReactionRef.current), code)
         }
 
