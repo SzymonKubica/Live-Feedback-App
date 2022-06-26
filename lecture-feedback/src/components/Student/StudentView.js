@@ -6,10 +6,10 @@ import { socket, SocketContext } from "../../context/socket"
 import Header from "../Header"
 import StudentFeedbackGrid from "./StudentFeedbackGrid"
 import CommentSection from "./CommentSection"
-import { useParams, useLocation, useNavigate } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import CustomAlert from "../CustomAlert"
+import { getString, NilReaction } from "../Reactions"
 
-const NilReaction = "nil"
 
 export const StudentView = () => {
   const [selectedReaction, setSelectedReaction] = useState(NilReaction)
@@ -19,11 +19,6 @@ export const StudentView = () => {
   const [disconnectAlertVisible, setDisconnectAlertVisible] = useState(false)
   let { code } = useParams()
   let navigate = useNavigate()
-  const location = useLocation()
-
-  // Selected is set when disconnect and refresh is done
-  const queryParams = new URLSearchParams(location.search)
-  const selected = queryParams.get("selected")
 
   // reset the button when lecturer creates a snapshot
   useEffect(() => {
@@ -50,9 +45,9 @@ export const StudentView = () => {
 
         socket.emit("join", { room: code, type: "student" })
 
-        // in case of disconnection and reconnection
-        if (selected != null) {
-          setSelectedReaction(selected)
+        // Must have reconnected so resend reaction
+        if (selectedReaction != NilReaction) {
+          socket.emit("add reaction" + getString(selectedReaction))
         }
 
         // For when you disconnect due to an error and reconnect
@@ -61,12 +56,7 @@ export const StudentView = () => {
         })
 
         socket.on("connect", () => {
-          console.log("connected")
-          if (disconnectAlertVisible) {
-            setDisconnectAlertVisible(false)
-            // window.location.reload();
-            window.location.search = `&selected=${selectedReaction}`;
-          }
+          setDisconnectAlertVisible(false)
         })
 
       })
@@ -83,7 +73,7 @@ export const StudentView = () => {
       socket.emit("leave", { room: code })
     }
     //
-  }, [])
+  }, [disconnectAlertVisible])
 
   function onClose() {
     setAlertVisible(false)
