@@ -35,6 +35,10 @@ export const StudentView = () => {
           navigate("/")
         }
       })
+      .then(() => {        
+        socket.emit("join", { room: code, type: "student" })
+
+      })
       .then(() => {
         socket.on("reset buttons", () => {
           setSelectedReaction(NilReaction)
@@ -42,8 +46,6 @@ export const StudentView = () => {
 
           setVisibleComment(false)
         })
-
-        socket.emit("join", { room: code, type: "student" })
 
         // Must have reconnected so resend reaction
         if (selectedReaction != NilReaction) {
