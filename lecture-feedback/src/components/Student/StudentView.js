@@ -1,23 +1,13 @@
 import React, { useState, useEffect } from "react"
 
-import {
-  ChakraProvider,
-  Stack,
-  theme,
-  Heading,
-  Box,
-  Alert,
-  AlertTitle,
-  AlertIcon,
-  AlertDescription,
-  CloseButton,
-} from "@chakra-ui/react"
+import { ChakraProvider, Stack, theme, Heading, Box } from "@chakra-ui/react"
 
 import { socket, SocketContext } from "../../context/socket"
 import Header from "../Header"
 import StudentFeedbackGrid from "./StudentFeedbackGrid"
 import CommentSection from "./CommentSection"
 import { useParams, useNavigate } from "react-router-dom"
+import CustomAlert from "./CustomAlert"
 
 const NilReaction = "nil"
 
@@ -79,18 +69,17 @@ export const StudentView = () => {
         <Stack width="100%">
           <Header />
           {alertVisible ? (
-            <Box>
-              <Alert status="info">
-                <AlertIcon />
-                <AlertTitle> Reactions were reset!</AlertTitle>
-                <AlertDescription>
-                  Please update your feedback.
-                </AlertDescription>
-                <CloseButton onClick={onClose} />
-              </Alert>
+            <Box height="50">
+              <CustomAlert
+                title="Reactions were reset!"
+                description="Please update your feedback."
+                onClose={onClose}
+              />
             </Box>
           ) : (
-            <Heading textAlign="center">Live Reactions</Heading>
+            <Heading textAlign="center" height="50">
+              Live Reactions
+            </Heading>
           )}
 
           <StudentFeedbackGrid
