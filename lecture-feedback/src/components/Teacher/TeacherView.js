@@ -178,7 +178,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
 
   return (
     <ChakraProvider theme={theme}>
-      <Box>
+      <Box height={height}>
         {showSave ? (
           <Center>
             <PresentationFileFinder allowSave={true} code={code} />
@@ -195,11 +195,11 @@ export const TeacherView = ({ isAuth, setAuth }) => {
                 />
                 <Heading textAlign="center">Reaction Analysis</Heading>
                 <Heading textAlign="center"> Code: {code} </Heading>
-                <Grid templateColumns="repeat(3, 1fr)" height="calc(76vh)">
+                <Grid templateColumns="repeat(3, 1fr)" height="calc(70vh)">
                   <GridItem rowSpan={2} colSpan={2}>
                     <Container maxW="100%" id="graphsDiv">
                       {chartView === 0 ? (
-                        <Container maxW={Math.min(0.66 * width, 0.76 * height)}>
+                        <Container maxW={Math.min(0.66 * width, 0.70 * height)}>
                           <TeacherGraph2 room={code} data={circleGraphData} />
                         </Container>
                       ) : chartView === 1 ? (
@@ -210,7 +210,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
                           customReaction={customReaction}
                         />
                       ) : (
-                        <Container maxW={width * 0.66} maxH={height * 0.76}>
+                        <Container maxW={width * 0.66} maxH={height * 0.70}>
                           <TeacherGraph3
                             room={code}
                             customReaction={customReaction}
@@ -225,7 +225,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
                   </GridItem>
                 </Grid>
 
-                <Flex>
+                <Flex height='100%' marginTop={height * 0.01}>
                   <Spacer />
                   <Button onClick={handleEndPresentation} size='lg'>
                     End Presentation
