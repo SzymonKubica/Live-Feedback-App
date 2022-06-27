@@ -23,11 +23,8 @@ export const StudentView = () => {
 
   // keep reference up to date to use in below useEffect on reconnection
   useEffect(() => {
-    console.log(selectedReaction)
-    console.log(resubmitReaction)
     if (selectedReaction !== NilReaction && resubmitReaction) {
-      console.log("here")
-      socket.emit("add reaction" + getString(selectedReaction), code)
+      socket.emit("add reaction", getString(selectedReaction), code)
       setResubmitReaction(false)
     }
   }, [selectedReaction, resubmitReaction])
@@ -51,11 +48,10 @@ export const StudentView = () => {
         socket.emit("join", { room: code, type: "student" })
 
       })
-      .then(() => {
+      .then(() => {  
         socket.on("reset buttons", () => {
           setSelectedReaction(NilReaction)
           setAlertVisible(true)
-
           setVisibleComment(false)
         })
 
