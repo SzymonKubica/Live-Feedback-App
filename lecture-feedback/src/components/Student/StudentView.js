@@ -27,7 +27,7 @@ export const StudentView = () => {
     console.log(resubmitReaction)
     if (selectedReaction !== NilReaction && resubmitReaction) {
       console.log("here")
-      socket.emit("add reaction" + getString(selectedReactionRef.current), code)
+      socket.emit("add reaction" + getString(selectedReaction), code)
       setResubmitReaction(false)
     }
   }, [selectedReaction, resubmitReaction])
