@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom"
 import TeacherFeedbackBars from "./TeacherFeedbackBars"
 import { getColour, Reaction } from "../Reactions"
 import { PresentationFileFinder } from "./Finder"
+import CustomAlert from "../CustomAlert"
 
 export const TeacherView = ({ isAuth, setAuth }) => {
   const [studentCounter, setStudentCounter] = useState(0)
@@ -33,6 +34,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
   const { width, height } = useViewport()
   const [showSave, setShowSave] = useState(false)
   const [customReaction, setCustomReaction] = useState("")
+  const [disconnected, setDisconnected] = useState(false)
 
   let { code } = useParams()
   let navigate = useNavigate()
@@ -98,6 +100,15 @@ export const TeacherView = ({ isAuth, setAuth }) => {
               })
               .then(() => {
                 socket.emit("join", { room: code, type: "teacher" })
+
+                // For when you disconnect due to an error and reconnect
+                socket.on("disconnect", () => {
+                  setDisconnected(true)
+                })
+
+                socket.on("connect", () => {
+                  setDisconnected(false)
+                })
         
                 socket.on("update", data => {
                   setData(data)
@@ -167,7 +178,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
       socket.off("presentation ended")
       socket.emit("leave", { room: code })
     }
-  }, [])
+  }, [disconnected])
 
 
   const handleEndPresentation = () => {
@@ -193,6 +204,12 @@ export const TeacherView = ({ isAuth, setAuth }) => {
                   state={chartView}
                   setState={setChartView}
                 />
+                {disconnected ? 
+                  <CustomAlert
+                    title="Connection lost, trying to reconnect ..."
+                    description="Check your connection and refresh."
+                    onClose={() => setDisconnected(false)}
+                  />: null }
                 <Heading textAlign="center">Reaction Analysis</Heading>
                 <Heading textAlign="center"> Code: {code} </Heading>
                 <Grid templateColumns="repeat(3, 1fr)" height="calc(70vh)">

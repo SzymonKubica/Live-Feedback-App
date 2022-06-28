@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef} from "react"
 
 import { ChakraProvider, Stack, theme, Heading, Box } from "@chakra-ui/react"
 
@@ -7,18 +7,28 @@ import Header from "../Header"
 import StudentFeedbackGrid from "./StudentFeedbackGrid"
 import CommentSection from "./CommentSection"
 import { useParams, useNavigate } from "react-router-dom"
-import CustomAlert from "./CustomAlert"
+import CustomAlert from "../CustomAlert"
+import { getString, NilReaction } from "../Reactions"
 
-const NilReaction = "nil"
 
 export const StudentView = () => {
   const [selectedReaction, setSelectedReaction] = useState(NilReaction)
+  const [resubmitReaction, setResubmitReaction] = useState(false)
   const [visibleComment, setVisibleComment] = useState(false)
   const [customReaction, setCustomReaction] = useState("Too Slow")
   const [alertVisible, setAlertVisible] = useState(false)
+  const [disconnected, setDisconnected] = useState(false)
   let { code } = useParams()
   let navigate = useNavigate()
 
+  // keep reference up to date to use in below useEffect on reconnection
+  useEffect(() => {
+    if (selectedReaction !== NilReaction && resubmitReaction) {
+      socket.emit("add reaction", getString(selectedReaction), code)
+      setResubmitReaction(false)
+    }
+  }, [selectedReaction, resubmitReaction])
+  
   // reset the button when lecturer creates a snapshot
   useEffect(() => {
     const requestOptions = {
@@ -34,15 +44,27 @@ export const StudentView = () => {
           navigate("/")
         }
       })
-      .then(() => {
+      .then(() => {        
+        socket.emit("join", { room: code, type: "student" })
+
+      })
+      .then(() => {  
         socket.on("reset buttons", () => {
           setSelectedReaction(NilReaction)
           setAlertVisible(true)
-
           setVisibleComment(false)
         })
 
-        socket.emit("join", { room: code, type: "student" })
+        // For when you disconnect due to an error and reconnect
+        socket.on("disconnect", () => {
+          setDisconnected(true)
+        })
+
+        socket.on("connect", () => {
+          setDisconnected(false)
+          setResubmitReaction(true)
+        })
+
       })
     fetch("/api/get-custom-reaction", requestOptions)
       .then(res => res.json())
@@ -57,7 +79,7 @@ export const StudentView = () => {
       socket.emit("leave", { room: code })
     }
     //
-  }, [])
+  }, [disconnected])
 
   function onClose() {
     setAlertVisible(false)
@@ -68,6 +90,13 @@ export const StudentView = () => {
       <SocketContext.Provider value={socket}>
         <Stack width="100%">
           <Header />
+          {disconnected ? 
+                  <CustomAlert
+                    title="Connection lost, trying to reconnect ..."
+                    description="Check your connection and refresh."
+                    onClose={() => setDisconnected(false)}
+                  />
+          : null }
           {alertVisible ? (
             <Box height="50">
               <CustomAlert
@@ -88,6 +117,7 @@ export const StudentView = () => {
             customReaction={customReaction}
             room={code}
             setAlertVisible={setAlertVisible}
+            disconnected={disconnected}
           />
           <CommentSection
             visible={visibleComment}

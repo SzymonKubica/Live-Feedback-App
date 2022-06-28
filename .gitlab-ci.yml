@@ -26,6 +26,7 @@ deploy_dev_job:
     - dpl --provider=heroku --app=lecture-feedback-drp-dev --api-key=$HEROKU_API
   only:
      - dev
+     - disconnect_fix
 
 deploy_prod_job:
   image: ruby:2.7.5
