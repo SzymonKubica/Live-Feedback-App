@@ -17,7 +17,7 @@ export const StudentView = () => {
   const [visibleComment, setVisibleComment] = useState(false)
   const [customReaction, setCustomReaction] = useState("Too Slow")
   const [alertVisible, setAlertVisible] = useState(false)
-  const [disconnectAlertVisible, setDisconnectAlertVisible] = useState(false)
+  const [disconnected, setDisconnected] = useState(false)
   let { code } = useParams()
   let navigate = useNavigate()
 
@@ -57,11 +57,11 @@ export const StudentView = () => {
 
         // For when you disconnect due to an error and reconnect
         socket.on("disconnect", () => {
-          setDisconnectAlertVisible(true)
+          setDisconnected(true)
         })
 
         socket.on("connect", () => {
-          setDisconnectAlertVisible(false)
+          setDisconnected(false)
           setResubmitReaction(true)
         })
 
@@ -90,7 +90,7 @@ export const StudentView = () => {
       <SocketContext.Provider value={socket}>
         <Stack width="100%">
           <Header />
-          {disconnectAlertVisible ? 
+          {disconnected ? 
                   <CustomAlert
                     title="Connection lost, trying to reconnect ..."
                     description="Check your connection and refresh."
@@ -117,6 +117,7 @@ export const StudentView = () => {
             customReaction={customReaction}
             room={code}
             setAlertVisible={setAlertVisible}
+            disconnected={disconnected}
           />
           <CommentSection
             visible={visibleComment}

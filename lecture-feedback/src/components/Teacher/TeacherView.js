@@ -34,7 +34,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
   const { width, height } = useViewport()
   const [showSave, setShowSave] = useState(false)
   const [customReaction, setCustomReaction] = useState("")
-  const [disconnectAlertVisible, setDisconnectAlertVisible] = useState(false)
+  const [disconnected, setDisconnected] = useState(false)
 
   let { code } = useParams()
   let navigate = useNavigate()
@@ -103,11 +103,11 @@ export const TeacherView = ({ isAuth, setAuth }) => {
 
                 // For when you disconnect due to an error and reconnect
                 socket.on("disconnect", () => {
-                  setDisconnectAlertVisible(true)
+                  setDisconnected(true)
                 })
 
                 socket.on("connect", () => {
-                  setDisconnectAlertVisible(false)
+                  setDisconnected(false)
                 })
         
                 socket.on("update", data => {
@@ -204,7 +204,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
                   state={chartView}
                   setState={setChartView}
                 />
-                {disconnectAlertVisible ? 
+                {disconnected ? 
                   <CustomAlert
                     title="Connection lost, trying to reconnect ..."
                     description="Check your connection and refresh."
