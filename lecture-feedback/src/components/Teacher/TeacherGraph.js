@@ -7,7 +7,7 @@ const TeacherGraph = props => {
   useEffect(() => {
     socket.on("update all", data => {
       setState(prevState => ({
-        series: [data.good, data.confused, data.tooFast, data.chilling],
+        series: [data.good, data.confused, data.tooFast, data.custom],
         options: prevState.options,
       }))
     })
@@ -15,14 +15,14 @@ const TeacherGraph = props => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      room: JSON.stringify({"room": props.room})
+      room: JSON.stringify({ room: props.room }),
     }
 
     fetch("/api/all_reactions", requestOptions)
       .then(res => res.json())
       .then(data => {
         setState(prevState => ({
-          series: [data.good, data.confused, data.tooFast, data.chilling],
+          series: [data.good, data.confused, data.tooFast, data.custom],
           options: prevState.options,
         }))
       })

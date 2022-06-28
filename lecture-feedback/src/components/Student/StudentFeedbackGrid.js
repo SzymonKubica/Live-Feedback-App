@@ -6,10 +6,16 @@ import StudentFeedbackButton from "./StudentFeedbackButton"
 import { Reaction } from "../Reactions"
 import CommentSection from "./CommentSection"
 
-
-const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction, room}) => {
+const StudentFeedbackGrid = ({
+  selectedReaction,
+  setSelectedReaction,
+  room,
+  customReaction,
+  setAlertVisible,
+  disconnected
+}) => {
   return (
-    <Center width="100%" height="calc(70vh)">
+    <Center width="100%" height="calc(60vh)">
       <SimpleGrid marginBlock="5%" width="90%" height="90%" columns="2">
         <StudentFeedbackButton
           title="Good"
@@ -17,7 +23,9 @@ const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction, room}) => 
           reaction={Reaction.GOOD}
           selectedReaction={selectedReaction}
           setSelectedReaction={setSelectedReaction}
+          setAlertVisible={setAlertVisible}
           room={room}
+          disconnected={disconnected}
         />
         <StudentFeedbackButton
           title="Confused"
@@ -25,7 +33,9 @@ const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction, room}) => 
           reaction={Reaction.CONFUSED}
           selectedReaction={selectedReaction}
           setSelectedReaction={setSelectedReaction}
+          setAlertVisible={setAlertVisible}
           room={room}
+          disconnected={disconnected}
         />
         <StudentFeedbackButton
           title="Too Fast"
@@ -33,15 +43,19 @@ const StudentFeedbackGrid = ({ selectedReaction, setSelectedReaction, room}) => 
           reaction={Reaction.TOO_FAST}
           selectedReaction={selectedReaction}
           setSelectedReaction={setSelectedReaction}
+          setAlertVisible={setAlertVisible}
           room={room}
+          disconnected={disconnected}
         />
         <StudentFeedbackButton
-          title="Chilling"
+          title={customReaction}
           color="twitter"
-          reaction={Reaction.CHILLING}
+          reaction={Reaction.CUSTOM}
           selectedReaction={selectedReaction}
           setSelectedReaction={setSelectedReaction}
+          setAlertVisible={setAlertVisible}
           room={room}
+          disconnected={disconnected}
         />
       </SimpleGrid>
     </Center>

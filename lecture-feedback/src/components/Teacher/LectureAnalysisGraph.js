@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { Line } from "react-chartjs-2"
 import {
   Chart as ChartJS,
-  ArcElement,
   Tooltip,
   Legend,
   CategoryScale,
@@ -11,11 +10,10 @@ import {
   LineElement,
   Title,
 } from "chart.js"
-import { SocketContext } from "../../context/socket"
-import { Button, Stack } from "@chakra-ui/react"
+import { Stack } from "@chakra-ui/react"
 import Reaction, { getColour } from "../Reactions"
 
-const TeacherGraph3 = ({ room, customReaction }) => {
+const LectureAnalysisGraph = ({ room, setTime, customReaction }) => {
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -26,7 +24,8 @@ const TeacherGraph3 = ({ room, customReaction }) => {
     Legend
   )
 
-  ChartJS.defaults.font.size=20
+  ChartJS.defaults.font.size=15
+
 
   const initialDatasets = {
     good: [],
@@ -37,27 +36,14 @@ const TeacherGraph3 = ({ room, customReaction }) => {
 
   const [data, setData] = useState(getSettings(initialDatasets))
 
-  function getLabels() {
-    let labels = []
-    let i
-    for (i = 0; i < 21; i++) {
-      labels.push(String(i * (-5)))
-    }
-
-    labels.reverse()
-    return labels
-  }
-
   function getSettings(props) {
     return {
-      labels: getLabels(),
       datasets: [
         {
           label: "Good",
           data: props.good,
           backgroundColor: getColour(Reaction.GOOD),
           borderColor: getColour(Reaction.GOOD),
-          // hidden: true,
         },
         {
           label: "Confused",
@@ -72,7 +58,7 @@ const TeacherGraph3 = ({ room, customReaction }) => {
           borderColor: getColour(Reaction.TOO_FAST),
         },
         {
-          label: customReaction,
+          label: customReaction ,
           data: props.custom,
           backgroundColor: getColour(Reaction.CUSTOM),
           borderColor: getColour(Reaction.CUSTOM),
@@ -81,8 +67,7 @@ const TeacherGraph3 = ({ room, customReaction }) => {
     }
   }
 
-  const REFRESH_TIME = 10000
-
+  // We need to update the data when we actually get reaction from async call
   useEffect(() => {
     const requestOptions = {
       method: "POST",
@@ -90,31 +75,37 @@ const TeacherGraph3 = ({ room, customReaction }) => {
       body: JSON.stringify({ room: room }),
     }
 
-    function fetch_graph_data() {
-      fetch("/api/line_graph_data", requestOptions)
-        .then(res => res.json())
-        .then(data => {
-          setData(getSettings(data))
-        })
-        .then(console.log("Fetched from api"))
-    }
+    fetch("/api/analytics_graph_data", requestOptions)
+      .then(res => res.json())
+      .then(data => {
+        setData(getSettings(data))
+      })
+  }, [customReaction])
 
-    fetch_graph_data()
-
-    const interval = setInterval(() => {
-      fetch_graph_data()
-    }, REFRESH_TIME)
-  }, [])
+  function pad(s) {
+    return s < 10 ? '0' + s : s
+  }
 
   const [options, setOptions] = useState({
     responsive: true,
+    maintainAspectRatio: false,
     scales: {
       x: {
         type: "linear",
         position: "bottom",
         title: {
           display: true,
-          text: "Time(seconds ago)",
+          text: "Time",
+        },
+        ticks: {
+          callback: function sToTime(value, index, ticks) {
+            var secs = value % 60;
+            value = (value - secs) / 60;
+            var mins = value % 60;
+            var hrs = (value - mins) / 60;
+
+            return (hrs > 0 ? (pad(hrs) + ':'): '') + pad(mins) + ':' + pad(secs);
+          }
         },
       },
       y: {
@@ -123,16 +114,33 @@ const TeacherGraph3 = ({ room, customReaction }) => {
         title: {
           display: true,
           text: "Reactions",
-        }
+        },
       },
+    },
+    elements: {
+      point: {
+        pointRadius: 2,
+      },
+    },
+    onClick: function (event, elementsAtEvent) {
+      let valueX = null
+      var scale = this.scales["x"]
+      valueX = scale.getValueForPixel(event.x)
+      setTime(valueX)
     },
   })
 
   return (
-    <Stack>
-      <Line updateMode="none" data={data} options={options} />
+    <Stack marginTop={5}>
+      <Line
+        id="chart"
+        updateMode="none"
+        data={data}
+        options={options}
+        height={50}
+      />
     </Stack>
   )
 }
 
-export default TeacherGraph3
+export default LectureAnalysisGraph

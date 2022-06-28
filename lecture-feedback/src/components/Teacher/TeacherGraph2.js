@@ -6,6 +6,9 @@ import { SocketContext } from "../../context/socket"
 const TeacherGraph2 = ({ data }) => {
   ChartJS.register(ArcElement, Tooltip, Legend)
 
+  ChartJS.defaults.font.size=20
+
+
   const [options, setOptions] = useState({
     responsive: true,
   })

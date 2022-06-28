@@ -1,15 +1,18 @@
+import functools
 import re
-from flask import Flask, request, session
+from flask import Flask, jsonify, request, session
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from flask_session import Session
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+import bcrypt
 
 # Our modules
 import database
 import line_graph
 from reaction import Reaction, getString
+import analysis_graph
 
 load_dotenv()
 
@@ -42,6 +45,15 @@ def not_found(e):
 def index():
     return app.send_static_file("index.html")
 
+# Decorator to ensurer a user is logged in
+def login_required(func):
+    @functools.wraps(func)
+    def secure_function(*args, **kwargs):
+        if "logged_in_email" not in session:
+            return jsonify({"error":"unauthorised"}), 401
+        return func(*args, **kwargs)
+    return secure_function
+
 def reset_buttons(room):
     emit("reset buttons", to=room)
 
@@ -53,18 +65,24 @@ def test_connect():
     print("connected")
     print(request.sid)
 
+
 @socketio.on("disconnect")
 def test_disconnect():
     if request.sid in students_sid:
         room = sid_to_room[request.sid]
         student_room_counts[room] -= 1
         students_sid.remove(request.sid)
+        database.remove_pending_reaction(room, request.sid)
         sid_to_room.pop(request.sid)
         update(room)
         print("student disconnected")
     else:
-        # TODO: Add some handling for the case when a teacher was disconnected due to some error
         print("teacher disconnected")
+
+@socketio.on("set custom reaction")
+def set_custom_reaction(room, reaction):
+    database.set_custom_reaction(room, reaction)
+    
 
 @socketio.on("join")
 def on_join(data):
@@ -96,13 +114,14 @@ def on_leave(data):
         student_room_counts[room] -= 1
         students_sid.remove(request.sid)
         sid_to_room.pop(request.sid)
+        database.remove_pending_reaction(request.sid, room)
         update(room)
         leave_room(room)
         session.pop(room)
 
     # TODO: figure out what to do for lecturers
-    #leave_room(room)
-    #session.pop(room) # since they have now left the meeting
+    leave_room(room)
+    # session.pop(room) # since they have now left the meeting
     print("left room")
 
 @socketio.on("add reaction")
@@ -110,6 +129,14 @@ def handle_reaction(reaction, room):
     sid = request.sid
     database.add_insight(reaction, room, sid)
     update(room)
+
+@socketio.on("update line graph")
+@login_required
+def handle_message():
+    room = sid_to_room[request.sid]
+    emit("update line graph", line_graph.room_to_graph_data[room], to=room)
+
+
 
 @socketio.on("remove reaction")
 def handle_reaction(reaction, room):
@@ -126,7 +153,7 @@ def update(room):
 def count_active_reactions_in(room):
     output = {}
     for reaction in Reaction:
-        output[reaction] = database.count_active(reaction, room, students_sid)
+        output[reaction] = database.count_active(reaction, room)
     return output
 
 @socketio.on("update line graph")
@@ -142,6 +169,18 @@ def handle_message():
     update(room)
     reset_buttons(room)
     print("snapshot created for room: " + str(room))
+
+@socketio.on("end presentation")
+def handle_end_presentation():
+    if session["logged_in_email"]:
+        room = sid_to_room[request.sid]
+        database.end_presentation(room)
+        emit("presentation ended", to=room)
+
+    else:
+        # do something maybe?
+        pass
+    pass
 
 @app.route("/api/create-snapshot")
 @cross_origin()
@@ -159,16 +198,26 @@ def get_snapshots():
     print("Request received to show snapshots")
     room = sid_to_room[request.sid]
     snapshots = database.find_snapshots(room)
+    database.get_reset_snaphosts(room)
     return {"snapshots":snapshots}
 
+
+@app.route("/api/get-custom-reaction", methods=['POST'])
+@cross_origin()
+def get_custom_reaction():
+    room = request.json['room']
+    return {"reaction": database.get_custom_reaction(room)}
+
 @app.route("/api/reaction-count", methods=['POST'])
+@login_required
 @cross_origin()
 def get_reaction_count():
         reaction = request.json["reaction"]
         room = request.json["room"]
-        return {"count":database.count_active(reaction, room, students_sid)}
+        return {"count":database.count_active(reaction, room)}
 
 @app.route("/api/student-count", methods=['POST'])
+@login_required
 @cross_origin()
 def get_student_count():
         room = request.json["room"]
@@ -180,18 +229,38 @@ def get_student_count():
         return {"count":count}
 
 @app.route("/api/all_reactions", methods=['POST'])
+@login_required
 @cross_origin()
 def get_all_reactions():
         room = request.json["room"]
         return count_active_reactions_in(room)
 
 @app.route("/api/line_graph_data", methods=['POST'])
+@login_required
 @cross_origin()
 def send_graph_data():
     room = request.json["room"]
     print("Line graph data requested for room: " + str(room))
-    line_graph.update_graph_data(room, students_sid)
+    line_graph.update_graph_data(room)
     return line_graph.room_to_graph_data[room]
+
+@app.route("/api/analytics_graph_data", methods=['POST'])
+@login_required
+@cross_origin()
+def send_analytics_data():
+    room = request.json["room"]
+    print("Analytics graph data requested for room: " + str(room))
+    return analysis_graph.get_analytics_data_for(room)
+
+@socketio.on("create snapshot")
+@login_required
+def handle_message():
+    room = sid_to_room[request.sid]
+    database.create_new_snapshot(room, students_sid)
+    update(room)
+    reset_buttons(room)
+    print("snapshot created for room: " + str(room))
+
 
 @socketio.on("leave comment")
 def add_comment(comment, reaction, room):
@@ -201,6 +270,7 @@ def add_comment(comment, reaction, room):
     return {"success":True}
 
 @app.route("/api/get-comments", methods=['POST'])
+@login_required
 @cross_origin()
 def get_comments():
         room = request.json["room"]
@@ -208,19 +278,162 @@ def get_comments():
         print(comments)
         return {"comments": comments}
 
+
+@app.route("/api/get-all-comments", methods=['POST'])
+@login_required
+@cross_origin()
+def get_all_comments():
+    room = request.json["room"]
+    comments = database.get_all_comments(room)
+    return {"comments": comments}
+
+
+@app.route("/api/get-start-time", methods=['POST'])
+@login_required
+@cross_origin()
+def get_start_time():
+    room = request.json["room"]
+    time = database.get_start_time(room)
+    return {"time": time}
+
+@app.route("/api/get-end-time", methods=['POST'])
+@login_required
+@cross_origin()
+def get_end_time():
+    room = request.json["room"]
+    time = database.get_end_time(room)
+    return {"time": time}
+
 # code stuff
 @app.route("/api/new-code")
+@login_required
 @cross_origin()
 def get_new_code():
-    code = database.get_new_code()
-    database.fetch_snapshot(str(code))   
+    time = datetime.now()
+    code = database.get_new_code(session["logged_in_email"], time)
+    database.fetch_snapshot(str(code), time)   
     return {"code":code}
 
 @app.route("/api/is-code-active", methods=['POST'])
 @cross_origin()
 def is_code_active():
-    code = request.json['code']
+    code = request.json['room']
     return {"valid":database.is_active_code(code)}
+
+# Returns presentation if there is an active one
+@app.route("/api/get-active-code")
+# @login_required
+@cross_origin()
+def get_active_presentation():
+    email = session["logged_in_email"]
+    code = database.find_active_presentation_for(email)
+
+    if code is None:
+        return {"code": "none"}
     
+    return {"code": code}
+
+# login stuff
+@app.route("/api/create-user", methods=['POST'])
+@cross_origin()
+def create_user():
+    email = request.json['email']
+    password = request.json['password'].encode('utf8')
+
+    # if exists complain
+    if database.user_exists(email):
+        return jsonify({"error": "user already exists"}), 409
+
+    hash = bcrypt.hashpw(password, bcrypt.gensalt())
+    database.store_new_user(email, hash)
+    return jsonify({"success": True}), 200
+
+@app.route("/api/login", methods=['POST'])
+@cross_origin()
+def login():
+    email = request.json['email']
+    password = request.json['password'].encode('utf8')
+
+    if not database.user_exists(email):
+        return jsonify({"error": "invalid details"}), 403
+
+    user = database.get_user(email)
+
+    if bcrypt.checkpw(password, user["hash"]):
+        session["logged_in_email"] = email
+        return jsonify({"success": True}), 200 
+    else:
+        return jsonify({"error": "invalid details"}), 403
+
+@app.route("/api/authenticated", methods=['POST'])
+@cross_origin()
+def check_authenticated():
+    if session.get("logged_in_email") is None:
+        return {"authenticated": False}
+    else:
+        return {"authenticated": True}
+
+
+@app.route("/api/logout", methods=['POST'])
+@cross_origin()
+def logout():
+    if session.get("logged_in_email") is None:
+        return jsonify({"error": "not logged in"}), 400
+    else:
+        session.pop("logged_in_email")
+        return jsonify({"success": True}), 200
+
+@app.route("/api/owner", methods=['POST'])
+@login_required
+@cross_origin()
+def check_owner():
+    room = request.json["code"]
+    return {"owner":database.room_owner(room, session["logged_in_email"])}
+
+
+# Gets the previous structure
+@app.route("/api/get-presentations", methods=['GET'])
+@login_required
+@cross_origin()
+def get_presentations():
+    return database.get_presentation_directory(session["logged_in_email"])
+
+# updated the presentations directory structure
+@app.route("/api/set-presentations", methods=['POST'])
+@login_required
+@cross_origin()
+def set_presentations():
+    directory = request.json["directory"]
+    print(directory)
+    database.set_presentation_directory(session["logged_in_email"], directory)
+    return {"success":True}
+
+# Sets the link for videos
+@app.route("/api/set-video-link", methods=['POST'])
+@login_required
+@cross_origin()
+def set_video_link():
+    room = request.json["room"]
+    link = request.json["link"]
+    print("here")
+    database.set_video_link(room, link)
+    return {"success": True}
+
+# Gets the link for videos
+@app.route("/api/get-video-link", methods=['POST'])
+@login_required
+@cross_origin()
+def get_video_link():
+    room = request.json["room"]
+    link = database.get_video_link(room)
+    return {"link":link}
+
+@app.route("/api/set-metric", methods=['POST'])
+@cross_origin()
+def set_metric():
+    data = request.json["data"]
+    database.set_metric(data)
+    return {"success": True}
+
 if __name__ == "__main__":
     socketio.run()
