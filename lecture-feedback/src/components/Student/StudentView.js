@@ -55,6 +55,10 @@ export const StudentView = () => {
           setVisibleComment(false)
         })
 
+        socket.on("presentation ended", () => {
+          navigate("/")
+        })
+
         // For when you disconnect due to an error and reconnect
         socket.on("disconnect", () => {
           setDisconnected(true)
@@ -75,7 +79,7 @@ export const StudentView = () => {
     // Disconnect when unmounts
     return () => {
       socket.off("reset buttons")
-      console.log("hello")
+      socket.off("presentation ended")
       socket.emit("leave", { room: code })
     }
     //
