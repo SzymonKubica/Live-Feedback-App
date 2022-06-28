@@ -178,7 +178,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
       socket.off("presentation ended")
       socket.emit("leave", { room: code })
     }
-  }, [disconnectAlertVisible])
+  }, [disconnected])
 
 
   const handleEndPresentation = () => {
@@ -208,7 +208,7 @@ export const TeacherView = ({ isAuth, setAuth }) => {
                   <CustomAlert
                     title="Connection lost, trying to reconnect ..."
                     description="Check your connection and refresh."
-                    onClose={() => setDisconnectAlertVisible(false)}
+                    onClose={() => setDisconnected(false)}
                   />: null }
                 <Heading textAlign="center">Reaction Analysis</Heading>
                 <Heading textAlign="center"> Code: {code} </Heading>

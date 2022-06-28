@@ -79,7 +79,7 @@ export const StudentView = () => {
       socket.emit("leave", { room: code })
     }
     //
-  }, [disconnectAlertVisible])
+  }, [disconnected])
 
   function onClose() {
     setAlertVisible(false)
@@ -94,7 +94,7 @@ export const StudentView = () => {
                   <CustomAlert
                     title="Connection lost, trying to reconnect ..."
                     description="Check your connection and refresh."
-                    onClose={() => setDisconnectAlertVisible(false)}
+                    onClose={() => setDisconnected(false)}
                   />
           : null }
           {alertVisible ? (
