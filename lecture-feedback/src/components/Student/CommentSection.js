@@ -91,7 +91,7 @@ export default function CommentSection({visible, setVisible, selectedReaction, r
               <option>Other</option> 
             </Select>
             { selection === "Other" ?
-            <Textarea value={comment} onClick={() => setInvalidCommend(false)} isInvalid={invalidCommend} placeholder='Add an optional comment' size = 'lg' onChange={handleInputChange} maxLength={41}/>
+            <Textarea value={comment} onClick={() => setInvalidCommend(false)} isInvalid={invalidCommend} placeholder='Add an optional comment' onChange={handleInputChange} maxLength={41}/>
             : null}
             <Button onClick={handleSend} colorScheme='blue' size='sm'>Send</Button>
         </Box> : null}
