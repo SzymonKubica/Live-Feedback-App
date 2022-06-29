@@ -33,7 +33,7 @@ const Messages = ({ messages, h, startTime, setTime, commentsVisible, setComment
 				const mils = Date.parse(item.time) - Date.parse(startTime)
 				const secs = mils / 1000
 
-				return ( (startTime === undefined && commentsVisible[index]) || startTime !== undefined &&
+				return ( (startTime === undefined && commentsVisible[index]) || startTime !== undefined ?
 					<Flex key={index} w="100%">
 						<Flex
 							bg={getColour(item.reaction)}
@@ -68,6 +68,7 @@ const Messages = ({ messages, h, startTime, setTime, commentsVisible, setComment
 							</Grid>
 						</Box>
 					</Flex>
+					: null
 				);
 				// }
 			})}
