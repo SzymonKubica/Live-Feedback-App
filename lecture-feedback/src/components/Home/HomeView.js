@@ -11,10 +11,14 @@ import {
   Input,
   Box,
   Text,
+  Link,
+  SimpleGrid
 } from "@chakra-ui/react"
 import NavButton from "../NavButton"
 import Header from "../Header"
-import { useNavigate } from "react-router-dom"
+import {Routes, Route, useNavigate} from 'react-router-dom'
+import student from "../../public/student.png"
+import lecturer from "../../public/lecturer.png"
 
 export const HomeView = () => {
   const [joinVisible, setJoinVisible] = useState(false)
@@ -50,6 +54,9 @@ export const HomeView = () => {
       handleJoin()   
     }
   }
+  const navigateTeacher = () => {
+    navigate("teacher/login");
+  };
   
   return (
     <ChakraProvider theme={theme}>
@@ -57,14 +64,22 @@ export const HomeView = () => {
         <Header />
         <VStack spacing="20px" marginTop="10px">
           <Heading>Home</Heading>
-          <Button
-            colorScheme="blue"
-            size="lg"
-            onClick={() => setJoinVisible(!joinVisible)}
-          >
-            Student
+          <Center width="100%" height="calc(60vh)">
+        <SimpleGrid marginBlock="5%" width="90%" height="90%" columns="2">
+        <Button height = "100%" 
+        colorScheme="blue"
+        size="lg"
+        onClick={() => setJoinVisible(!joinVisible)}>
+          <Box><img src={student}/> <Heading color = "black">Student</Heading></Box>
           </Button>
-          {joinVisible ? (
+          {/* <Link to= "teacher/login" width = "100%"> */}
+        <Button height = "100%" colorScheme= "cyan" onClick={navigateTeacher}><Box><img src={lecturer} /> <Heading>Teacher</Heading></Box></Button>
+        {/* <NavButton></NavButton> */}
+        {/* </Link> */}
+        </SimpleGrid>
+        
+        </Center>
+        {joinVisible ? (
             <Box>
               <Center>
                 <Input
@@ -84,7 +99,6 @@ export const HomeView = () => {
               ) : null}
             </Box>
           ) : null}
-          <NavButton name="Teacher" dst="teacher/login" size="lg" />
         </VStack>
       </Stack>
     </ChakraProvider>
