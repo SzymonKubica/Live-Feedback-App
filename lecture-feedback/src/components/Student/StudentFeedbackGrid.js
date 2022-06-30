@@ -15,7 +15,7 @@ const StudentFeedbackGrid = ({
   disconnected
 }) => {
   return (
-    <Center width="100%" height="calc(60vh)">
+    <Center width="100%" height="calc(50vh)">
       <SimpleGrid marginBlock="5%" width="90%" height="90%" columns="2">
         <StudentFeedbackButton
           title="Good"

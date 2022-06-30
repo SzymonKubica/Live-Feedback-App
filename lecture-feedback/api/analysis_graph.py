@@ -34,13 +34,13 @@ def get_analytics_data_for(room):
 
         # Add resets to the time-event map
         for reset_time in resets:
-            time_to_event[reset_time] = "reset"
+            time_to_event[reset_time.replace(microsecond=0)] = "reset"
 
         reaction_to_events[reaction] = time_to_event
 
     # Sort the list of event times
     for reset_time in resets:
-        times.append(reset_time.replace(microsecond=0))
+        times.add(reset_time.replace(microsecond=0))
 
     # for now the start time is the time of the first reaction.
 
@@ -62,10 +62,9 @@ def get_analytics_data_for(room):
         points = [] # A list of points that will be sent to the frontend.
         current_count = 0 # Current count of active reactions
         for time in sorted_times:
+            
             if (time in reaction_to_events[reaction]):
-                # print("in")
                 events = reaction_to_events[reaction][time]
-                # print(current_event)
                 for event in events:
                     if (event == "add"):
                         current_count += 1

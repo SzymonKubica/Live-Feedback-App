@@ -69,7 +69,7 @@ export const HomeView = () => {
               <Center>
                 <Input
                   placeholder="Enter code to Join"
-                  size="sm"
+                  size="md"
                   onChange={handleInputChange}
                 />
               </Center>

@@ -23,7 +23,7 @@ deploy_dev_job:
   script:
     - cp lecture-feedback/api/requirements.txt .
     - gem install dpl --pre
-    - dpl --provider=heroku --app=lecture-feedback-drp-dev --api-key=$HEROKU_API
+    - dpl --provider=heroku --app=intera-drp-dev --api-key=$HEROKU_API
   only:
      - dev
 
@@ -33,6 +33,6 @@ deploy_prod_job:
   script:
     - cp lecture-feedback/api/requirements.txt .
     - gem install dpl --pre
-    - dpl --provider=heroku --app=lecture-feedback-drp --api-key=$HEROKU_API
+    - dpl --provider=heroku --app=intera-drp --api-key=$HEROKU_API
   only:
      - master

@@ -48,10 +48,8 @@ export const TeacherMenu = ({ isAuth, setAuth }) => {
   const options = [
     "Example Please",
     "Too Slow",
-    "Can you go back to:",
     "I can't hear",
     "I can't see",
-    "Technical difficulties",
     "Other",
   ]
 
